@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
-import { EventCard } from '../EventCard';
+import { EventCard } from '../features/event/EventCard';
 import { events, moods } from '../../lib/mockData';
 import { SlidersHorizontal, ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
@@ -10,12 +10,26 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Button } from '../ui/button';
 import { formatDateObjectToDDMMYYYY } from '../../lib/dateUtils';
 
+
+
 interface MoodResultsPageProps {
   mood: string;
   onNavigate: (page: string, data?: any) => void;
+  bookmarkedEventIds: number[];                              
+  rsvpedEventIds: number[];                                  
+  onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
+  onRSVPChange: (eventId: number, isRSVPed: boolean) => void;
 }
 
-export function MoodResultsPage({ mood, onNavigate }: MoodResultsPageProps) {
+
+export function MoodResultsPage({
+  mood,
+  onNavigate,
+  bookmarkedEventIds,
+  rsvpedEventIds,
+  onBookmarkChange,
+  onRSVPChange,
+ }: MoodResultsPageProps) {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [priceFilter, setPriceFilter] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
@@ -100,6 +114,9 @@ export function MoodResultsPage({ mood, onNavigate }: MoodResultsPageProps) {
           <h1 className="text-4xl mb-2">You're feeling: <span style={{ color: moodData?.color }}>{moodData?.name}</span></h1>
           <p className="text-gray-600">Here are events that match your mood</p>
         </motion.div>
+
+        
+        
 
         {/* Filters */}
         <motion.div

@@ -1,0 +1,18 @@
+This folder contains the logic and UI for event recommendations that are dynamically displayed to users based on their selected mood or quiz result.
+It personalizes the Eventurer experience by showing relevant events tied to user preferences.
+
+⸻
+
+1️⃣ RecommendationPanel.tsx
+• Purpose:
+Displays a carousel of mood-based recommended events with interactive navigation controls (arrows + dots).
+
+• Key Features:
+	•	Filters all events from mockData based on the user’s current mood (e.g., “chill,” “social,” “active”).
+	•	Uses React’s useMemo for optimized filtering and slicing of event lists.
+	•	Includes forward/back navigation and pagination dots to scroll through event cards.
+	•	Renders individual event previews using the shared EventCard component.
+	•	Provides callback props for bookmarking, RSVPing, and event selection.
+
+• Visual Role:
+Acts as a personalized event showcase — the highlight section of the landing or results page where users discover curated events matching their vibe.

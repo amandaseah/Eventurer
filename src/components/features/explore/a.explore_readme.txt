@@ -1,0 +1,31 @@
+This folder powers the Explore Page — the section of Eventurer where users browse and filter all available events.
+It focuses on helping users narrow down event listings based on category, price, date, and sorting preferences.
+
+⸻
+
+1️⃣ FiltersPanel.tsx
+
+Purpose:
+A filter control panel that lets users refine the list of visible events on the Explore Page.
+
+Key Features:
+	•	Filter Controls
+	•	Dropdowns for Category, Price, and Sort By.
+	•	Date picker (via a popover calendar) to filter events happening on a specific day.
+	•	Interactive State Handling
+	•	Accepts state and setter functions from the parent (e.g. setCategory, setPrice, setDate, setSortBy).
+	•	Updates filter values dynamically as the user selects options.
+	•	Visual Design
+	•	Compact white card layout with rounded corners and shadows.
+	•	Uses clear iconography (SlidersHorizontal, Calendar) for context.
+	•	Grid layout responsive across devices (2 columns on tablet, 4 on desktop).
+	•	Tech
+	•	Built with Shadcn/UI primitives (Select, Popover, Button, Calendar).
+	•	Uses Lucide icons for clarity and aesthetic consistency.
+
+Visual Role:
+Acts as the control hub for filtering and sorting events — positioned at the top of the Explore Page above the event grid.
+
+Where It’s Used:
+	•	Explore Page: main page for discovering events.
+	•	Optionally reusable on filtered result or search pages.

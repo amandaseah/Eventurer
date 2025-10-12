@@ -1,0 +1,35 @@
+This folder contains all components related to user authentication — primarily the login and signup forms.
+It handles how users access the Eventurer platform and begin their personalized event discovery journey.
+
+⸻
+
+1️⃣ LoginForm.tsx
+• Purpose:
+Provides a minimal, animated login form where users can enter their email/username and password to access their Eventurer dashboard.
+
+• Key Features:
+	•	Includes email/username and password fields with Lucide icons (Mail, Lock).
+	•	Uses motion for subtle entrance animations on form fields and buttons.
+	•	On successful submission, calls onNavigate('landing') to route the user to the landing page.
+	•	Maintains a clean, modern UI with rounded input boxes and gradient buttons.
+
+• Visual Role:
+Serves as the entry point for returning users, balancing simplicity and visual appeal with light animations and gradient styling.
+
+⸻
+
+2️⃣ SignupForm.tsx
+• Purpose:
+Provides the user registration form for creating a new Eventurer account.
+It captures basic user details and validates them before completing signup.
+
+• Key Features:
+	•	Uses react-hook-form for handling validation and form state.
+	•	Includes full name, email, password, confirm password, and terms checkbox fields.
+	•	Built-in real-time validation (e.g., password match, email pattern check).
+	•	Toggles for showing/hiding passwords with Lucide icons (Eye, EyeOff).
+	•	Shows success feedback via toast.success() and resets the form on submit.
+	•	Accepts an onSuccess callback that notifies the parent (e.g., switches back to login mode).
+
+• Visual Role:
+Acts as the account creation interface — maintaining design consistency with animated transitions and rounded card layouts while reinforcing trust through clear validation feedback.
