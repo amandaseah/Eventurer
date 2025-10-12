@@ -1,0 +1,52 @@
+This folder contains all the components that power the Event Info Page — the detailed view users see after clicking into a specific event.
+It combines both the event’s factual information (details, description, and stats) and interactive user actions (RSVP, save/bookmark, etc.).
+
+⸻
+
+1️⃣ EventDetails.tsx
+
+Purpose:
+Displays the core information about a single event — such as its date, time, location, category, and description.
+
+Key Features:
+	•	Shows event metadata (date, location, category) with icons and colored accents.
+	•	Formats dates using the shared formatDateToDDMMYYYY helper.
+	•	Adds an “About this event” section with a dynamic message based on the event’s mood (e.g. chill, active, social, learn).
+	•	Includes a “Saved by X people” stat at the bottom for quick social proof.
+
+Visual Role:
+A clean, well-spaced card that makes the event content readable and visually engaging — usually appears above or beside EventActions.
+
+⸻
+
+2️⃣ EventActions.tsx
+
+Purpose:
+Provides interactive controls for the event page — letting users RSVP or bookmark the event.
+
+Key Features:
+	•	Displays the event’s price and deadline (if not past).
+	•	Includes an animated RSVP button that opens a confirmation dialog (AlertDialog) before confirming or canceling.
+	•	Includes a Save / Bookmark toggle button with animated feedback.
+	•	Uses props like isRSVPed, isBookmarked, onConfirmRSVP, and onToggleBookmark to sync state with parent components.
+	•	Conditionally styles buttons (e.g., green for confirmed RSVP, pink for bookmarked).
+
+Visual Role:
+Appears as the action card on the event detail screen — complementing the static details with engagement actions.
+Often placed beside or below EventDetails to encourage participation.
+
+⸻
+
+🔧 Dependencies:
+	•	Framer Motion (motion/react) for animations.
+	•	Lucide-react icons for visual clarity.
+	•	Shadcn/UI Alert Dialog for RSVP confirmation.
+	•	formatDateToDDMMYYYY utility for consistent date formatting.
+
+⸻
+
+🧭 Combined Purpose:
+
+Together, these components form the core structure of the Event Info Page:
+	•	EventDetails → informs the user about the event.
+	•	EventActions → allows the user to take action on the event.

@@ -1,0 +1,67 @@
+This folder manages all **discussion and comment features** related to event-specific forums.  
+Each component handles a different aspect of creating, displaying, and interacting with posts and replies.
+
+⸻
+
+1️⃣ `types.ts`
+• **Purpose:**  
+Defines the `ForumPost` interface used throughout the forum components to keep data structures consistent.  
+• **Key Fields:**  
+`id`, `eventId`, `username`, `timestamp`, `comment`, `upvotes`, `image?`, `replyTo?`
+
+⸻
+
+2️⃣ `Composer.tsx`
+• **Purpose:**  
+A lightweight, quick-post input bar for short text updates.  
+• **Key Features:**  
+Single-line input field with a “Post” button that triggers `onPost(text)`.  
+Ideal for short comments or quick notes.  
+• **Visual Role:**  
+Displayed above or below longer threads for fast interaction.
+
+⸻
+
+3️⃣ `NewPostForm.tsx`
+• **Purpose:**  
+Full-featured form allowing users to compose detailed posts with optional images.  
+• **Key Features:**  
+Includes text area, image upload preview, and clear/submit buttons.  
+Validates input to ensure non-empty submission.  
+• **Visual Role:**  
+Used as the main post composer on a forum or event discussion page.
+
+⸻
+
+4️⃣ `PostItem.tsx`
+• **Purpose:**  
+Renders a single forum post or reply with its associated details and actions.  
+• **Key Features:**  
+Displays username, timestamp, comment, optional image.  
+Allows upvoting and threaded replies.  
+Recursively renders replies for nested discussion.  
+• **Visual Role:**  
+Core display component for forum threads.
+
+⸻
+
+5️⃣ `PostList.tsx`
+• **Purpose:**  
+Builds the threaded discussion structure from a flat array of posts.  
+• **Key Features:**  
+Sorts posts by upvotes, separates top-level comments from replies, and renders using `PostItem`.  
+• **Visual Role:**  
+Manages and displays the complete forum conversation hierarchy.
+
+⸻
+
+6️⃣ `TopForumPreview.tsx`
+• **Purpose:**  
+Shows a preview of the top or most-upvoted posts in a compact summary card.  
+• **Key Features:**  
+Displays top three posts with username, timestamp, snippet, and upvote count.  
+Includes “View All” button to navigate to the full discussion page.  
+• **Visual Role:**  
+Acts as a teaser or highlight component—commonly used on the Event Info or Landing Page.
+
+⸻

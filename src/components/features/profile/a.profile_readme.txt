@@ -1,0 +1,74 @@
+1️⃣ ProfileHeader.tsx
+
+Purpose:
+Displays the user’s main profile information — their name, email, and membership date — in a visually appealing header.
+
+Key details:
+	•	Uses motion for entry animations.
+	•	Shows a circular avatar built from the user’s initials (e.g. “Alex Chen → AC”).
+	•	Serves as the top section of the Profile page for user identity.
+
+Used in: ProfilePage.tsx near the top — replaces the inline header block.
+
+⸻
+
+2️⃣ EventsGrid.tsx
+
+Purpose:
+Reusable grid that lists event cards (bookmarked, upcoming, or past) in a consistent layout.
+
+Key details:
+	•	Imports EventCard from the event feature.
+	•	Accepts event arrays (props) and displays them in responsive grids.
+	•	Handles bookmark/RSVP toggles and event navigation.
+	•	Animated appearance for smooth transitions.
+
+Used in:
+All three tabs in ProfilePage.tsx → Bookmarked, Upcoming, and Past Events sections.
+
+⸻
+
+3️⃣ AccountPanel.tsx
+
+Purpose:
+Manages the user’s account information and allows toggling between view/edit modes.
+
+Key details:
+	•	Uses props for name, email, and memberSince.
+	•	When isEditing is true → shows editable Input fields.
+	•	When false → shows read-only info display.
+	•	Includes Save/Cancel buttons to confirm or discard edits.
+	•	Designed for clean integration with future backend profile updates.
+
+Used in:
+The Account tab of ProfilePage.tsx.
+
+⸻
+
+4️⃣ SettingsPanel.tsx
+
+Purpose:
+Handles the user preferences and settings section (notifications, mood preferences, privacy controls).
+
+Key details:
+	•	Static panel with animated cards for preferences.
+	•	Includes toggles for notifications, mood types, and privacy options.
+	•	Serves as a foundation for future data binding to real user settings.
+
+Used in:
+The Settings tab of ProfilePage.tsx.
+
+⸻
+
+5️⃣ ProfilePage.tsx
+
+Purpose:
+Main container that ties all the above components together.
+Implements the tab navigation between different profile views.
+
+Key details:
+	•	Uses Tabs from the Shadcn UI system.
+	•	Manages local states for user data, active tab, and editing mode.
+	•	Imports all profile feature components for modular display.
+	•	Handles filtering and sorting of event data from mockData.
+	•	Defines back navigation and transitions.
