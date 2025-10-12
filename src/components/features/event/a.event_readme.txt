@@ -1,0 +1,37 @@
+This folder contains the reusable event UI building block used across the app — a polished card component that shows event info, allows quick actions (bookmark/RSVP), and routes users to the event details page.
+
+⸻
+
+1️⃣ EventCard.tsx
+
+Purpose:
+A clickable event card that displays the key details of an event (image, title, date, location, price) and provides bookmark and RSVP actions with UI feedback.
+
+Key Features:
+	•	Animated visual card
+	•	Subtle hover lift + image zoom (motion/react).
+	•	“Closing soon” badge (when deadline is within 3 days).
+	•	Quick actions
+	•	Bookmark toggle (with counter) — persists via callbacks.
+	•	RSVP button with a confirm dialog (AlertDialog) and success toasts.
+	•	Smart behavior
+	•	Uses props to initialize bookmark/RSVP state (isBookmarkedInitially, isRSVPedInitially).
+	•	Syncs state with parent via onBookmarkChange / onRSVPChange.
+	•	Switches to “Your comment” block for past events that have userComment.
+	•	Flexible layout
+	•	Optional centerText layout for carousel/hero use cases.
+
+Visual Role:
+A highly polished, tappable card used in lists, carousels, and grids to drive engagement. It’s the primary surface where users discover, save, and commit (RSVP) to events.
+
+Where It’s Used:
+	•	Explore page: grids of upcoming events.
+	•	Landing page: featured sections/carousels.
+	•	Mood Results page: filtered events matching a mood.
+
+Tech & Dependencies:
+	•	Framer Motion (motion/react) for animations.
+	•	Shadcn UI AlertDialog for confirming RSVP.
+	•	Lucide icons for visuals (Calendar, MapPin, Bookmark, Clock).
+	•	formatDateToDDMMYYYY helper for consistent date display.
+	•	Image wrapper with fallback handling for images.

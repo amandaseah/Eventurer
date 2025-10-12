@@ -1,3 +1,5 @@
+import LoginForm from '../features/signup/LoginForm';
+
 import { motion } from 'motion/react';
 import { Sparkles, Mail, Lock } from 'lucide-react';
 import { Input } from '../ui/input';
@@ -11,6 +13,9 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     onNavigate('landing');
+    const [mode, setMode] = useState<'login' | 'signup'>('login');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
   };
 
   return (
@@ -56,66 +61,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
         </motion.div>
 
         {/* Login Form */}
-        <form onSubmit={handleLogin} className="space-y-5">
-          <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            <label className="block text-sm mb-2 text-gray-700">Email or Username</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Enter your email"
-                className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
-              />
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            <label className="block text-sm mb-2 text-gray-700">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <Input
-                type="password"
-                placeholder="Enter your password"
-                className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
-              />
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Button
-              type="submit"
-              className="w-full h-12 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-300 hover:shadow-xl transition-all"
-            >
-              Login
-            </Button>
-          </motion.div>
-
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6 }}
-          >
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full h-12 rounded-2xl border-2 hover:bg-purple-50"
-            >
-              Sign Up
-            </Button>
-          </motion.div>
-        </form>
+        <LoginForm onNavigate={onNavigate} />
 
         {/* Social Login */}
         <motion.div

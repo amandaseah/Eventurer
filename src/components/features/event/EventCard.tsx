@@ -1,9 +1,9 @@
 import { Calendar, MapPin, Bookmark, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import Image from './common/Image';
+import Image from '../../common/Image';
 import { useState, useEffect } from 'react';
-import { formatDateToDDMMYYYY } from '../lib/dateUtils';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
+import { formatDateToDDMMYYYY } from '../../../lib/dateUtils';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../ui/alert-dialog';
 import { toast } from 'sonner';
 
 interface EventCardProps {

@@ -5,11 +5,10 @@ import { MoodResultsPage } from './components/pages/MoodResultsPage';
 import { EventExplorePage } from './components/pages/EventExplorePage';
 import { EventInfoPage } from './components/pages/EventInfoPage';
 import { EventForumPage } from './components/pages/EventForumPage';
-import { DiscussionPage } from './components/pages/DiscussionPage';
 import { ProfilePage } from './components/pages/ProfilePage';
 import { CountdownWidget } from './components/CountdownWidget';
 import { Toaster } from './components/ui/sonner';
-import { events, generalDiscussions } from './lib/mockData';
+import { events } from './lib/mockData';
 
 interface Discussion {
   id: number;
@@ -28,7 +27,6 @@ type Page =
   | 'explore'
   | 'event-info'
   | 'event-forum'
-  | 'discussion'
   | 'profile';
 
 interface PageData {
@@ -42,7 +40,7 @@ export default function App() {
   const [navigationHistory, setNavigationHistory] = useState<Page[]>(['login']);
   const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([1, 2, 3, 4]);
   const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([3, 4, 7]);
-  const [discussions, setDiscussions] = useState<Discussion[]>(generalDiscussions);
+  
 
   const handleNavigate = (page: Page, data?: PageData) => {
     setCurrentPage(page);
@@ -91,7 +89,14 @@ export default function App() {
       {currentPage === 'login' && <LoginPage onNavigate={handleNavigate} />}
       {currentPage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
       {currentPage === 'mood-results' && pageData.mood && (
-        <MoodResultsPage mood={pageData.mood} onNavigate={handleNavigate} />
+        <MoodResultsPage 
+        mood={pageData.mood}
+        onNavigate={handleNavigate}
+        bookmarkedEventIds={bookmarkedEventIds}
+        rsvpedEventIds={rsvpedEventIds}
+        onBookmarkChange={handleBookmarkChange}
+        onRSVPChange={handleRSVPChange}
+         />
       )}
       {currentPage === 'explore' && (
         <EventExplorePage 
@@ -116,7 +121,7 @@ export default function App() {
       {currentPage === 'event-forum' && pageData.eventId && (
         <EventForumPage eventId={pageData.eventId} onNavigate={handleNavigate} />
       )}
-      {currentPage === 'discussion' && <DiscussionPage onNavigate={handleNavigate} />}
+      
       {currentPage === 'profile' && (
         <ProfilePage 
           onNavigate={handleNavigate}

@@ -1,0 +1,33 @@
+This folder manages the location and navigation features of Eventurer — displaying maps and directions for event venues.
+It helps users visualize where an event is and how to reach it easily.
+
+⸻
+
+1️⃣ Map.tsx
+• Purpose:
+Acts as the base map display component for showing the event’s location.
+Currently, it serves as a placeholder container but is designed for future integration (e.g., Leaflet, Google Maps, or OneMap API).
+
+• Key Features:
+	•	Uses a memoized React component (memo) for performance optimization.
+	•	Displays a placeholder area for the map with clear structure for later enhancement.
+	•	Easy to extend with actual geolocation data and interactive markers.
+
+• Visual Role:
+Renders the map frame within the event details page — provides the geographical context of the event.
+
+⸻
+
+2️⃣ HowToGetThere.tsx
+• Purpose:
+Displays directions and transport info for getting to the event location.
+It’s an informative card that combines map visualization and quick-access transport data.
+
+• Key Features:
+	•	Imports and embeds the Map component to show the location visually.
+	•	Displays static transport information (nearest MRT, bus stops, walking distances).
+	•	Uses animations (motion) for smooth entry transitions and a lively UI.
+	•	Uses event data (event.location) for dynamic display.
+
+• Visual Role:
+Provides a friendly, interactive “How to Get There” section on the Event Details page — balancing both utility and presentation.

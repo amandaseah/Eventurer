@@ -1,0 +1,71 @@
+import { motion } from "motion/react";
+import { Input } from "../../ui/input";
+import { Button } from "../../ui/button";
+
+export default function AccountPanel({
+  isEditing,
+  name,
+  email,
+  memberSince,
+  onChangeName,
+  onChangeEmail,
+  onSave,
+  onCancel,
+}: {
+  isEditing: boolean;
+  name: string;
+  email: string;
+  memberSince: string;
+  onChangeName: (v: string) => void;
+  onChangeEmail: (v: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-3xl p-8 shadow-md"
+    >
+      <h2 className="text-2xl mb-6">Account Information</h2>
+
+      {isEditing ? (
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm text-gray-600 mb-2">Full Name</label>
+            <Input value={name} onChange={(e) => onChangeName(e.target.value)} className="rounded-2xl" />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600 mb-2">Email</label>
+            <Input value={email} onChange={(e) => onChangeEmail(e.target.value)} className="rounded-2xl" />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Member Since</label>
+            <p className="text-lg text-gray-400">{memberSince}</p>
+          </div>
+          <div className="pt-4 flex gap-3">
+            <Button onClick={onSave} className="px-6 py-3 bg-purple-500 text-white rounded-2xl hover:bg-purple-600 transition-all">
+              Save Changes
+            </Button>
+            <Button onClick={onCancel} variant="outline" className="px-6 py-3 rounded-2xl">Cancel</Button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Full Name</label>
+            <p className="text-lg">{name}</p>
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Email</label>
+            <p className="text-lg">{email}</p>
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Member Since</label>
+            <p className="text-lg">{memberSince}</p>
+          </div>
+        </div>
+      )}
+    </motion.div>
+  );
+}

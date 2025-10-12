@@ -1,0 +1,38 @@
+This folder contains the main interactive and visual components that make up the Landing Page experience — the first screen users see after logging in.
+
+⸻
+
+1️⃣ Hero.tsx
+	•	Purpose:
+The main “hero” banner section that welcomes users with a bold tagline and call-to-action button (Start Quiz).
+	•	Key Features:
+	•	Uses animations (motion) and a gradient sparkle icon.
+	•	Emphasizes the app’s purpose (“Find events that match your mood”).
+	•	The CTA button triggers the quiz (onStart prop).
+	•	Visual Role:
+Acts as the attention-grabbing header — sets the tone and transitions users into the quiz flow.
+
+⸻
+
+2️⃣ MoodQuiz.tsx
+	•	Purpose:
+The interactive mood quiz that determines the user’s current vibe (e.g., “chill,” “active,” “social,” etc.).
+	•	Key Features:
+	•	Imports quiz data from lib/mockData.
+	•	Animates questions and progress bar transitions.
+	•	Calculates a top mood based on user answers.
+	•	Ends with a “See Matching Events” button that passes the selected mood to the next page.
+	•	Visual Role:
+A dynamic, card-style quiz with animations and smooth transitions between questions.
+
+⸻
+
+3️⃣ FeaturedEvents.tsx
+	•	Purpose:
+Highlights a curated set of events on the landing page (like “Upcoming Events” or “Popular Now”).
+	•	Key Features:
+	•	Uses event data from mockData.
+	•	Displays cards with event images, dates, and categories.
+	•	Serves as a preview carousel or grid below the hero section.
+	•	Visual Role:
+Adds richness and variety to the landing page, encouraging users to browse events right after taking the quiz.
