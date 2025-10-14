@@ -10,6 +10,8 @@ import { CountdownWidget } from './components/CountdownWidget';
 import { Toaster } from './components/ui/sonner';
 import { events } from './lib/mockData';
 
+
+
 interface Discussion {
   id: number;
   username: string;
