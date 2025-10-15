@@ -9,8 +9,3 @@ yarn.lock
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
-
-.env# Environment files (never commit real secrets)
-.env
-.env.*
-!.env.example
