@@ -1100,13 +1100,13 @@ export default function HowToGetThere({ event }: { event: any }) {
                         <span className="flex-1">{station.name}</span>
                         <div className="flex flex-col items-end gap-1">
                           {isActive && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-medium text-purple-700">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-purple-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-purple-600 shadow-sm">
                               <Navigation className="h-3 w-3" />
                               On map
                             </span>
                           )}
                           {typeof station.dist === 'number' && (
-                            <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs text-purple-700">
+                            <span className="inline-flex items-center justify-center rounded-full bg-purple-100 px-2 py-0.5 text-xs text-purple-700">
                               {station.dist} m
                             </span>
                           )}
@@ -1134,19 +1134,9 @@ export default function HowToGetThere({ event }: { event: any }) {
                               {summary.lines?.join(' • ')}
                             </p>
                           )}
-                          {(summary.googleMapsUrls?.walk || summary.googleMapsUrls?.transit || summary.googleMapsUrls?.fullTransit) && (
+                          {summary.transitToEvent &&
+                            (summary.googleMapsUrls?.transit || summary.googleMapsUrls?.fullTransit) && (
                             <div className="relative flex flex-wrap gap-2 text-[11px]">
-                              {summary.googleMapsUrls?.walk && (
-                                <a
-                                  href={summary.googleMapsUrls.walk}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-purple-700 shadow-sm ring-1 ring-purple-100 hover:bg-purple-50"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <Navigation className="h-3 w-3" /> Walk map
-                                </a>
-                              )}
                               {summary.googleMapsUrls?.transit && summary.transitToEvent && (
                                 <a
                                   href={summary.googleMapsUrls.transit}
@@ -1263,13 +1253,13 @@ export default function HowToGetThere({ event }: { event: any }) {
                         <span className="flex-1">{stop.name}</span>
                         <div className="flex flex-col items-end gap-1">
                           {isActive && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-emerald-600 shadow-sm">
                               <Navigation className="h-3 w-3" />
                               On map
                             </span>
                           )}
                           {typeof stop.dist === 'number' && (
-                            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
+                            <span className="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
                               {stop.dist} m
                             </span>
                           )}
@@ -1297,19 +1287,8 @@ export default function HowToGetThere({ event }: { event: any }) {
                               {summary.lines?.join(' • ')}
                             </p>
                           )}
-                          {(summary.googleMapsUrls?.walk || summary.googleMapsUrls?.transit || summary.googleMapsUrls?.fullTransit) && (
+                          {(summary.googleMapsUrls?.transit || summary.googleMapsUrls?.fullTransit) && (
                             <div className="relative flex flex-wrap gap-2 text-[11px]">
-                              {summary.googleMapsUrls?.walk && (
-                                <a
-                                  href={summary.googleMapsUrls.walk}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-emerald-700 shadow-sm ring-1 ring-emerald-100 hover:bg-emerald-50"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <Navigation className="h-3 w-3" /> Walk map
-                                </a>
-                              )}
                               {summary.googleMapsUrls?.transit && (
                                 <a
                                   href={summary.googleMapsUrls.transit}
