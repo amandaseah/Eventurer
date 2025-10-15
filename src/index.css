@@ -3242,3 +3242,71 @@ html {
     transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0));
   }
 }
+
+@layer utilities {
+  @keyframes htgtGradientFlow {
+    0% {
+      background-position: 0% 25%;
+    }
+    40% {
+      background-position: 110% 80%;
+    }
+    70% {
+      background-position: 60% 120%;
+    }
+    100% {
+      background-position: 0% 25%;
+    }
+  }
+
+  .htgt-route-card-gradient {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: linear-gradient(
+      130deg,
+      rgba(103, 232, 249, 0.85) 0%,
+      rgba(59, 130, 246, 0.62) 28%,
+      rgba(255, 255, 255, 0.55) 52%,
+      rgba(165, 180, 252, 0.68) 74%,
+      rgba(125, 211, 252, 0.8) 100%
+    );
+    background-size: 320% 320%;
+    opacity: 0.78;
+    filter: blur(6px) saturate(135%);
+    animation: htgtGradientFlow 7.5s ease-in-out infinite;
+    pointer-events: none;
+    will-change: background-position;
+  }
+
+  .htgt-tips-card-gradient {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: linear-gradient(
+      150deg,
+      rgba(255, 228, 239, 0.88) 0%,
+      rgba(251, 207, 232, 0.6) 30%,
+      rgba(255, 255, 255, 0.52) 55%,
+      rgba(244, 183, 212, 0.65) 78%,
+      rgba(255, 214, 228, 0.8) 100%
+    );
+    background-size: 320% 320%;
+    opacity: 0.78;
+    filter: blur(6px) saturate(140%);
+    animation: htgtGradientFlow 9s ease-in-out infinite reverse;
+    pointer-events: none;
+    will-change: background-position;
+  }
+
+  .htgt-card-dim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.32) 0%,
+      rgba(255, 255, 255, 0.2) 45%,
+      rgba(255, 255, 255, 0.32) 100%
+    );
+  }
+}
