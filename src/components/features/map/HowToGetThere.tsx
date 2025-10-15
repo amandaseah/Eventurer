@@ -35,8 +35,6 @@ type TransitSummary = {
     transit?: string;
     fullTransit?: string;
   };
-  totalDurationSeconds?: number;
-  totalDurationText?: string;
 };
 
 const MAP_READY_TIMEOUT_MS = 1500;
@@ -122,8 +120,6 @@ const km = (m: number) => (m / 1000).toFixed(2);
 
 function fmtDuration(distanceM: number, secFromAPI?: number) {
   const realistic = distanceM / 1.25; // ~4.5 km/h
-  if (distanceM >= 4000) return 'Too far to walk — consider transit';
-
   let s = secFromAPI ?? realistic;
   if (secFromAPI && (secFromAPI < realistic * 0.5 || secFromAPI > realistic * 3)) {
     s = realistic;
@@ -472,10 +468,10 @@ export default function HowToGetThere({ event }: { event: any }) {
         ];
 
     let fromYou: TransitLegMeta | undefined;
-    if (youPos) {
+    if (youPos && eventPos) {
       const fromYouResult = await getRoute({
         origin: youPos,
-        destination: option.position,
+        destination: eventPos,
         travelMode: gm.TravelMode.WALKING,
       });
       const fromLeg = fromYouResult?.routes?.[0]?.legs?.[0];
@@ -490,36 +486,17 @@ export default function HowToGetThere({ event }: { event: any }) {
       }
     }
 
-    const hasTransitLeg = Boolean(transitMeta?.durationSeconds);
-    const totalDurationSeconds = hasTransitLeg
-      ? (fromYou?.durationSeconds ?? 0) + (transitMeta?.durationSeconds ?? 0) + (walkingMeta?.durationSeconds ?? 0)
-      : undefined;
-    const totalDurationText = hasTransitLeg && totalDurationSeconds
-      ? formatDurationMinutes(totalDurationSeconds)
-      : undefined;
-
     const hoverParts = [`<div style="font-weight:600">${option.name} → ${event?.title ?? 'Event'}</div>`];
-    if (totalDurationText) {
+    if (fromYou?.durationText) {
+      const dist = fromYou.distanceText ? ` • ${fromYou.distanceText}` : '';
       hoverParts.push(
-        `<div style="font-size:13px;">Total travel ≈ ${totalDurationText}</div>`
-      );
-    }
-    if (transitMeta?.durationText) {
-      const dist = transitMeta.distanceText ? ` • ${transitMeta.distanceText}` : '';
-      hoverParts.push(
-        `<div>Transit: ${transitMeta.durationText}${dist}</div>`
+        `<div style="margin-top:6px;font-size:12px;color:#475569;">Direct walk from you: ${fromYou.durationText}${dist}</div>`
       );
     }
     if (walkingMeta?.durationText) {
       const dist = walkingMeta.distanceText ? ` • ${walkingMeta.distanceText}` : '';
       hoverParts.push(
         `<div style="font-size:12px;color:#475569;">Walk to event: ${walkingMeta.durationText}${dist}</div>`
-      );
-    }
-    if (fromYou?.durationText) {
-      const dist = fromYou.distanceText ? ` • ${fromYou.distanceText}` : '';
-      hoverParts.push(
-        `<div style="margin-top:6px;font-size:12px;color:#475569;">From you: ${fromYou.durationText}${dist}</div>`
       );
     }
     if (transitMeta?.modeLabel) {
@@ -544,8 +521,6 @@ export default function HowToGetThere({ event }: { event: any }) {
       fromYou,
       travelMode,
       googleMapsUrls,
-      totalDurationSeconds: totalDurationSeconds || undefined,
-      totalDurationText,
     };
   };
 
@@ -958,7 +933,7 @@ export default function HowToGetThere({ event }: { event: any }) {
 
   const showSummary = Boolean(eventPos && youPos);
   const safeDist = distanceM ?? (eventPos && youPos ? haversine(youPos, eventPos) : 0);
-  const durationTxt = showSummary ? fmtDuration(safeDist, durationS ?? undefined) : '—';
+  const durationTxt = showSummary ? fmtDuration(safeDist, durationS ?? undefined) : undefined;
 
   return (
     <motion.div
@@ -1008,20 +983,36 @@ export default function HowToGetThere({ event }: { event: any }) {
 
       {/* Summary */}
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="p-4 rounded-2xl bg-purple-50">
-          <p className="text-sm text-gray-600 mb-1">Route Summary</p>
-          {showSummary ? (
-            <p className="text-lg">
-              Walking: <span className="font-semibold">{km(safeDist)} km</span> •{' '}
-              <span className="font-semibold">{durationTxt}</span>
-            </p>
-          ) : (
-            <p className="text-gray-700">Enable location to see route & time</p>
-          )}
+        <div className="relative overflow-hidden rounded-3xl bg-cyan-50 text-slate-900 shadow-xl p-6 border border-cyan-100">
+          <span aria-hidden className="htgt-route-card-gradient" />
+          <span aria-hidden className="htgt-card-dim" />
+          <div className="relative z-10 text-center flex flex-col items-center">
+            <span className="block w-14 rounded-full bg-cyan-400/80 mb-2 shadow-[0_0_10px_rgba(59,183,235,0.45)]" />
+            <p className="text-xl font-semibold uppercase tracking-[0.2em] text-cyan-900 mb-3 drop-shadow-[0_3px_8px_rgba(14,165,233,0.24)]">Route Summary</p>
+            {showSummary ? (
+              <>
+                <p className="text-xl font-extrabold leading-tight text-slate-900 drop-shadow-[0_10px_22px_rgba(14,165,233,0.3)]">
+                  {km(safeDist)} km away
+                </p>
+                {durationTxt && (
+                  <p className="mt-2 text-xs text-slate-800 drop-shadow-sm">Walking time ≈ {durationTxt}</p>
+                )}
+              </>
+            ) : (
+              <p className="text-slate-800 drop-shadow-sm">Enable location to see how far you are from the event.</p>
+            )}
+          </div>
         </div>
-        <div className="p-4 rounded-2xl bg-green-50">
-          <p className="text-sm text-gray-600 mb-1">Tips</p>
-          <p>Tap a station or stop to highlight the walking path, then use the buttons to open the route directly in Google Maps.</p>
+        <div className="relative overflow-hidden rounded-3xl bg-pink-50 shadow-xl p-6 border border-pink-100">
+          <span aria-hidden className="htgt-tips-card-gradient" />
+          <span aria-hidden className="htgt-card-dim" />
+          <div className="relative z-10 text-center flex flex-col items-center">
+            <span className="block h-1 w-14 rounded-full bg-pink-400/80 mb-3 shadow-[0_0_10px_rgba(244,114,182,0.45)]" />
+            <p className="text-xl font-semibold uppercase tracking-[0.2em] text-pink-900 mb-3 drop-shadow-[0_3px_8px_rgba(244,114,182,0.24)]">Tips</p>
+            <p className="text-xs text-grey-800 mb-3 leading-relaxed drop-shadow-sm max-w-[26rem]">
+              Tap a station or stop to highlight the walking path, then use the buttons to open the route directly in Google Maps.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -1073,10 +1064,11 @@ export default function HowToGetThere({ event }: { event: any }) {
                   const isActive = selectedTransit?.type === 'mrt' && selectedTransit.index === idx;
                   const isClickable = Boolean(station.position);
                   const cardClasses = [
-                    'group relative w-full overflow-hidden rounded-2xl border bg-white/95 px-4 py-4 text-left transition-all duration-200 focus-visible:outline-none',
-                    'shadow-sm shadow-purple-100/30 border-purple-100',
-                    isClickable ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-200/60 focus-visible:ring-2 focus-visible:ring-purple-400/80' : 'cursor-default opacity-70',
-                    isActive ? 'ring-2 ring-purple-400 shadow-lg shadow-purple-300/40' : '',
+                    'group relative w-full overflow-hidden rounded-2xl bg-white px-4 py-4 text-left transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline-none',
+                    isActive
+                      ? 'border-4 border-purple-500 shadow-[0_14px_34px_rgba(147,51,234,0.28)]'
+                      : 'border border-purple-100 shadow-sm shadow-purple-100/30',
+                    isClickable ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-200/60 focus-visible:ring-2 focus-visible:ring-purple-200/70' : 'cursor-default opacity-70',
                     !isClickable ? 'pointer-events-none' : '',
                   ]
                     .filter(Boolean)
@@ -1192,7 +1184,7 @@ export default function HowToGetThere({ event }: { event: any }) {
 
         {/* Buses */}
         <div className="mt-6">
-          <p className="flex items-center gap-2 font-semibold text-emerald-700">
+          <p className="flex items-center gap-2 font-semibold text-pink-700">
             <span className="text-lg leading-none">🚌</span>
             <span>Nearby Bus Stops</span>
           </p>
@@ -1209,7 +1201,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                 {Array.from({ length: 3 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="h-16 rounded-2xl bg-gradient-to-r from-emerald-100/70 to-emerald-50/40 animate-pulse"
+                    className="h-16 rounded-2xl bg-gradient-to-r from-pink-100/70 to-pink-50/40 animate-pulse"
                   />
                 ))}
               </motion.div>
@@ -1226,10 +1218,11 @@ export default function HowToGetThere({ event }: { event: any }) {
                   const isActive = selectedTransit?.type === 'bus' && selectedTransit.index === idx;
                   const isClickable = Boolean(stop.position);
                   const cardClasses = [
-                    'group relative w-full overflow-hidden rounded-2xl border bg-white/95 px-4 py-4 text-left transition-all duration-200 focus-visible:outline-none',
-                    'shadow-sm shadow-emerald-100/30 border-emerald-100',
-                    isClickable ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-200/60 focus-visible:ring-2 focus-visible:ring-emerald-400/80' : 'cursor-default opacity-70',
-                    isActive ? 'ring-2 ring-emerald-400 shadow-lg shadow-emerald-300/40' : '',
+                    'group relative w-full overflow-hidden rounded-2xl bg-pink-50 px-4 py-4 text-left transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline-none',
+                    isActive
+                      ? 'border-4 border-pink-500 shadow-[0_14px_34px_rgba(236,72,153,0.28)]'
+                      : 'border border-pink-100 shadow-sm shadow-pink-100/40',
+                    isClickable ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-200/60 focus-visible:ring-2 focus-visible:ring-pink-200/70' : 'cursor-default opacity-70',
                     !isClickable ? 'pointer-events-none' : '',
                   ]
                     .filter(Boolean)
@@ -1248,42 +1241,42 @@ export default function HowToGetThere({ event }: { event: any }) {
                       className={cardClasses}
                       disabled={!isClickable}
                     >
-                      <span className={`pointer-events-none absolute inset-x-0 -top-8 h-12 bg-gradient-to-br from-emerald-100/60 via-emerald-50/0 to-transparent transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-90'}`} />
-                      <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-emerald-900">
+                      <span className={`pointer-events-none absolute inset-x-0 -top-8 h-12 bg-gradient-to-br from-pink-100/60 via-pink-50/0 to-transparent transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-90'}`} />
+                      <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-pink-900">
                         <span className="flex-1">{stop.name}</span>
                         <div className="flex flex-col items-end gap-1">
                           {isActive && (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-emerald-600 shadow-sm">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-pink-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-pink-600 shadow-sm">
                               <Navigation className="h-3 w-3" />
                               On map
                             </span>
                           )}
                           {typeof stop.dist === 'number' && (
-                            <span className="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
+                            <span className="inline-flex items-center justify-center rounded-full bg-pink-100 px-2 py-0.5 text-xs text-pink-700">
                               {stop.dist} m
                             </span>
                           )}
                         </div>
                       </div>
                       {stop.address && (
-                        <p className="relative mt-1 text-xs text-emerald-700/80">{stop.address}</p>
+                        <p className="relative mt-1 text-xs text-pink-700/80">{stop.address}</p>
                       )}
                       {summary ? (
-                        <div className="relative mt-3 space-y-3 text-xs text-gray-600">
+                        <div className="relative mt-3 space-y-3 text-xs text-pink-900/80">
                           <div className="flex flex-wrap items-center gap-2">
                             {summary.walkToEvent?.durationText && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700/80">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-pink-50 px-2.5 py-1 text-[11px] font-medium text-pink-700/80">
                                 🚶‍♀️ Stop → Event {summary.walkToEvent.durationText}
                               </span>
                             )}
                           </div>
                           {!summary.transitToEvent && (
-                            <p className="text-[11px] text-emerald-600/80">
+                            <p className="text-[11px] text-pink-600/80">
                               Transit details unavailable — showing the walking path from this stop.
                             </p>
                           )}
                           {(summary.lines?.length ?? 0) > 0 && (
-                            <p className="text-[11px] text-emerald-600/90">
+                            <p className="text-[11px] text-pink-600/90">
                               {summary.lines?.join(' • ')}
                             </p>
                           )}
@@ -1294,7 +1287,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                                   href={summary.googleMapsUrls.transit}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-emerald-700 shadow-sm ring-1 ring-emerald-100 hover:bg-emerald-50"
+                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-pink-700 shadow-sm ring-1 ring-pink-100 hover:bg-pink-50"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   🚌 Stop → Event
@@ -1305,7 +1298,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                                   href={summary.googleMapsUrls.fullTransit}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-emerald-700 shadow-sm ring-1 ring-emerald-100 hover:bg-emerald-50"
+                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-pink-700 shadow-sm ring-1 ring-pink-100 hover:bg-pink-50"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   🗺️ Full transit
@@ -1315,12 +1308,12 @@ export default function HowToGetThere({ event }: { event: any }) {
                           )}
                         </div>
                       ) : (
-                        <p className="relative mt-3 text-[11px] text-emerald-600/80">
+                        <p className="relative mt-3 text-[11px] text-pink-600/80">
                           Tap to preview route details on the map.
                         </p>
                       )}
                       {loadingThis && (
-                        <div className="relative mt-3 flex items-center gap-2 text-[11px] font-medium text-emerald-600">
+                        <div className="relative mt-3 flex items-center gap-2 text-[11px] font-medium text-pink-600">
                           <Loader2 className="h-3 w-3 animate-spin" />
                           Calculating route…
                         </div>
