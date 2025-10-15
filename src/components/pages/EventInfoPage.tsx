@@ -3,6 +3,10 @@ import TopForumPreview from "../features/forum/TopForumPreview";
 import EventActions from "../features/eventInfo/EventActions";
 import EventDetails from "../features/eventInfo/EventDetails";
 
+import NewPostForm from "../features/forum/NewPostForm";
+import PostList from "../features/forum/PostList";
+import { useEventForum } from "../../hooks/useEventForum";
+
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Header } from "../Header";
@@ -65,13 +69,17 @@ export function EventInfoPage({
   const [showRSVPDialog, setShowRSVPDialog] = useState(false);
   const [saves, setSaves] = useState(event?.saves || 0);
 
+  // replace forumPosts mock
+  const { posts, addPost } = useEventForum(eventId);
+
+
   if (!event) {
     return <div>Event not found</div>;
   }
 
-  const eventForumPosts = forumPosts
-    .filter((p) => p.eventId === eventId)
-    .slice(0, 3);
+  // const eventForumPosts = forumPosts
+  //   .filter((p) => p.eventId === eventId)
+  //   .slice(0, 3);
 
   const handleBookmark = () => {
     const newBookmarked = !isBookmarked;
@@ -172,9 +180,23 @@ export function EventInfoPage({
 
               {/* Top Forum Posts Preview */}
               <TopForumPreview
-                posts={eventForumPosts}
+                posts={posts.slice(0,3)}
                 onViewAll={() => onNavigate('event-forum', { eventId })}
               />
+
+              <div className="mt-8">
+                <h2 className="text-2xl mb-4">Discussion Forum</h2>
+
+                {/* Detailed post with optional image */}
+                <NewPostForm
+                  onAddPost={(comment, image) => addPost(comment, image)}
+                />
+
+                {/* Full threaded post list */}
+                <PostList
+                  eventId={eventId}
+                />
+              </div>
 
               {/* How to Get There */}
               <HowToGetThere event={event} />

@@ -1,14 +1,13 @@
-{/* this is used for the textarea post */}
 import { useRef, useState } from "react";
 import { Button } from "../../ui/button";
 import { Textarea } from "../../ui/textarea";
 import { Image as ImageIcon, Send, X } from "lucide-react";
 
-export default function NewPostForm({
-  onAddPost,
-}: {
-  onAddPost: (payload: { comment: string; image?: string | null }) => void;
-}) {
+interface NewPostFormProps {
+  onAddPost: (comment: string, image?: string) => void;
+}
+
+export default function NewPostForm({ onAddPost }: NewPostFormProps) {
   const [text, setText] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -23,7 +22,8 @@ export default function NewPostForm({
 
   const handleSubmit = () => {
     if (!text.trim() && !image) return;
-    onAddPost({ comment: text, image });
+    // Call the hook function with parameters
+    onAddPost(text, image || undefined);
     setText("");
     setImage(null);
   };
@@ -41,7 +41,11 @@ export default function NewPostForm({
 
       {image && (
         <div className="relative mb-4 rounded-2xl overflow-hidden">
-          <img src={image} alt="Upload preview" className="w-full max-h-64 object-cover rounded-2xl" />
+          <img 
+            src={image} 
+            alt="Upload preview" 
+            className="w-full max-h-64 object-cover rounded-2xl" 
+          />
           <button
             onClick={() => setImage(null)}
             className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
@@ -59,7 +63,11 @@ export default function NewPostForm({
           onChange={handleImageSelect}
           className="hidden"
         />
-        <Button onClick={() => fileRef.current?.click()} variant="outline" className="rounded-full">
+        <Button 
+          onClick={() => fileRef.current?.click()} 
+          variant="outline" 
+          className="rounded-full"
+        >
           <ImageIcon className="w-4 h-4 mr-2" />
           Add Image
         </Button>

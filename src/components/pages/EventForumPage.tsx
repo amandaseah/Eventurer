@@ -1,26 +1,11 @@
+import { motion } from 'motion/react';
+import { Header } from '../Header';
+import { events } from '../../lib/mockData';
+import { MessageSquare, ArrowLeft, Wifi, WifiOff, Loader2 } from 'lucide-react';
 import NewPostForm from "../features/forum/NewPostForm";
 import PostList from "../features/forum/PostList";
-import { ForumPost } from "../features/forum/types";
+import { useEventForum } from "../../hooks/useEventForum";
 
-
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Header } from '../Header';
-import { events, forumPosts as initialForumPosts } from '../../lib/mockData';
-import { ThumbsUp, Send, MessageSquare, Image as ImageIcon, X, Reply, ArrowLeft } from 'lucide-react';
-import { Textarea } from '../ui/textarea';
-import { Button } from '../ui/button';
-
-interface ForumPost {
-  id: number;
-  eventId: number;
-  username: string;
-  timestamp: string;
-  comment: string;
-  upvotes: number;
-  image?: string;
-  replyTo?: number;
-}
 
 interface EventForumPageProps {
   eventId: number;
@@ -29,106 +14,39 @@ interface EventForumPageProps {
 
 export function EventForumPage({ eventId, onNavigate }: EventForumPageProps) {
   const event = events.find(e => e.id === eventId);
-  const [forumPosts, setForumPosts] = useState<ForumPost[]>(initialForumPosts.filter(p => p.eventId === eventId));
-  const [newComment, setNewComment] = useState('');
-  const [upvotedPosts, setUpvotedPosts] = useState<number[]>([]);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const { 
+    posts, 
+    upvotedPosts, 
+    isConnected, 
+    isLoading,
+    username,
+    addPost, 
+    upvotePost 
+  } = useEventForum(eventId);
 
   if (!event) {
-    return <div>Event not found</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Event not found</h2>
+          <button
+            onClick={() => onNavigate('explore')}
+            className="text-purple-600 hover:underline"
+          >
+            Return to Explore
+          </button>
+        </div>
+      </div>
+    );
   }
 
-  const handleUpvote = (postId: number) => {
-    if (upvotedPosts.includes(postId)) {
-      setUpvotedPosts(upvotedPosts.filter(id => id !== postId));
-      setForumPosts(forumPosts.map(post =>
-        post.id === postId ? { ...post, upvotes: post.upvotes - 1 } : post
-      ));
-    } else {
-      setUpvotedPosts([...upvotedPosts, postId]);
-      setForumPosts(forumPosts.map(post =>
-        post.id === postId ? { ...post, upvotes: post.upvotes + 1 } : post
-      ));
-    }
-  };
-
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleAddPost = () => {
-    if (newComment.trim() || selectedImage) {
-      const newPost: ForumPost = {
-        id: Math.max(...forumPosts.map(p => p.id), 0) + 1,
-        eventId,
-        username: 'You',
-        timestamp: 'Just now',
-        comment: newComment,
-        upvotes: 0,
-        image: selectedImage || undefined,
-        replyTo: replyingTo || undefined,
-      };
-      setForumPosts([newPost, ...forumPosts]);
-      setNewComment('');
-      setSelectedImage(null);
-      setReplyingTo(null);
-    }
-  };
-
-  const sortedPosts = [...forumPosts].sort((a, b) => b.upvotes - a.upvotes);
-
-  // Organize posts into threads
-  const topLevelPosts = sortedPosts.filter(post => !post.replyTo);
-  
-  const getReplies = (postId: number): ForumPost[] => {
-    return sortedPosts.filter(post => post.replyTo === postId);
-  };
-
-  const getReplyToPost = (postId: number) => {
-    return forumPosts.find(post => post.id === postId);
-  };
-
-  const handleAddTopLevelPost = (payload: { comment: string; image?: string | null }) => {
-    const newPost: ForumPost = {
-      id: Math.max(...forumPosts.map(p => p.id), 0) + 1,
-      eventId,
-      username: 'You',
-      timestamp: 'Just now',
-      comment: payload.comment,
-      upvotes: 0,
-      image: payload.image || undefined,
-    };
-    setForumPosts([newPost, ...forumPosts]);
-  };
-  
-  const handleAddReply = (payload: { parentId: number; comment: string; image?: string | null }) => {
-    const newPost: ForumPost = {
-      id: Math.max(...forumPosts.map(p => p.id), 0) + 1,
-      eventId,
-      username: 'You',
-      timestamp: 'Just now',
-      comment: payload.comment,
-      upvotes: 0,
-      image: payload.image || undefined,
-      replyTo: payload.parentId,
-    };
-    setForumPosts([...forumPosts, newPost]);
-  };
-
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <Header onNavigate={onNavigate} />
 
       <div className="container mx-auto px-6 py-12 max-w-4xl">
+        {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -136,55 +54,107 @@ export function EventForumPage({ eventId, onNavigate }: EventForumPageProps) {
         >
           <button
             onClick={() => onNavigate('event-info', { eventId })}
-            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-4"
+            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Event</span>
           </button>
-          <h1 className="text-4xl mb-2">{event.title}</h1>
-          <div className="flex items-center gap-3 text-gray-600">
-            <MessageSquare className="w-5 h-5" />
-            <span>Forum Discussion</span>
+          
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">{event.title}</h1>
+              <div className="flex items-center gap-3 text-gray-600">
+                <MessageSquare className="w-5 h-5" />
+                <span>Forum Discussion</span>
+                <span className="text-gray-400">•</span>
+                <span>{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
+              </div>
+            </div>
+            
+            {/* Connection Status Indicator */}
+            <div className="flex items-center gap-2">
+              {isConnected ? (
+                <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1.5 rounded-full text-sm">
+                  <Wifi className="w-4 h-4" />
+                  <span>Live</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-orange-600 bg-orange-50 px-3 py-1.5 rounded-full text-sm">
+                  <WifiOff className="w-4 h-4" />
+                  <span>Offline</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* User Info */}
+          <div className="mt-4 text-sm text-gray-500">
+            Posting as <span className="font-semibold text-purple-600">{username}</span>
           </div>
         </motion.div>
 
-        {/* Add New Post */}
-        <NewPostForm onAddPost={handleAddTopLevelPost} />
-
-        {/* Forum Posts */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="space-y-4"
-        >
-          
-
+        {/* Loading State */}
+        {isLoading ? (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-16 bg-white rounded-3xl"
           >
-            <PostList
-              posts={forumPosts}
-              upvotedPosts={upvotedPosts}
-              onUpvote={handleUpvote}
-              onSubmitReply={handleAddReply}
-            />
+            <Loader2 className="w-12 h-12 text-purple-400 animate-spin mb-4" />
+            <p className="text-gray-500">Loading forum...</p>
           </motion.div>
-
-          {sortedPosts.length === 0 && (
+        ) : (
+          <>
+            {/* Add New Post Form */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-16 bg-white rounded-3xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
             >
-              <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-xl text-gray-500 mb-2">No comments yet</p>
-              <p className="text-gray-400">Be the first to start the discussion!</p>
+              <NewPostForm onAddPost={addPost} />
             </motion.div>
-          )}
+
+            {/* Forum Posts */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="space-y-4"
+            >
+              <PostList 
+                eventId={eventId}
+                posts={posts}
+                onUpvote={upvotePost}
+              />
+
+            </motion.div>
+
+            {/* Empty State */}
+            {posts.length === 0 && !isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-center py-16 bg-white rounded-3xl shadow-md"
+              >
+                <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                <p className="text-xl text-gray-500 mb-2">No comments yet</p>
+                <p className="text-gray-400">Be the first to start the discussion!</p>
+              </motion.div>
+            )}
+          </>
+        )}
+
+        {/* Real-time Info Banner */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-8 p-4 bg-purple-50 rounded-2xl border border-purple-200"
+        >
+          <p className="text-sm text-purple-700 text-center">
+            💬 This forum updates in real-time. New comments and upvotes appear instantly!
+          </p>
         </motion.div>
       </div>
     </div>

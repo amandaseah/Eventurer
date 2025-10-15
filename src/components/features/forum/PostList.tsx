@@ -1,57 +1,65 @@
-{/* this is used for building threads*/}
+import { MessageSquare, ThumbsUp } from "lucide-react";
 
-import { motion } from "motion/react";
-import { ForumPost } from "./types";
-import PostItem from "./PostItem";
+interface Post {
+  id: string;
+  text: string;
+  image?: string;
+  createdAt: number;
+  username: string;
+  upvotes: number;
+}
 
-export default function PostList({
-  posts,
-  upvotedPosts,
-  onUpvote,
-  onSubmitReply,
-}: {
-  posts: ForumPost[];
-  upvotedPosts: number[];
-  onUpvote: (postId: number) => void;
-  onSubmitReply: (payload: { parentId: number; comment: string; image?: string | null }) => void;
-}) {
-  // sort by upvotes (desc)
-  const sorted = [...posts].sort((a, b) => b.upvotes - a.upvotes);
+interface PostListProps {
+  eventId: number;
+  posts: Post[];
+  onUpvote: (id: string) => void;
+}
 
-  // split to top-level and replies
-  const topLevel = sorted.filter((p) => !p.replyTo);
-  const getReplies = (id: number) => sorted.filter((p) => p.replyTo === id);
+export default function PostList({ posts, onUpvote }: PostListProps) {
+  if (!posts || posts.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <MessageSquare className="w-8 h-8 mx-auto mb-2" />
+        <p>No comments yet. Be the first to post!</p>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <h2 className="text-2xl mb-4">Discussion ({sorted.length})</h2>
-      {topLevel.map((p, idx) => (
-        <motion.div
-          key={p.id}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: idx * 0.1 }}
+    <div className="space-y-6">
+      {posts.map(post => (
+        <div
+          key={post.id}
+          className="bg-white rounded-3xl p-6 shadow-md hover:shadow-lg transition-shadow"
         >
-          <PostItem
-            post={p}
-            upvotedPosts={upvotedPosts}
-            onUpvote={onUpvote}
-            onSubmitReply={onSubmitReply}
-            replies={getReplies(p.id)}
-          />
-        </motion.div>
-      ))}
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-semibold text-purple-600">
+              {post.username}
+            </span>
+            <span className="text-gray-400 text-sm">
+              {new Date(post.createdAt).toLocaleString()}
+            </span>
+          </div>
 
-      {sorted.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-16 bg-white rounded-3xl"
-        >
-          <p className="text-xl text-gray-500 mb-2">No comments yet</p>
-          <p className="text-gray-400">Be the first to start the discussion!</p>
-        </motion.div>
-      )}
-    </>
+          <p className="text-gray-800 whitespace-pre-wrap mb-4">{post.text}</p>
+
+          {post.image && (
+            <img
+              src={post.image}
+              alt="Post"
+              className="rounded-xl mb-4 max-h-64 object-cover w-full"
+            />
+          )}
+
+          <button
+            onClick={() => onUpvote(post.id)}
+            className="flex items-center gap-1 text-purple-500 hover:text-purple-700 transition-colors"
+          >
+            <ThumbsUp className="w-4 h-4" />
+            <span>{post.upvotes}</span>
+          </button>
+        </div>
+      ))}
+    </div>
   );
 }
