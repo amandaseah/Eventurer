@@ -1,7 +1,7 @@
 // src/components/features/map/HowToGetThere.tsx
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Loader2, MapPin, Navigation } from 'lucide-react';
+import { Crosshair, Loader2, MapPin, Navigation } from 'lucide-react';
 import { loadGoogleMapsScript } from '../../../lib/loadGoogleMaps';
 import { geocodeAddress as geocodeOneMap } from '../../../lib/onemapPublic';
 
@@ -39,7 +39,7 @@ type TransitSummary = {
   totalDurationText?: string;
 };
 
-const MAP_READY_TIMEOUT_MS = 900;
+const MAP_READY_TIMEOUT_MS = 1500;
 
 // ---------- helpers ----------
 const isFiniteNumber = (value: unknown): value is number =>
@@ -200,6 +200,7 @@ export default function HowToGetThere({ event }: { event: any }) {
   const [transitSummaries, setTransitSummaries] = useState<Record<string, TransitSummary>>({});
   const [transitRouteLoadingKey, setTransitRouteLoadingKey] = useState<string | null>(null);
 
+  const [geoPending, setGeoPending] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const transitRouteRequestRef = useRef<{ key: string } | null>(null);
@@ -515,6 +516,12 @@ export default function HowToGetThere({ event }: { event: any }) {
         `<div style="font-size:12px;color:#475569;">Walk to event: ${walkingMeta.durationText}${dist}</div>`
       );
     }
+    if (fromYou?.durationText) {
+      const dist = fromYou.distanceText ? ` • ${fromYou.distanceText}` : '';
+      hoverParts.push(
+        `<div style="margin-top:6px;font-size:12px;color:#475569;">From you: ${fromYou.durationText}${dist}</div>`
+      );
+    }
     if (transitMeta?.modeLabel) {
       hoverParts.push(
         `<div style="color:${type === 'mrt' ? '#6b21a8' : '#047857'};font-size:12px;">${transitMeta.modeLabel}</div>`
@@ -587,23 +594,7 @@ export default function HowToGetThere({ event }: { event: any }) {
   // 1) Initialize the map
   useEffect(() => {
     let canceled = false;
-    let readyListeners: google.maps.MapsEventListener[] = [];
-    let fallbackTimer: number | null = null;
-
-    const clearReadyListeners = () => {
-      readyListeners.forEach((listener) => listener.remove());
-      readyListeners = [];
-    };
-
-    const markReady = () => {
-      if (canceled) return;
-      setMapReady(true);
-      clearReadyListeners();
-      if (fallbackTimer !== null) {
-        window.clearTimeout(fallbackTimer);
-        fallbackTimer = null;
-      }
-    };
+    let tileListener: any = null;
 
     (async () => {
       try {
@@ -627,16 +618,14 @@ export default function HowToGetThere({ event }: { event: any }) {
         mapObj.current = instance;
 
         if (instance?.addListener) {
-          readyListeners.push(instance.addListener('idle', markReady));
-          readyListeners.push(instance.addListener('tilesloaded', markReady));
+          tileListener = instance.addListener('tilesloaded', () => {
+            setMapReady(true);
+            tileListener?.remove?.();
+          });
         }
-        fallbackTimer = window.setTimeout(() => {
-          markReady();
+        setTimeout(() => {
+          if (!canceled) setMapReady(true);
         }, MAP_READY_TIMEOUT_MS);
-
-        requestAnimationFrame(() => {
-          window.google?.maps?.event?.trigger?.(instance, 'resize');
-        });
 
         if (window.google.maps.DirectionsRenderer) {
           dirRenderer.current = new window.google.maps.DirectionsRenderer({
@@ -655,11 +644,7 @@ export default function HowToGetThere({ event }: { event: any }) {
 
     return () => {
       canceled = true;
-      clearReadyListeners();
-      if (fallbackTimer !== null) {
-        window.clearTimeout(fallbackTimer);
-        fallbackTimer = null;
-      }
+      tileListener?.remove?.();
       dirRenderer.current?.setMap(null);
       dirRenderer.current = null;
       mapObj.current = null;
@@ -737,12 +722,15 @@ export default function HowToGetThere({ event }: { event: any }) {
   // 3) User location
   const locateMe = () => {
     if (!navigator.geolocation) return;
+    setGeoPending(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setYouPos({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setGeoPending(false);
       },
       () => {
         setYouPos(null);
+        setGeoPending(false);
       },
       { enableHighAccuracy: true, timeout: 8000 }
     );
@@ -971,6 +959,12 @@ export default function HowToGetThere({ event }: { event: any }) {
   const showSummary = Boolean(eventPos && youPos);
   const safeDist = distanceM ?? (eventPos && youPos ? haversine(youPos, eventPos) : 0);
   const durationTxt = showSummary ? fmtDuration(safeDist, durationS ?? undefined) : '—';
+  const nearestMrt = mrtStations?.[0];
+  const mrtWalk =
+    typeof nearestMrt?.dist === 'number'
+      ? (nearestMrt.dist >= 2500 ? '30+ min' : `${Math.max(1, Math.round(nearestMrt.dist / 80))} min`)
+      : null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -978,9 +972,18 @@ export default function HowToGetThere({ event }: { event: any }) {
       transition={{ delay: 0.2 }}
       className="bg-white rounded-3xl p-6 shadow-md"
     >
-      <div className="flex items-center gap-3 mb-4">
-        <Navigation className="w-6 h-6 text-purple-600" />
-        <h2 className="text-2xl font-semibold">How to Get There</h2>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <Navigation className="w-6 h-6 text-purple-600" />
+          <h2 className="text-2xl font-semibold">How to Get There</h2>
+        </div>
+        <button
+          onClick={locateMe}
+          className="px-4 py-2 rounded-full bg-white border hover:bg-purple-50 flex items-center gap-2 transition-colors"
+        >
+          <Crosshair className="w-4 h-4 text-purple-600" />
+          <span>{geoPending ? 'Locating…' : 'Use My Location'}</span>
+        </button>
       </div>
 
       {/* Map */}
@@ -1111,12 +1114,28 @@ export default function HowToGetThere({ event }: { event: any }) {
                       )}
                       {summary ? (
                         <div className="relative mt-3 space-y-3 text-xs text-gray-600">
-                          {summary.walkToEvent?.durationText && (
-                            <p className="inline-flex items-center gap-1 text-sm font-semibold text-purple-800">
-                              <span aria-hidden>🚶‍♀️</span>
-                              <span>{summary.walkToEvent.durationText} walk from station to event</span>
-                            </p>
-                          )}
+                          <div className="flex flex-wrap items-center gap-2">
+                            {summary.totalDurationText && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-3 py-1 text-[12px] font-semibold text-purple-800">
+                                ⏱ {summary.totalDurationText}
+                              </span>
+                            )}
+                            {summary.transitToEvent?.durationText && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-medium text-purple-700">
+                                🚇 Transit {summary.transitToEvent.durationText}
+                              </span>
+                            )}
+                            {summary.walkToEvent?.durationText && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-medium text-purple-700/80">
+                                🚶‍♀️ {summary.walkToEvent.durationText}
+                              </span>
+                            )}
+                            {summary.fromYou?.durationText && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-medium text-purple-700/70">
+                                📍 From you {summary.fromYou.durationText}
+                              </span>
+                            )}
+                          </div>
                           {!summary.transitToEvent && (
                             <p className="text-[11px] text-purple-600/80">
                               Transit details unavailable from Google right now — showing walking route from the station to the event.
@@ -1166,9 +1185,9 @@ export default function HowToGetThere({ event }: { event: any }) {
                           )}
                         </div>
                       ) : (
-                        <div className="relative mt-3 space-y-2 text-[11px] text-purple-600/80">
-                          <p>Tap to highlight this route on the map.</p>
-                        </div>
+                        <p className="relative mt-3 text-[11px] text-purple-600/80">
+                          Tap to preview route details on the map.
+                        </p>
                       )}
                       {loadingThis && (
                         <div className="relative mt-3 flex items-center gap-2 text-[11px] font-medium text-purple-600">
@@ -1176,13 +1195,16 @@ export default function HowToGetThere({ event }: { event: any }) {
                           Calculating route…
                         </div>
                       )}
+                      {idx === 0 && mrtWalk && (
+                        <p className="relative mt-3 inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 shadow-sm">
+                          ≈ {mrtWalk} walk from event
+                        </p>
+                      )}
                       {isActive && (
-                        <div className="relative mt-4 space-y-2">
-                          <p className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-[11px] font-semibold text-purple-700 shadow-sm">
-                            <Navigation className="h-3 w-3" />
-                            Showing on map
-                          </p>
-                        </div>
+                        <p className="relative mt-3 inline-flex items-center gap-1 rounded-full bg-purple-100 px-3 py-1 text-[11px] font-semibold text-purple-700 shadow-sm">
+                          <Navigation className="h-3 w-3" />
+                          Showing on map
+                        </p>
                       )}
                     </motion.button>
                   );
@@ -1273,12 +1295,28 @@ export default function HowToGetThere({ event }: { event: any }) {
                       )}
                       {summary ? (
                         <div className="relative mt-3 space-y-3 text-xs text-gray-600">
-                          {summary.walkToEvent?.durationText && (
-                            <p className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-800">
-                              <span aria-hidden>🚶‍♀️</span>
-                              <span>{summary.walkToEvent.durationText} walk from stop to event</span>
-                            </p>
-                          )}
+                          <div className="flex flex-wrap items-center gap-2">
+                            {summary.totalDurationText && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-[12px] font-semibold text-emerald-800">
+                                ⏱ {summary.totalDurationText}
+                              </span>
+                            )}
+                            {summary.transitToEvent?.durationText && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+                                🚌 Transit {summary.transitToEvent.durationText}
+                              </span>
+                            )}
+                            {summary.walkToEvent?.durationText && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700/80">
+                                🚶‍♀️ {summary.walkToEvent.durationText}
+                              </span>
+                            )}
+                            {summary.fromYou?.durationText && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700/70">
+                                📍 From you {summary.fromYou.durationText}
+                              </span>
+                            )}
+                          </div>
                           {!summary.transitToEvent && (
                             <p className="text-[11px] text-emerald-600/80">
                               Transit details unavailable — showing the walking path from this stop.
@@ -1328,9 +1366,9 @@ export default function HowToGetThere({ event }: { event: any }) {
                           )}
                         </div>
                       ) : (
-                        <div className="relative mt-3 space-y-2 text-[11px] text-emerald-600/80">
-                          <p>Tap to highlight this route on the map.</p>
-                        </div>
+                        <p className="relative mt-3 text-[11px] text-emerald-600/80">
+                          Tap to preview route details on the map.
+                        </p>
                       )}
                       {loadingThis && (
                         <div className="relative mt-3 flex items-center gap-2 text-[11px] font-medium text-emerald-600">
@@ -1339,7 +1377,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                         </div>
                       )}
                       {isActive && (
-                        <p className="relative mt-4 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-700 shadow-sm">
+                        <p className="relative mt-3 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-700 shadow-sm">
                           <Navigation className="h-3 w-3" />
                           Showing on map
                         </p>
