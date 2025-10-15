@@ -10,7 +10,7 @@ import { CountdownWidget } from './components/CountdownWidget';
 import { Toaster } from './components/ui/sonner';
 import { events } from './lib/mockData';
 
-
+console.log('[ENV] GMAPS KEY present = ', Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY));
 
 interface Discussion {
   id: number;
