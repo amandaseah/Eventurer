@@ -10,6 +10,14 @@ declare global {
 
 export const loadGoogleMapsScript = (): Promise<void> => {
   return new Promise((resolve, reject) => {
+    // Handle cases where Google Maps is already on the page (e.g. HMR reloads).
+    if (window.google && window.google.maps && !isLoaded) {
+      isLoaded = true;
+      isLoading = false;
+      resolve();
+      return;
+    }
+
     // Already loaded
     if (isLoaded && window.google && window.google.maps) {
       resolve();
