@@ -991,15 +991,22 @@ export default function HowToGetThere({ event }: { event: any }) {
 
       {/* Summary */}
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="relative overflow-hidden rounded-3xl bg-cyan-50 text-slate-900 shadow-xl p-6 border border-cyan-100">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-50 via-violet-100/45 to-white text-slate-900 shadow-2xl p-6 border-2 border-purple-200 ring-2 ring-purple-200/50"
+        >
           <span aria-hidden className="htgt-route-card-gradient" />
           <span aria-hidden className="htgt-card-dim" />
           <div className="relative z-10 text-center flex flex-col items-center">
-            <span className="block w-14 rounded-full bg-cyan-400/80 mb-2 shadow-[0_0_10px_rgba(59,183,235,0.45)]" />
-            <p className="text-xl font-semibold uppercase tracking-[0.2em] text-cyan-900 mb-3 drop-shadow-[0_3px_8px_rgba(14,165,233,0.24)]">Route Summary</p>
+            <span className="block w-14 rounded-full bg-purple-400/80 mb-2 shadow-[0_0_10px_rgba(168,85,247,0.45)]" />
+            <p className="text-xl font-semibold uppercase tracking-[0.2em] text-purple-900 mb-3 drop-shadow-[0_3px_8px_rgba(168,85,247,0.24)]">Route Summary</p>
             {showSummary ? (
               <>
-                <p className="text-xl font-extrabold leading-tight text-slate-900 drop-shadow-[0_10px_22px_rgba(14,165,233,0.3)]">
+                <p className="text-xl font-extrabold leading-tight text-slate-900 drop-shadow-[0_10px_22px_rgba(168,85,247,0.3)]">
                   {km(safeDist)} km away
                 </p>
                 {durationTxt && (
@@ -1010,8 +1017,15 @@ export default function HowToGetThere({ event }: { event: any }) {
               <p className="text-slate-800 drop-shadow-sm">Enable location to see how far you are from the event.</p>
             )}
           </div>
-        </div>
-        <div className="relative overflow-hidden rounded-3xl bg-pink-50 shadow-xl p-6 border border-pink-100">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="relative overflow-hidden rounded-3xl bg-pink-50 shadow-xl p-6 border border-pink-100"
+        >
           <span aria-hidden className="htgt-tips-card-gradient" />
           <span aria-hidden className="htgt-card-dim" />
           <div className="relative z-10 text-center flex flex-col items-center">
@@ -1021,7 +1035,7 @@ export default function HowToGetThere({ event }: { event: any }) {
               Tap a station or stop to highlight the walking path, then use the buttons to open the route directly in Google Maps.
             </p>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Public Transport */}
