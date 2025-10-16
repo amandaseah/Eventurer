@@ -195,6 +195,11 @@ export default function HowToGetThere({ event }: { event: any }) {
   const [selectedTransit, setSelectedTransit] = useState<{ type: 'mrt' | 'bus'; index: number } | null>(null);
   const [transitSummaries, setTransitSummaries] = useState<Record<string, TransitSummary>>({});
   const [transitRouteLoadingKey, setTransitRouteLoadingKey] = useState<string | null>(null);
+  // === Local card selection key (for active border highlight) ===
+  const [selectedCardKey, setSelectedCardKey] = useState<string | null>(null);
+
+  const getCardKey = (opt: TransitOption, type: 'mrt' | 'bus', idx: number) =>
+  `${type}:${opt.placeId ?? `${opt.name}:${idx}`}`;
 
   const [geoPending, setGeoPending] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -627,6 +632,7 @@ export default function HowToGetThere({ event }: { event: any }) {
       clearHighlightMarker();
       clearTransitRoute();
       setSelectedTransit(null);
+      setSelectedCardKey(null);
       setTransitSummaries({});
       setTransitRouteLoadingKey(null);
       transitRouteRequestRef.current = null;
@@ -774,6 +780,7 @@ export default function HowToGetThere({ event }: { event: any }) {
 
   useEffect(() => {
     setSelectedTransit(null);
+    setSelectedCardKey(null);
     clearHighlightMarker();
     clearTransitRoute();
     setTransitSummaries({});
@@ -885,7 +892,8 @@ export default function HowToGetThere({ event }: { event: any }) {
                 dist: Math.round(haversine(origin, coord)),
                 address: p.vicinity || p.formatted_address || '',
                 position: coord,
-              };
+                placeId: p.place_id,
+              } as any;
             });
 
         const mrtOptions = toTransitOptions(mrtRaw, eventPos)
@@ -1009,7 +1017,7 @@ export default function HowToGetThere({ event }: { event: any }) {
           <div className="relative z-10 text-center flex flex-col items-center">
             <span className="block h-1 w-14 rounded-full bg-pink-400/80 mb-3 shadow-[0_0_10px_rgba(244,114,182,0.45)]" />
             <p className="text-xl font-semibold uppercase tracking-[0.2em] text-pink-900 mb-3 drop-shadow-[0_3px_8px_rgba(244,114,182,0.24)]">Tips</p>
-            <p className="text-xs text-grey-800 mb-3 leading-relaxed drop-shadow-sm max-w-[26rem]">
+            <p className="text-xs text-gray-800 mb-3 leading-relaxed drop-shadow-sm max-w-[26rem]">
               Tap a station or stop to highlight the walking path, then use the buttons to open the route directly in Google Maps.
             </p>
           </div>
@@ -1061,14 +1069,19 @@ export default function HowToGetThere({ event }: { event: any }) {
                   const summaryKey = `mrt-${idx}`;
                   const summary = transitSummaries[summaryKey];
                   const loadingThis = transitRouteLoadingKey === summaryKey;
-                  const isActive = selectedTransit?.type === 'mrt' && selectedTransit.index === idx;
+                  const cardKey = getCardKey(station, 'mrt', idx);
+                  const isActive = selectedCardKey === cardKey;
                   const isClickable = Boolean(station.position);
                   const cardClasses = [
-                    'group relative w-full overflow-hidden rounded-2xl bg-white px-4 py-4 text-left transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline-none',
+                    'group relative w-full rounded-2xl bg-white px-4 py-4 text-left transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline-none',
+                    // active: extra-thick purple border + strong glow shadow
+                    // inside MRT cardClasses
                     isActive
-                      ? 'border-4 border-purple-500 shadow-[0_14px_34px_rgba(147,51,234,0.28)]'
-                      : 'border border-purple-100 shadow-sm shadow-purple-100/30',
-                    isClickable ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-200/60 focus-visible:ring-2 focus-visible:ring-purple-200/70' : 'cursor-default opacity-70',
+                    ? 'overflow-visible border-[3px] border-purple-600 outline outline-2 outline-purple-500/60 shadow-[0_0_0_4px_rgba(168,85,247,0.4),0_18px_40px_rgba(124,58,237,0.3)]'
+                    : 'overflow-hidden border border-purple-100 bg-white shadow-sm shadow-purple-100/30',
+                    isClickable
+                      ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-200/60'
+                      : 'cursor-default opacity-70',
                     !isClickable ? 'pointer-events-none' : '',
                   ]
                     .filter(Boolean)
@@ -1083,10 +1096,21 @@ export default function HowToGetThere({ event }: { event: any }) {
                       transition={{ delay: idx * 0.05 }}
                       whileHover={isClickable ? { y: -6, scale: 1.01 } : undefined}
                       whileTap={isClickable ? { scale: 0.99 } : undefined}
-                      onClick={() => isClickable && handleTransitSelection(station, 'mrt', idx)}
+                      onClick={() => {
+                        if (!isClickable) return;
+                        setSelectedCardKey(cardKey);
+                        handleTransitSelection(station, 'mrt', idx);
+                      }}
                       className={cardClasses}
                       disabled={!isClickable}
                     >
+                      {/* left accent bar to make the active state unmistakable */}
+                      <span
+                        aria-hidden
+                        className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 rounded-l-2xl transition-opacity duration-200 ${
+                          isActive ? 'opacity-100 bg-purple-500' : 'opacity-0 group-hover:opacity-60 bg-purple-400'
+                        }`}
+                      />
                       <span className={`pointer-events-none absolute inset-x-0 -top-8 h-12 bg-gradient-to-br from-purple-100/60 via-purple-50/0 to-transparent transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-90'}`} />
                       <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-purple-900">
                         <span className="flex-1">{station.name}</span>
@@ -1215,19 +1239,25 @@ export default function HowToGetThere({ event }: { event: any }) {
                   const summaryKey = `bus-${idx}`;
                   const summary = transitSummaries[summaryKey];
                   const loadingThis = transitRouteLoadingKey === summaryKey;
-                  const isActive = selectedTransit?.type === 'bus' && selectedTransit.index === idx;
+                  const cardKey = getCardKey(stop, 'bus', idx);
+                  const isActive = selectedCardKey === cardKey;
                   const isClickable = Boolean(stop.position);
                   const cardClasses = [
-                    'group relative w-full overflow-hidden rounded-2xl bg-pink-50 px-4 py-4 text-left transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline-none',
+                    'group relative w-full rounded-2xl bg-white px-4 py-4 text-left transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline-none',
+                    // active: extra-thick pink border + strong glow shadow
                     isActive
-                      ? 'border-4 border-pink-500 shadow-[0_14px_34px_rgba(236,72,153,0.28)]'
-                      : 'border border-pink-100 shadow-sm shadow-pink-100/40',
-                    isClickable ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-200/60 focus-visible:ring-2 focus-visible:ring-pink-200/70' : 'cursor-default opacity-70',
+                      ? 'overflow-visible border-[3px] border-pink-600 outline outline-2 outline-pink-500/60 shadow-[0_0_0_4px_rgba(244,114,182,0.4),0_18px_40px_rgba(236,72,153,0.3)]'
+                      : 'overflow-hidden border border-pink-100 bg-white shadow-sm shadow-pink-100/40',
+                    isClickable
+                      ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-200/60'
+                      : 'cursor-default opacity-70',
                     !isClickable ? 'pointer-events-none' : '',
                   ]
                     .filter(Boolean)
                     .join(' ');
+                    
                   return (
+                    
                     <motion.button
                       key={`${stop.name}-${idx}`}
                       type="button"
@@ -1237,10 +1267,21 @@ export default function HowToGetThere({ event }: { event: any }) {
                       transition={{ delay: idx * 0.04 }}
                       whileHover={isClickable ? { y: -6, scale: 1.01 } : undefined}
                       whileTap={isClickable ? { scale: 0.99 } : undefined}
-                      onClick={() => isClickable && handleTransitSelection(stop, 'bus', idx)}
+                      onClick={() => {
+                           if (!isClickable) return;
+                           setSelectedCardKey(cardKey);
+                           handleTransitSelection(stop, 'bus', idx);
+                         }}
                       className={cardClasses}
                       disabled={!isClickable}
                     >
+                      {/* left accent bar to make the active state unmistakable */}
+                      <span
+                        aria-hidden
+                        className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 rounded-l-2xl transition-opacity duration-200 ${
+                          isActive ? 'opacity-100 bg-pink-500' : 'opacity-0 group-hover:opacity-60 bg-pink-400'
+                        }`}
+                      />
                       <span className={`pointer-events-none absolute inset-x-0 -top-8 h-12 bg-gradient-to-br from-pink-100/60 via-pink-50/0 to-transparent transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-90'}`} />
                       <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-pink-900">
                         <span className="flex-1">{stop.name}</span>
