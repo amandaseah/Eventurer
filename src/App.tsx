@@ -10,7 +10,11 @@ import { CountdownWidget } from './components/CountdownWidget';
 import { Toaster } from './components/ui/sonner';
 import { events } from './lib/mockData';
 
-console.log('[ENV] GMAPS KEY present = ', Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY));
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import ThreeLanding from './components/features/landing3D/ThreeLanding'
+import HomePreview from './components/pages/HomePreview'
+
+
 
 interface Discussion {
   id: number;
@@ -36,10 +40,10 @@ interface PageData {
   eventId?: number;
 }
 
-export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('login');
+function ShellApp() {
+  const [currentPage, setCurrentPage] = useState<Page>('landing');
   const [pageData, setPageData] = useState<PageData>({});
-  const [navigationHistory, setNavigationHistory] = useState<Page[]>(['login']);
+  const [navigationHistory, setNavigationHistory] = useState<Page[]>(['landing']);
   const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([1, 2, 3, 4]);
   const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([3, 4, 7]);
   
@@ -145,5 +149,23 @@ export default function App() {
       
       <Toaster />
     </div>
+  );
+}
+
+// ---- Router wrapper ----
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* 3D landing at root */}
+        <Route path="/" element={<ThreeLanding />} />
+        {/* The page shown inside the monitor iframe */}
+        <Route path="/home" element={<HomePreview />} />
+        {/* Your existing app (state-based navigation) lives under /app */}
+        <Route path="/app" element={<ShellApp />} />
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
