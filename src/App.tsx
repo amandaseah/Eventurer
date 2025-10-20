@@ -98,6 +98,7 @@ export default function App() {
         onRSVPChange={handleRSVPChange}
          />
       )}
+
       {currentPage === 'explore' && (
         <EventExplorePage 
           onNavigate={handleNavigate}
@@ -107,6 +108,7 @@ export default function App() {
           onRSVPChange={handleRSVPChange}
         />
       )}
+
       {currentPage === 'event-info' && pageData.eventId && (
         <EventInfoPage 
           eventId={pageData.eventId} 
@@ -118,9 +120,16 @@ export default function App() {
           onRSVPChange={handleRSVPChange}
         />
       )}
-      {currentPage === 'event-forum' && pageData.eventId && (
-        <EventForumPage eventId={pageData.eventId} onNavigate={handleNavigate} />
+
+      {currentPage === "event-forum" && pageData.eventId && (
+        <EventForumPage 
+          eventId={pageData.eventId}
+          onGoBack={handleGoBack}
+          onNavigate={handleNavigate}
+          username={pageData?.username || "Guest"}
+        />
       )}
+
       
       {currentPage === 'profile' && (
         <ProfilePage 
