@@ -16,6 +16,7 @@ const FOCUS: Record<FocusKey, { position: [number, number, number]; target: [num
 const DWELL_DELAY_MS = 220
 const TWEEN_DURATION = 1.1
 const TWEEN_EASE = 'power3.inOut'
+const DESK_YAW = THREE.MathUtils.degToRad(-42)
 
 export function fitCameraToObject(
   camera: THREE.PerspectiveCamera,
@@ -103,6 +104,7 @@ function DeskWithMonitor({
   htmlPointerEnabled,
   showInstruction,
   devMode,
+  deskGroupRef,
 }: {
   onMonitorEnter: () => void
   onMonitorLeave: () => void
@@ -110,34 +112,60 @@ function DeskWithMonitor({
   htmlPointerEnabled: boolean
   showInstruction: boolean
   devMode: boolean
+  deskGroupRef: React.MutableRefObject<THREE.Group | null>
 }) {
-  const { scene } = useGLTF('/final.glb') as any
+  const { scene } = useGLTF('/final2.glb') as any
   const readyRef = useRef(false)
 
   useEffect(() => {
     scene.traverse((child: any) => {
       if (child.isMesh) {
+        if (child.geometry && !child.userData.__geometryPrepared) {
+          child.geometry = child.geometry.clone()
+          child.geometry.computeVertexNormals()
+          child.userData.__geometryPrepared = true
+        }
         child.castShadow = true
         child.receiveShadow = true
+        const materials = Array.isArray(child.material) ? child.material : [child.material]
+        materials.forEach((material) => {
+          if (!material) return
+          material.polygonOffset = true
+          material.polygonOffsetFactor = 2
+          material.polygonOffsetUnits = 2
+          if (material.side === undefined || material.side === THREE.DoubleSide) {
+            material.side = THREE.FrontSide
+          }
+          material.depthWrite = true
+          material.depthTest = true
+          material.needsUpdate = true
+          if ('shadowSide' in material) {
+            material.shadowSide = THREE.FrontSide
+          }
+        })
       }
     })
   }, [scene])
 
   useEffect(() => {
     if (!readyRef.current) {
-      readyRef.current = true
-      onModelReady(scene)
+      const target = deskGroupRef.current ?? scene
+      if (target) {
+        readyRef.current = true
+        onModelReady(target)
+      }
     }
-  }, [scene, onModelReady])
+  }, [deskGroupRef, scene, onModelReady])
 
   const planeSize: [number, number] = [0.64, 0.38]
   const planePos: [number, number, number] = [0.02, 1.16, -0.048]
   const planeRot: [number, number, number] = [0, Math.PI, 0]
   const planeRot2: [number, number, number] = [0, 1.6, 0]
-  const deskYaw = THREE.MathUtils.degToRad(-42)
-
   return (
-    <group rotation={[0, deskYaw, 0]}>
+    <group
+      ref={deskGroupRef}
+      rotation={[0, DESK_YAW, 0]}
+    >
       <primitive object={scene} />
       <mesh
         position={planePos}
@@ -208,6 +236,8 @@ function DeskWithMonitor({
   )
 }
 
+useGLTF.preload('/final2.glb')
+
 function ControlsUpdater({ controlsRef }: { controlsRef: React.MutableRefObject<OrbitControlsImpl | null> }) {
   useFrame(() => {
     controlsRef.current?.update()
@@ -226,6 +256,8 @@ function CameraParallax({
   dwellTimerRef: React.MutableRefObject<number | null>
   mouseRef: React.MutableRefObject<{ x: number; y: number }>
 }) {
+  const parallaxRef = useRef({ x: 0, y: 0 })
+
   useFrame((_, delta) => {
     const controls = controlsRef.current
     if (!controls) return
@@ -239,23 +271,52 @@ function CameraParallax({
     const targetOffsetX = (canParallax ? mouseRef.current.x : 0) * 0.15
     const targetOffsetY = (canParallax ? mouseRef.current.y : 0) * 0.08
 
-    const desiredPosX = FOCUS.wide.position[0] + targetOffsetX
-    const desiredPosY = FOCUS.wide.position[1] + targetOffsetY * 0.4
-    const desiredPosZ = FOCUS.wide.position[2] - targetOffsetX * 0.45
+    const parallaxSmoothing = 2.3
+    parallaxRef.current.x = THREE.MathUtils.damp(parallaxRef.current.x, targetOffsetX, parallaxSmoothing, delta)
+    parallaxRef.current.y = THREE.MathUtils.damp(parallaxRef.current.y, targetOffsetY, parallaxSmoothing, delta)
 
-    const desiredTargetX = FOCUS.wide.target[0] + targetOffsetX * 0.6
-    const desiredTargetY = FOCUS.wide.target[1] + targetOffsetY * 0.75
-    const desiredTargetZ = FOCUS.wide.target[2] - targetOffsetX * 0.3
+    const offsetX = parallaxRef.current.x
+    const offsetY = parallaxRef.current.y
 
-    const lerpAlpha = Math.min(delta * 3, 0.08)
+    const cinematicFactor = 3
 
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, desiredPosX, lerpAlpha)
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, desiredPosY, lerpAlpha)
-    camera.position.z = THREE.MathUtils.lerp(camera.position.z, desiredPosZ, lerpAlpha)
+    camera.position.x = THREE.MathUtils.damp(
+      camera.position.x,
+      FOCUS.wide.position[0] + offsetX * 1.0,
+      cinematicFactor,
+      delta,
+    )
+    camera.position.y = THREE.MathUtils.damp(
+      camera.position.y,
+      FOCUS.wide.position[1] + offsetY * 0.4,
+      cinematicFactor,
+      delta,
+    )
+    camera.position.z = THREE.MathUtils.damp(
+      camera.position.z,
+      FOCUS.wide.position[2] - offsetX * 0.45,
+      cinematicFactor,
+      delta,
+    )
 
-    controls.target.x = THREE.MathUtils.lerp(controls.target.x, desiredTargetX, lerpAlpha)
-    controls.target.y = THREE.MathUtils.lerp(controls.target.y, desiredTargetY, lerpAlpha)
-    controls.target.z = THREE.MathUtils.lerp(controls.target.z, desiredTargetZ, lerpAlpha)
+    controls.target.x = THREE.MathUtils.damp(
+      controls.target.x,
+      FOCUS.wide.target[0] + offsetX * 0.6,
+      cinematicFactor,
+      delta,
+    )
+    controls.target.y = THREE.MathUtils.damp(
+      controls.target.y,
+      FOCUS.wide.target[1] + offsetY * 0.75,
+      cinematicFactor,
+      delta,
+    )
+    controls.target.z = THREE.MathUtils.damp(
+      controls.target.z,
+      FOCUS.wide.target[2] - offsetX * 0.3,
+      cinematicFactor,
+      delta,
+    )
 
     controls.update()
   })
@@ -266,6 +327,7 @@ function CameraParallax({
 export default function ThreeLanding() {
   const controlsRef = useRef<OrbitControlsImpl | null>(null)
   const modelRef = useRef<THREE.Object3D | null>(null)
+  const deskGroupRef = useRef<THREE.Group | null>(null)
   const dwellTimerRef = useRef<number | null>(null)
   const zoomStateRef = useRef<ZoomState>('WIDE')
   const mouse = useRef({ x: 0, y: 0 })
@@ -277,6 +339,13 @@ export default function ThreeLanding() {
   useCursor(isHovering)
 
   const isZoomed = currentZoomState === 'ZOOMED'
+  const handleDeskReady = useCallback(
+    (object: THREE.Object3D) => {
+      modelRef.current = deskGroupRef.current ?? object
+      setModelReady(true)
+    },
+    [],
+  )
 
   useEffect(() => {
     const controls = controlsRef.current
@@ -398,47 +467,83 @@ export default function ThreeLanding() {
   return (
     <>
       <Canvas
+        dpr={[1, 2]}
         shadows
-        camera={{ fov: 45, near: 0.1, far: 100, position: FOCUS.wide.position }}
+        gl={{
+          antialias: true,
+          powerPreference: 'high-performance',
+          alpha: false,
+          depth: true,
+          stencil: false,
+          logarithmicDepthBuffer: true,
+        }}
+        onCreated={({ gl, camera }) => {
+          gl.setClearColor('#0e0e10', 1)
+          gl.outputColorSpace = THREE.SRGBColorSpace
+          gl.toneMapping = THREE.ACESFilmicToneMapping
+          gl.toneMappingExposure = 0.85
+          gl.shadowMap.enabled = true
+          gl.shadowMap.type = THREE.PCFSoftShadowMap
+          if ('useLegacyLights' in gl) {
+            // ensure physically based lighting pipeline for stable shading
+            ;(gl as any).useLegacyLights = false
+          }
+          if ('physicallyCorrectLights' in gl) {
+            ;(gl as any).physicallyCorrectLights = true
+          }
+          camera.near = 0.25
+          camera.far = 30
+          camera.updateProjectionMatrix()
+        }}
+        camera={{ fov: 45, near: 0.25, far: 30, position: FOCUS.wide.position }}
         style={{ width: '100vw', height: '100vh', background: '#0e0e10' }}
       >
         <Suspense fallback={null}>
           <color attach='background' args={['#0e0e10']} />
-        <Environment preset='studio' />
-        <DeskWithMonitor
-          devMode={devMode}
-          htmlPointerEnabled={isZoomed}
-          showInstruction={!overlayOpen && currentZoomState === 'WIDE'}
-          onMonitorEnter={handleMonitorEnter}
-          onMonitorLeave={handleMonitorLeave}
-          onModelReady={(object) => {
-            modelRef.current = object
-            setModelReady(true)
-          }}
-        />
-        <ContactShadows position={[0, -0.001, 0]} opacity={0.35} scale={10} blur={2} />
-        <OrbitControls
-          ref={controlsRef}
-          enableDamping
-          dampingFactor={0.1}
-          minDistance={1.5}
-          maxDistance={4}
-          minPolarAngle={0.8}
-          maxPolarAngle={1.35}
-          minAzimuthAngle={-Math.PI / 4}
-          maxAzimuthAngle={Math.PI / 4}
-          enableZoom
-          enablePan={false}
-          zoomSpeed={0.6}
-          target={FOCUS.wide.target}
-        />
-        <ControlsUpdater controlsRef={controlsRef} />
-        <CameraParallax
-          controlsRef={controlsRef}
-          zoomStateRef={zoomStateRef}
-          dwellTimerRef={dwellTimerRef}
-          mouseRef={mouse}
-        />
+          <ambientLight intensity={0.35} color='#ffe8d2' />
+          <directionalLight
+            position={[4, 6, 2]}
+            intensity={0.6}
+            color='#f4c89d'
+            castShadow
+            shadow-bias={-0.0008}
+            shadow-normalBias={0.04}
+            shadow-mapSize-width={2048}
+            shadow-mapSize-height={2048}
+          />
+          <Environment preset='studio' environmentIntensity={0.7} />
+          <DeskWithMonitor
+            devMode={devMode}
+            htmlPointerEnabled={isZoomed}
+            showInstruction={!overlayOpen && currentZoomState === 'WIDE'}
+            deskGroupRef={deskGroupRef}
+            onMonitorEnter={handleMonitorEnter}
+            onMonitorLeave={handleMonitorLeave}
+            onModelReady={handleDeskReady}
+          />
+          <ContactShadows position={[0, -0.001, 0]} opacity={0.35} scale={10} blur={2} />
+          <OrbitControls
+            ref={controlsRef}
+            enableDamping
+            dampingFactor={0.1}
+            minDistance={1.5}
+            maxDistance={4}
+            minPolarAngle={0.8}
+            maxPolarAngle={1.35}
+            minAzimuthAngle={-Math.PI / 4}
+            maxAzimuthAngle={Math.PI / 4}
+            enableZoom
+            enablePan={false}
+            zoomSpeed={0.6}
+            target={FOCUS.wide.target}
+          />
+          <ControlsUpdater controlsRef={controlsRef} />
+          <CameraParallax
+            controlsRef={controlsRef}
+            zoomStateRef={zoomStateRef}
+            dwellTimerRef={dwellTimerRef}
+            mouseRef={mouse}
+          />
         </Suspense>
       </Canvas>
       <div
