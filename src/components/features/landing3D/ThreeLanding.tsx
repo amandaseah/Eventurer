@@ -114,7 +114,7 @@ function DeskWithMonitor({
   devMode: boolean
   deskGroupRef: React.MutableRefObject<THREE.Group | null>
 }) {
-  const { scene } = useGLTF('/final2.glb') as any
+  const { scene } = useGLTF('/finaldeets.glb') as any
   const readyRef = useRef(false)
 
   useEffect(() => {
@@ -236,7 +236,7 @@ function DeskWithMonitor({
   )
 }
 
-useGLTF.preload('/final2.glb')
+useGLTF.preload('/finaldeets.glb')
 
 function ControlsUpdater({ controlsRef }: { controlsRef: React.MutableRefObject<OrbitControlsImpl | null> }) {
   useFrame(() => {
@@ -271,14 +271,14 @@ function CameraParallax({
     const targetOffsetX = (canParallax ? mouseRef.current.x : 0) * 0.15
     const targetOffsetY = (canParallax ? mouseRef.current.y : 0) * 0.08
 
-    const parallaxSmoothing = 2.3
+    const parallaxSmoothing = 4
     parallaxRef.current.x = THREE.MathUtils.damp(parallaxRef.current.x, targetOffsetX, parallaxSmoothing, delta)
     parallaxRef.current.y = THREE.MathUtils.damp(parallaxRef.current.y, targetOffsetY, parallaxSmoothing, delta)
 
     const offsetX = parallaxRef.current.x
     const offsetY = parallaxRef.current.y
 
-    const cinematicFactor = 3
+    const cinematicFactor = 5
 
     camera.position.x = THREE.MathUtils.damp(
       camera.position.x,
