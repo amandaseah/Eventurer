@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import gsap from 'gsap'
 import { Suspense, useEffect, useRef, useState, useCallback } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Environment, ContactShadows, useCursor, useGLTF, Html } from '@react-three/drei'
+import { OrbitControls, Environment, ContactShadows, useCursor, useGLTF, Html, useProgress } from '@react-three/drei'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 
 type FocusKey = 'wide' | 'monitor'
@@ -324,6 +324,45 @@ function CameraParallax({
   return null
 }
 
+function GlobalLoader({ opacity }: { opacity: number }) {
+  const { progress } = useProgress()
+  const rounded = Math.min(100, Math.max(0, Math.round(progress)))
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 90,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'radial-gradient(circle at 20% 20%, rgba(62,46,109,0.5), rgba(8,6,14,0.95))',
+        color: '#f8f7ff',
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase',
+        fontSize: '0.85rem',
+        fontWeight: 600,
+        pointerEvents: 'auto',
+        opacity,
+        transition: 'opacity 260ms ease',
+      }}
+    >
+      <div
+        style={{
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+        }}
+      >
+        <span style={{ opacity: 0.8 }}>Loading Eventurer</span>
+        <span style={{ fontSize: '0.75rem', letterSpacing: '0.32em', opacity: 0.6 }}>{`${rounded}%`}</span>
+      </div>
+    </div>
+  )
+}
+
 export default function ThreeLanding() {
   const controlsRef = useRef<OrbitControlsImpl | null>(null)
   const modelRef = useRef<THREE.Object3D | null>(null)
@@ -336,6 +375,9 @@ export default function ThreeLanding() {
   const [isHovering, setIsHovering] = useState(false)
   const [overlayOpen, setOverlayOpen] = useState(false)
   const [currentZoomState, setCurrentZoomState] = useState<ZoomState>('WIDE')
+  const [canvasDpr, setCanvasDpr] = useState<[number, number]>([1, 1.6])
+  const [showLoader, setShowLoader] = useState(true)
+  const [loaderOpacity, setLoaderOpacity] = useState(1)
   useCursor(isHovering)
 
   const isZoomed = currentZoomState === 'ZOOMED'
@@ -346,6 +388,22 @@ export default function ThreeLanding() {
     },
     [],
   )
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const deviceCap = Math.min(window.devicePixelRatio || 1, 1.6)
+    setCanvasDpr([1, deviceCap])
+  }, [])
+
+  useEffect(() => {
+    if (modelReady) {
+      setLoaderOpacity(0)
+      const timeout = window.setTimeout(() => setShowLoader(false), 280)
+      return () => window.clearTimeout(timeout)
+    }
+    setShowLoader(true)
+    setLoaderOpacity(1)
+  }, [modelReady])
 
   useEffect(() => {
     const controls = controlsRef.current
@@ -467,7 +525,7 @@ export default function ThreeLanding() {
   return (
     <>
       <Canvas
-        dpr={[1, 2]}
+        dpr={canvasDpr}
         shadows
         gl={{
           antialias: true,
@@ -475,8 +533,9 @@ export default function ThreeLanding() {
           alpha: false,
           depth: true,
           stencil: false,
-          logarithmicDepthBuffer: true,
+          logarithmicDepthBuffer: false,
         }}
+        performance={{ min: 0.6, debounce: 200 }}
         onCreated={({ gl, camera }) => {
           gl.setClearColor('#0e0e10', 1)
           gl.outputColorSpace = THREE.SRGBColorSpace
@@ -496,20 +555,26 @@ export default function ThreeLanding() {
           camera.updateProjectionMatrix()
         }}
         camera={{ fov: 45, near: 0.25, far: 30, position: FOCUS.wide.position }}
-        style={{ width: '100vw', height: '100vh', background: '#0e0e10' }}
+        style={{
+          width: '100vw',
+          height: '100vh',
+          background: '#0e0e10',
+          opacity: modelReady ? 1 : 0,
+          transition: 'opacity 320ms ease',
+        }}
       >
         <Suspense fallback={null}>
           <color attach='background' args={['#0e0e10']} />
           <ambientLight intensity={0.35} color='#ffe8d2' />
           <directionalLight
             position={[4, 6, 2]}
-            intensity={0.6}
+            intensity={0.55}
             color='#f4c89d'
             castShadow
             shadow-bias={-0.0008}
             shadow-normalBias={0.04}
-            shadow-mapSize-width={2048}
-            shadow-mapSize-height={2048}
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
           />
           <Environment preset='studio' environmentIntensity={0.7} />
           <DeskWithMonitor
@@ -521,7 +586,7 @@ export default function ThreeLanding() {
             onMonitorLeave={handleMonitorLeave}
             onModelReady={handleDeskReady}
           />
-          <ContactShadows position={[0, -0.001, 0]} opacity={0.35} scale={10} blur={2} />
+          <ContactShadows position={[0, -0.001, 0]} opacity={0.35} scale={10} blur={2} frames={1} />
           <OrbitControls
             ref={controlsRef}
             enableDamping
@@ -593,6 +658,7 @@ export default function ThreeLanding() {
           <iframe title='Eventurer Monitor' src='/app' style={{ width: '100%', height: '100%', border: 'none' }} />
         </div>
       </div>
+      {showLoader && <GlobalLoader opacity={loaderOpacity} />}
     </>
   )
 }
