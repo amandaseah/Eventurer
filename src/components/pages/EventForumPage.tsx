@@ -1,6 +1,6 @@
 import NewPostForm from "../features/forum/NewPostForm";
 import PostList from "../features/forum/PostList";
-import { ForumPost } from "../features/forum/types";
+import type { ForumPost } from "../features/forum/types";
 
 
 import { useState, useRef } from 'react';
@@ -11,16 +11,6 @@ import { ThumbsUp, Send, MessageSquare, Image as ImageIcon, X, Reply, ArrowLeft 
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 
-interface ForumPost {
-  id: number;
-  eventId: number;
-  username: string;
-  timestamp: string;
-  comment: string;
-  upvotes: number;
-  image?: string;
-  replyTo?: number;
-}
 
 interface EventForumPageProps {
   eventId: number;

@@ -1,5 +1,5 @@
 import LoginForm from '../features/signup/LoginForm';
-
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Mail, Lock } from 'lucide-react';
 import { Input } from '../ui/input';
