@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import { Suspense, useEffect, useRef, useState, useCallback } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, useCursor, useGLTF, Html, useProgress } from '@react-three/drei'
+import HomePreview from '../../pages/HomePreview'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 
 type FocusKey = 'wide' | 'monitor'
@@ -116,6 +117,7 @@ function DeskWithMonitor({
 }) {
   const { scene } = useGLTF('/finaldeets.glb') as any
   const readyRef = useRef(false)
+  const [iframeLoaded, setIframeLoaded] = useState(false)
 
   useEffect(() => {
     scene.traverse((child: any) => {
@@ -194,21 +196,61 @@ function DeskWithMonitor({
         <Html
           transform
           position={[0, 0, 0]}
-        //   rotation={[0, deskYaw, 0]}
-        //   position={[0, 0, 0.015]}
           scale={[planeSize[0] / 700, planeSize[0] / 700, planeSize[0] / 700]}
-        //   scale={[planeSize[0] / 350, planeSize[0] / 350, planeSize[0] / 350]}
           distanceFactor={1}
           style={{
             width: 700,
             height: 430,
-            borderRadius: 8,
+            borderRadius: 12,
             overflow: 'hidden',
-            boxShadow: '0 0 20px rgba(0,0,0,0.35)',
+            boxShadow: '0 0 24px rgba(234, 129, 180, 0.22)',
+            background: '#fff0f6',
             pointerEvents: htmlPointerEnabled ? 'auto' : 'none',
+            transition: 'pointer-events 0.2s ease',
           }}
         >
-          <iframe title='Eventurer' src='/app' style={{ width: '100%', height: '100%', border: 'none' }} />
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(145deg, rgba(255,240,246,0.96), rgba(255,228,238,0.92))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                opacity: htmlPointerEnabled ? 0 : 1,
+                transition: 'opacity 280ms ease',
+              }}
+            >
+              <div style={{ width: '100%', height: '100%', pointerEvents: 'none' }}>
+                <HomePreview />
+              </div>
+            </div>
+            <iframe
+              title='Eventurer'
+              src='/app'
+              loading='eager'
+              onLoad={() => setIframeLoaded(true)}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                background: '#fff0f6',
+                opacity: iframeLoaded && htmlPointerEnabled ? 1 : iframeLoaded ? 0 : 0,
+                pointerEvents: htmlPointerEnabled ? 'auto' : 'none',
+                transition: 'opacity 320ms ease',
+              }}
+            />
+          </div>
         </Html>
         {showInstruction && (
           <Html
@@ -324,7 +366,34 @@ function CameraParallax({
   return null
 }
 
+const LOADER_STYLE_ID = 'eventurer-loader-animations'
+const loaderAnimationCss = `
+@keyframes eventurerGlowDriftA {
+  0% { transform: translate3d(-30%, -35%, 0) scale(1); opacity: 0.58; }
+  50% { transform: translate3d(25%, -15%, 0) scale(1.25); opacity: 0.72; }
+  100% { transform: translate3d(-20%, 30%, 0) scale(1.05); opacity: 0.6; }
+}
+@keyframes eventurerGlowDriftB {
+  0% { transform: translate3d(35%, 20%, 0) scale(0.95); opacity: 0.45; }
+  50% { transform: translate3d(-10%, -25%, 0) scale(1.4); opacity: 0.7; }
+  100% { transform: translate3d(40%, -5%, 0) scale(1.1); opacity: 0.5; }
+}
+@keyframes eventurerLoaderPulse {
+  0%, 100% { transform: translateY(0); opacity: 0.65; }
+  50% { transform: translateY(-6px); opacity: 1; }
+}
+`
+
 function GlobalLoader({ opacity }: { opacity: number }) {
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (document.getElementById(LOADER_STYLE_ID)) return
+    const styleTag = document.createElement('style')
+    styleTag.id = LOADER_STYLE_ID
+    styleTag.textContent = loaderAnimationCss
+    document.head.appendChild(styleTag)
+  }, [])
+
   const { progress } = useProgress()
   const rounded = Math.min(100, Math.max(0, Math.round(progress)))
 
@@ -337,12 +406,9 @@ function GlobalLoader({ opacity }: { opacity: number }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'radial-gradient(circle at 20% 20%, rgba(62,46,109,0.5), rgba(8,6,14,0.95))',
-        color: '#f8f7ff',
-        letterSpacing: '0.18em',
-        textTransform: 'uppercase',
-        fontSize: '0.85rem',
-        fontWeight: 600,
+        overflow: 'hidden',
+        background: 'linear-gradient(135deg, rgba(255, 228, 240, 0.92), rgba(255, 200, 220, 0.9))',
+        color: '#5b3142',
         pointerEvents: 'auto',
         opacity,
         transition: 'opacity 260ms ease',
@@ -350,14 +416,66 @@ function GlobalLoader({ opacity }: { opacity: number }) {
     >
       <div
         style={{
+          position: 'absolute',
+          width: '65vmax',
+          height: '65vmax',
+          top: '50%',
+          left: '50%',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.82) 0%, rgba(255,176,204,0.16) 45%, rgba(255,191,214,0) 70%)',
+          filter: 'blur(0px)',
+          mixBlendMode: 'screen',
+          animation: 'eventurerGlowDriftA 8.5s ease-in-out infinite',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          width: '55vmax',
+          height: '55vmax',
+          top: '35%',
+          right: '30%',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,245,250,0.78) 0%, rgba(253,203,220,0.18) 40%, rgba(255,200,224,0) 72%)',
+          filter: 'blur(0px)',
+          mixBlendMode: 'screen',
+          animation: 'eventurerGlowDriftB 10s ease-in-out infinite',
+          pointerEvents: 'none',
+        }}
+      />
+
+      <div
+        style={{
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
           gap: 12,
+          alignItems: 'center',
+          letterSpacing: '0.22em',
+          textTransform: 'uppercase',
         }}
       >
-        <span style={{ opacity: 0.8 }}>Loading Eventurer</span>
-        <span style={{ fontSize: '0.75rem', letterSpacing: '0.32em', opacity: 0.6 }}>{`${rounded}%`}</span>
+        <span
+          style={{
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            opacity: 0.88,
+            animation: 'eventurerLoaderPulse 2.6s ease-in-out infinite',
+          }}
+        >
+          Loading Eventurer
+        </span>
+        <span
+          style={{
+            fontSize: '0.75rem',
+            fontWeight: 500,
+            letterSpacing: '0.32em',
+            opacity: 0.65,
+          }}
+        >
+          {`${rounded}%`}
+        </span>
       </div>
     </div>
   )
