@@ -67,6 +67,17 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
           Login
         </Button>
       </motion.div>
+
+      <div className="text-center mt-3 text-sm text-gray-500">
+        Don't have an account?{' '}
+        <button
+          type="button"
+          onClick={() => onNavigate('signup')}
+          className="text-purple-600 hover:underline font-medium"
+        >
+          Sign up here!
+        </button>
+      </div>
     </motion.form>
   );
 }
