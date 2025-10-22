@@ -6,7 +6,7 @@ import EventDetails from "../features/eventInfo/EventDetails";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Header } from "../Header";
-import { events, forumPosts } from "../../lib/mockData";
+// import { events, forumPosts } from "../../lib/mockData";
 import Image from "../common/Image";
 import {
   Calendar,
@@ -35,6 +35,7 @@ import { formatDateToDDMMYYYY } from "../../lib/dateUtils";
 
 interface EventInfoPageProps {
   eventId: number;
+  events: any[];
   onNavigate: (page: string, data?: any) => void;
   onGoBack: () => void;
   bookmarkedEventIds: number[];
@@ -48,6 +49,7 @@ interface EventInfoPageProps {
 
 export function EventInfoPage({
   eventId,
+  events,
   onNavigate,
   onGoBack,
   bookmarkedEventIds,
