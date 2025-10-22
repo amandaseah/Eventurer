@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { LoginPage } from './components/pages/LoginPage';
+import { SignupPage } from './components/pages/SignupPage';
 import { LandingPage } from './components/pages/LandingPage';
 import { MoodResultsPage } from './components/pages/MoodResultsPage';
 import { EventExplorePage } from './components/pages/EventExplorePage';
@@ -22,6 +23,7 @@ interface Discussion {
 
 type Page =
   | 'login'
+  | 'signup'
   | 'landing'
   | 'mood-results'
   | 'explore'
@@ -42,9 +44,11 @@ export default function App() {
   const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([3, 4, 7]);
   
 
-  const handleNavigate = (page: Page, data?: PageData) => {
-    setCurrentPage(page);
-    setNavigationHistory(prev => [...prev, page]);
+  const handleNavigate = (page: string, data?: PageData) => {
+    // allow string pages coming from child components; coerce into Page when possible
+    const target = page as Page;
+    setCurrentPage(target);
+    setNavigationHistory(prev => [...prev, target]);
     if (data) {
       setPageData(data);
     }
@@ -82,12 +86,13 @@ export default function App() {
   const bookmarkedEvents = events.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
   const rsvpedEvents = events.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
 
-  const showCountdownWidget = currentPage !== 'login' && (bookmarkedEvents.length > 0 || rsvpedEvents.length > 0);
+  const showCountdownWidget = currentPage !== 'login' && currentPage !== 'signup' && (bookmarkedEvents.length > 0 || rsvpedEvents.length > 0);
 
   return (
     <div className="size-full">
-      {currentPage === 'login' && <LoginPage onNavigate={handleNavigate} />}
-      {currentPage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
+  {currentPage === 'login' && <LoginPage onNavigate={handleNavigate} />}
+  {currentPage === 'signup' && <SignupPage onNavigate={handleNavigate} />}
+  {currentPage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
       {currentPage === 'mood-results' && pageData.mood && (
         <MoodResultsPage 
         mood={pageData.mood}
