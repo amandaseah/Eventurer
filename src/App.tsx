@@ -110,6 +110,7 @@ export default function App() {
       {currentPage === 'event-info' && pageData.eventId && (
         <EventInfoPage 
           eventId={pageData.eventId} 
+          events={events}
           onNavigate={handleNavigate}
           onGoBack={handleGoBack}
           bookmarkedEventIds={bookmarkedEventIds}

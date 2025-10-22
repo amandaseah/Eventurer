@@ -1,12 +1,16 @@
 import RecommendationPanel from "../features/recommendation/RecommendationPanel";
 import FiltersPanel from "../features/explore/FiltersPanel";
+// import { fetchEventbriteEventsForMe } from '../../lib/eventbriteService';
+import { sanityCheckMe, fetchEventbriteEventsForMe } from '../../lib/eventbriteService';
 
 
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
-import { events } from '../../lib/mockData';
+// import { events } from '../../lib/mockData';
+import { fetchEventbriteEvents } from '../../lib/eventbriteService';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, SlidersHorizontal, ArrowLeft } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Calendar } from '../ui/calendar';
@@ -38,8 +42,30 @@ export function EventExplorePage({
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
 
-  const recommendedEvents = events.filter(e => !e.isPast).slice(0, 4);
-  let allEvents = [...events.filter(e => !e.isPast)];
+  const [fetchedEvents, setFetchedEvents] = useState<any[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+
+ useEffect(() => {
+  async function load() {
+    setLoadingEvents(true);
+    try {
+      await sanityCheckMe();       // ← if this fails, stop and fix token/header
+    } catch {
+      setLoadingEvents(false);
+      return;
+    }
+    const data = await fetchEventbriteEventsForMe();
+    console.log('[Explore] fetched events:', data);  
+    setFetchedEvents(data);
+    console.log("Fetched:", data);
+    setLoadingEvents(false);
+  }
+  load();
+}, []);
+
+  const recommendedEvents = fetchedEvents.filter(e => !e.isPast).slice(0, 4);
+  let allEvents = [...fetchedEvents.filter(e => !e.isPast)];
+
 
   if (categoryFilter !== 'all') {
     allEvents = allEvents.filter(e => e.category === categoryFilter);
@@ -124,6 +150,7 @@ export function EventExplorePage({
         <div className="w-full">
           {/* Carousel Section */}
           <RecommendationPanel
+            events={fetchedEvents}
             onSelect={(id) => onNavigate("event-info", { eventId: id })}
             bookmarkedEventIds={bookmarkedEventIds}
             rsvpedEventIds={rsvpedEventIds}

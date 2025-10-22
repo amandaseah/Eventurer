@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { events as allEvents } from "../../../lib/mockData";               // no alias
+// import { events as allEvents } from "../../../lib/mockData";               // no alias
 import { EventCard } from "../event/EventCard";                  // no alias
 
 type Props = {
+  events: any[] // receive events from parent
   mood?: string;                                                         // "chill" | "active" | "social" | etc
   limit?: number;                                                        // how many to show (default 4)
   title?: string;                                                        // heading text
@@ -16,6 +17,7 @@ type Props = {
 };
 
 export default function RecommendationPanel({
+  events,
   mood,
   limit = 4,
   title = "Recommended Events (based on your mood)",
@@ -27,10 +29,10 @@ export default function RecommendationPanel({
 }: Props) {
   // pick recommended events
   const recommended = useMemo(() => {
-    const pool = allEvents.filter(e => !e.isPast);
+    const pool = events.filter(e => !e.isPast);
     const byMood = mood ? pool.filter(e => e.mood === mood) : pool;
     return byMood.slice(0, limit);
-  }, [mood, limit]);
+  }, [events, mood, limit]);
 
   const [current, setCurrent] = useState(0);
   const next = () => setCurrent(p => (p === recommended.length - 1 ? 0 : p + 1));

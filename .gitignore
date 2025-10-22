@@ -3,6 +3,7 @@ dist
 .vite
 pnpm-lock.yaml
 yarn.lock
+.env.local
 
 .DS_Store
 
