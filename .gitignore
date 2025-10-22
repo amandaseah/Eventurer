@@ -13,3 +13,4 @@ yarn.lock
 # env files
 .env
 .env.local
+.env
