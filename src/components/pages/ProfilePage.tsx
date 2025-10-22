@@ -1,5 +1,8 @@
 import ProfileHeader from "../features/profile/ProfileHeader";
 import AccountPanel from "../features/profile/AccountPanel";
+import { auth, db } from '../../lib/firebase.ts';
+import { updateProfile } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import SettingsPanel from "../features/profile/SettingsPanel";
 import EventsGrid from "../features/profile/EventsGrid";
 
@@ -21,6 +24,7 @@ interface ProfilePageProps {
   rsvpedEventIds: number[];
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
   onRSVPChange: (eventId: number, isRSVPed: boolean) => void;
+  currentUser?: any;
 }
 
 export function ProfilePage({ 
@@ -29,18 +33,41 @@ export function ProfilePage({
   bookmarkedEventIds, 
   rsvpedEventIds, 
   onBookmarkChange,
-  onRSVPChange 
+  onRSVPChange,
+  currentUser,
 }: ProfilePageProps) {
   const [activeTab, setActiveTab] = useState('bookmarked');
   const [isEditingAccount, setIsEditingAccount] = useState(false);
-  const [userName, setUserName] = useState('Alex Chen');
-  const [userEmail, setUserEmail] = useState('alex.chen@example.com');
+  const [userName, setUserName] = useState(() => {
+    if (currentUser) {
+      if (currentUser.displayName) return currentUser.displayName;
+      const fn = currentUser.firstName || currentUser.first_name || '';
+      const ln = currentUser.lastName || currentUser.last_name || '';
+      if (fn || ln) return `${fn} ${ln}`.trim();
+      if (currentUser.email) return currentUser.email.split('@')[0];
+    }
+    return 'Alex Chen';
+  });
 
-  // Mock user data
+  const [userEmail, setUserEmail] = useState(() => currentUser?.email || 'alex.chen@example.com');
+
+  // Prefer currentUser (if passed) but allow local editing
+  let memberSince = 'January 2025';
+  if (currentUser && currentUser.createdAt) {
+    try {
+      const d = new Date(currentUser.createdAt);
+      memberSince = d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+    } catch (e) {
+      memberSince = String(currentUser.createdAt).slice(0, 10);
+    }
+  }
+
+  // prefer local editable state so UI updates immediately after save;
+  // fall back to auth-provided values when local state is empty
   const user = {
-    name: userName,
-    email: userEmail,
-    memberSince: 'January 2025',
+    name: userName || currentUser?.displayName,
+    email: userEmail || currentUser?.email,
+    memberSince,
   };
 
   // Filter events based on bookmarked and RSVP'd IDs
@@ -50,7 +77,40 @@ export function ProfilePage({
 
   const handleSaveProfile = () => {
     setIsEditingAccount(false);
-    // In a real app, this would save to backend
+    // If we have an authenticated user, persist changes to Firebase
+    // Otherwise this remains a local-only change
+  };
+
+  const handleSaveProfileWithData = async (changes?: { firstName?: string; lastName?: string; email?: string }) => {
+    setIsEditingAccount(false);
+    // update local state
+    if (changes?.firstName || changes?.lastName) {
+      const combined = `${changes.firstName || ''} ${changes.lastName || ''}`.trim();
+      if (combined) setUserName(combined);
+    }
+    if (changes?.email) setUserEmail(changes.email);
+
+    // if we have a logged-in user, try to persist
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      // update auth profile displayName
+      const displayName = `${changes?.firstName || user.displayName || ''} ${changes?.lastName || ''}`.trim() || user.displayName || undefined;
+      if (displayName) {
+        await updateProfile(user, { displayName });
+      }
+
+      // update Firestore user doc
+      await setDoc(doc(db, 'users', user.uid), {
+        firstName: changes?.firstName ?? null,
+        lastName: changes?.lastName ?? null,
+        displayName: displayName ?? null,
+        email: changes?.email ?? user.email ?? null,
+      }, { merge: true });
+    } catch (e) {
+      console.warn('Failed to persist profile changes', e);
+    }
   };
 
   return (
@@ -210,10 +270,7 @@ export function ProfilePage({
               memberSince={user.memberSince}
               onChangeName={setUserName}
               onChangeEmail={setUserEmail}
-              onSave={() => {
-                setIsEditingAccount(false);
-                // TODO: save to backend if needed
-              }}
+              onSave={handleSaveProfileWithData}
               onCancel={() => setIsEditingAccount(false)}
             />
             {!isEditingAccount && (
