@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LoginPage } from './components/pages/LoginPage';
 import { LandingPage } from './components/pages/LandingPage';
 import { MoodResultsPage } from './components/pages/MoodResultsPage';
@@ -9,6 +9,7 @@ import { ProfilePage } from './components/pages/ProfilePage';
 import { CountdownWidget } from './components/CountdownWidget';
 import { Toaster } from './components/ui/sonner';
 import { events } from './lib/mockData';
+import { loadGoogleMapsScript } from './lib/loadGoogleMaps';
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import ThreeLanding from './components/features/landing3D/ThreeLanding'
@@ -46,6 +47,13 @@ function ShellApp() {
   const [navigationHistory, setNavigationHistory] = useState<Page[]>(['landing']);
   const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([1, 2, 3, 4]);
   const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([3, 4, 7]);
+
+  useEffect(() => {
+    // Preload Google Maps so the first visit to event details feels instant.
+    loadGoogleMapsScript().catch((error) => {
+      console.warn('[ShellApp] Failed to preload Google Maps script:', error);
+    });
+  }, []);
   
 
   const handleNavigate = (page: Page, data?: PageData) => {
