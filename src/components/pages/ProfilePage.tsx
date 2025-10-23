@@ -1,13 +1,13 @@
 import ProfileHeader from "../features/profile/ProfileHeader";
 import AccountPanel from "../features/profile/AccountPanel";
 import { auth, db } from '../../lib/firebase.ts';
-import { updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { updateProfile, onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import SettingsPanel from "../features/profile/SettingsPanel";
 import EventsGrid from "../features/profile/EventsGrid";
 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
@@ -113,6 +113,60 @@ export function ProfilePage({
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.warn('Sign out failed', e);
+    }
+    // navigate to login page
+    onNavigate('login');
+  };
+
+  // Listen for auth state changes so the page updates after signup/login
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      if (!u) return;
+      // update local state from auth
+      if (u.displayName) setUserName(u.displayName);
+      if (u.email) setUserEmail(u.email);
+
+      // try to fetch Firestore user doc for first/last and createdAt
+      try {
+        const snap = await getDoc(doc(db, 'users', u.uid));
+        if (snap.exists()) {
+          const data: any = snap.data();
+          if (data?.firstName || data?.lastName) {
+            const fn = data.firstName || data.first_name || '';
+            const ln = data.lastName || data.last_name || '';
+            const combined = `${fn} ${ln}`.trim();
+            if (combined) setUserName(combined);
+          }
+          if (data?.createdAt) {
+            try {
+              const ts = data.createdAt;
+              const date = typeof ts.toDate === 'function' ? ts.toDate() : new Date(ts);
+              // we don't store memberSince in state; this will affect rendering via computation
+            } catch (e) {
+              // ignore
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to read user doc', e);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  // Sync when parent-provided currentUser prop changes (e.g., after login)
+  useEffect(() => {
+    if (!currentUser) return;
+    if (currentUser.displayName) setUserName(currentUser.displayName);
+    else if (currentUser.firstName || currentUser.lastName) setUserName(`${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim());
+    if (currentUser.email) setUserEmail(currentUser.email);
+  }, [currentUser]);
+
   return (
     <div className="min-h-screen">
       <Header currentPage="profile" onNavigate={onNavigate} />
@@ -135,6 +189,7 @@ export function ProfilePage({
           name={user.name}
           email={user.email}
           memberSince={user.memberSince}
+          onSignOut={handleSignOut}
         />
 
         {/* Tabs */}
