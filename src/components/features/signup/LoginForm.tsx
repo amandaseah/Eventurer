@@ -24,9 +24,9 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
 
     setLoading(true);
     try {
-      await signInWithEmail({ email, password });
-      // navigate to profile where auth listener will update UI
-      onNavigate('profile');
+  await signInWithEmail({ email, password });
+  // after successful login, navigate to landing
+  onNavigate('landing');
     } catch (err: any) {
       setError(err?.message || 'Unable to sign in');
     } finally {

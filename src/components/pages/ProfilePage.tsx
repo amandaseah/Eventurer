@@ -6,16 +6,12 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
 import SettingsPanel from "../features/profile/SettingsPanel";
 import EventsGrid from "../features/profile/EventsGrid";
 
-
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { Header } from '../Header';
-import { EventCard } from '../features/event/EventCard';
 import { events } from '../../lib/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { User, Bookmark, CheckCircle, Clock, Settings, ArrowLeft } from 'lucide-react';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
 
 interface ProfilePageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -38,37 +34,21 @@ export function ProfilePage({
 }: ProfilePageProps) {
   const [activeTab, setActiveTab] = useState('bookmarked');
   const [isEditingAccount, setIsEditingAccount] = useState(false);
-  const [userName, setUserName] = useState(() => {
-    if (currentUser) {
-      if (currentUser.displayName) return currentUser.displayName;
-      const fn = currentUser.firstName || currentUser.first_name || '';
-      const ln = currentUser.lastName || currentUser.last_name || '';
-      if (fn || ln) return `${fn} ${ln}`.trim();
-      if (currentUser.email) return currentUser.email.split('@')[0];
+
+  // Local user display state (prefers ints from auth/db but editable locally)
+  const [userName, setUserName] = useState<string>(currentUser?.displayName || `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() || 'Alex Chen');
+  const [userEmail, setUserEmail] = useState<string>(currentUser?.email || 'alex.chen@example.com');
+  const [memberSince, setMemberSince] = useState<string>(() => {
+    if (currentUser?.createdAt) {
+      try {
+        const d = new Date(currentUser.createdAt);
+        return d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+      } catch { /* fallthrough */ }
     }
-    return 'Alex Chen';
+    return 'January 2025';
   });
 
-  const [userEmail, setUserEmail] = useState(() => currentUser?.email || 'alex.chen@example.com');
-
-  // Prefer currentUser (if passed) but allow local editing
-  let memberSince = 'January 2025';
-  if (currentUser && currentUser.createdAt) {
-    try {
-      const d = new Date(currentUser.createdAt);
-      memberSince = d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
-    } catch (e) {
-      memberSince = String(currentUser.createdAt).slice(0, 10);
-    }
-  }
-
-  // prefer local editable state so UI updates immediately after save;
-  // fall back to auth-provided values when local state is empty
-  const user = {
-    name: userName || currentUser?.displayName,
-    email: userEmail || currentUser?.email,
-    memberSince,
-  };
+  const user = { name: userName, email: userEmail, memberSince };
 
   // Filter events based on bookmarked and RSVP'd IDs
   const bookmarkedEvents = events.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
@@ -83,33 +63,28 @@ export function ProfilePage({
 
   const handleSaveProfileWithData = async (changes?: { firstName?: string; lastName?: string; email?: string }) => {
     setIsEditingAccount(false);
-    // update local state
+    // Update local preview
     if (changes?.firstName || changes?.lastName) {
-      const combined = `${changes.firstName || ''} ${changes.lastName || ''}`.trim();
-      if (combined) setUserName(combined);
+      setUserName(`${changes?.firstName || ''} ${changes?.lastName || ''}`.trim());
     }
     if (changes?.email) setUserEmail(changes.email);
 
-    // if we have a logged-in user, try to persist
+    // Persist to Firebase if logged in
     try {
-      const user = auth.currentUser;
-      if (!user) return;
+      const u = auth.currentUser;
+      if (!u) return;
 
-      // update auth profile displayName
-      const displayName = `${changes?.firstName || user.displayName || ''} ${changes?.lastName || ''}`.trim() || user.displayName || undefined;
-      if (displayName) {
-        await updateProfile(user, { displayName });
-      }
+      const displayName = `${changes?.firstName || u.displayName || ''} ${changes?.lastName || ''}`.trim() || u.displayName || undefined;
+      if (displayName) await updateProfile(u, { displayName });
 
-      // update Firestore user doc
-      await setDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(db, 'users', u.uid), {
         firstName: changes?.firstName ?? null,
         lastName: changes?.lastName ?? null,
         displayName: displayName ?? null,
-        email: changes?.email ?? user.email ?? null,
+        email: changes?.email ?? u.email ?? null,
       }, { merge: true });
-    } catch (e) {
-      console.warn('Failed to persist profile changes', e);
+    } catch (err) {
+      console.warn('Failed to persist profile changes', err);
     }
   };
 
@@ -127,33 +102,23 @@ export function ProfilePage({
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (!u) return;
-      // update local state from auth
-      if (u.displayName) setUserName(u.displayName);
-      if (u.email) setUserEmail(u.email);
+      // update from auth first
+      setUserName(u.displayName || userName);
+      setUserEmail(u.email || userEmail);
 
-      // try to fetch Firestore user doc for first/last and createdAt
+      // then try to enrich from Firestore user doc
       try {
         const snap = await getDoc(doc(db, 'users', u.uid));
-        if (snap.exists()) {
-          const data: any = snap.data();
-          if (data?.firstName || data?.lastName) {
-            const fn = data.firstName || data.first_name || '';
-            const ln = data.lastName || data.last_name || '';
-            const combined = `${fn} ${ln}`.trim();
-            if (combined) setUserName(combined);
-          }
-          if (data?.createdAt) {
-            try {
-              const ts = data.createdAt;
-              const date = typeof ts.toDate === 'function' ? ts.toDate() : new Date(ts);
-              // we don't store memberSince in state; this will affect rendering via computation
-            } catch (e) {
-              // ignore
-            }
-          }
+        if (!snap.exists()) return;
+        const data: any = snap.data();
+        if (data.firstName || data.lastName) setUserName(`${data.firstName || ''} ${data.lastName || ''}`.trim());
+        if (data.createdAt) {
+          const ts = data.createdAt;
+          const date = typeof ts.toDate === 'function' ? ts.toDate() : new Date(ts);
+          setMemberSince(date.toLocaleString(undefined, { month: 'long', year: 'numeric' }));
         }
-      } catch (e) {
-        console.warn('Failed to read user doc', e);
+      } catch (err) {
+        console.warn('Failed to read user doc', err);
       }
     });
     return () => unsub();
