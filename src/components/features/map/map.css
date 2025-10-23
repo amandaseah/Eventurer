@@ -1,0 +1,24 @@
+/* Force Leaflet to stay inside the card */
+.map-wrapper {
+    position: relative;
+    overflow: hidden;         /* clip tiles when panning/zooming */
+    border-radius: 1.5rem;    /* match your rounded-3xl */
+    isolation: isolate;       /* <- creates a new stacking context! */
+  }
+  
+  /* Keep Leaflet stuff above the background of the wrapper, but inside it */
+  .map-wrapper .leaflet-container {
+    z-index: 0;
+  }
+  
+  .map-wrapper .leaflet-pane,
+  .map-wrapper .leaflet-control,
+  .map-wrapper .leaflet-top,
+  .map-wrapper .leaflet-bottom {
+    z-index: 1;
+  }
+  
+  /* Optional: ensure the map has a definite height if not already */
+  .map-wrapper .leaflet-container {
+    height: 320px; /* or 360px to taste */
+  }
