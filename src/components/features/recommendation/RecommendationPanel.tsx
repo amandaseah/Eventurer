@@ -35,6 +35,9 @@ export default function RecommendationPanel({
   }, [events, mood, limit]);
 
   const [current, setCurrent] = useState(0);
+  // if no events yet, don't render
+  if (!events || events.length === 0) return null;
+
   const next = () => setCurrent(p => (p === recommended.length - 1 ? 0 : p + 1));
   const prev = () => setCurrent(p => (p === 0 ? recommended.length - 1 : p - 1));
 
