@@ -1,23 +1,12 @@
 import LoginForm from '../features/signup/LoginForm';
-
 import { motion } from 'motion/react';
-import { Sparkles, Mail, Lock } from 'lucide-react';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
+import { Sparkles } from 'lucide-react';
 
 interface LoginPageProps {
   onNavigate: (page: string) => void;
 }
 
 export function LoginPage({ onNavigate }: LoginPageProps) {
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    onNavigate('landing');
-    const [mode, setMode] = useState<'login' | 'signup'>('login');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
       {/* Animated background gradients */}
