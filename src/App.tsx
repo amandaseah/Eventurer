@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { LoginPage } from './components/pages/LoginPage';
+import { SignupPage } from './components/pages/SignupPage';
 import { LandingPage } from './components/pages/LandingPage';
 import { MoodResultsPage } from './components/pages/MoodResultsPage';
 import { EventExplorePage } from './components/pages/EventExplorePage';
@@ -15,8 +16,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import ThreeLanding from './components/features/landing3D/ThreeLanding'
 import HomePreview from './components/pages/HomePreview'
 
-
-
 interface Discussion {
   id: number;
   username: string;
@@ -29,6 +28,7 @@ interface Discussion {
 
 type Page =
   | 'login'
+  | 'signup'
   | 'landing'
   | 'mood-results'
   | 'explore'
@@ -42,9 +42,13 @@ interface PageData {
 }
 
 function ShellApp() {
-  const [currentPage, setCurrentPage] = useState<Page>('landing');
+  // Get initial page from URL parameters
+  const params = new URLSearchParams(window.location.search);
+  const initialPage = (params.get('page') as Page) || 'landing';
+  
+  const [currentPage, setCurrentPage] = useState<Page>(initialPage);
   const [pageData, setPageData] = useState<PageData>({});
-  const [navigationHistory, setNavigationHistory] = useState<Page[]>(['landing']);
+  const [navigationHistory, setNavigationHistory] = useState<Page[]>([initialPage]);
   const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([1, 2, 3, 4]);
   const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([3, 4, 7]);
 
@@ -56,12 +60,45 @@ function ShellApp() {
   }, []);
   
 
-  const handleNavigate = (page: Page, data?: PageData) => {
-    setCurrentPage(page);
-    setNavigationHistory(prev => [...prev, page]);
-    if (data) {
-      setPageData(data);
-    }
+  // eventbrite events fetch!
+  const [fetchedEvents, setFetchedEvents] = useState<any[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoadingEvents(true);
+        await sanityCheckMe();
+        const data = await fetchEventbriteEventsForMe();
+        const enriched = data.map((e: any) => {
+        const { mood, category } = categorizeEvent(
+          e.name?.text || e.name || "",
+          e.description?.text || e.description || "",
+          e.category?.name || e.category
+        );
+        return { ...e, mood, category };
+      });
+        setFetchedEvents(enriched);
+        if (mounted) setFetchedEvents(data);
+      } catch (err) {
+        console.error("[App] failed fetching events:", err);
+      } finally {
+        if (mounted) setLoadingEvents(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const bookmarkedEvents = fetchedEvents.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
+  const rsvpedEvents    = fetchedEvents.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
+
+
+  const handleNavigate: (page: string, data?: any) => void = (page, data) => {
+    setCurrentPage(page as Page);
+    setNavigationHistory(prev => [...prev, page as Page]);
+    if (data) setPageData(data as PageData);
   };
 
   const handleGoBack = () => {
@@ -93,18 +130,22 @@ function ShellApp() {
     }
   };
 
-  const bookmarkedEvents = events.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
-  const rsvpedEvents = events.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
-
   const showCountdownWidget = currentPage !== 'login' && (bookmarkedEvents.length > 0 || rsvpedEvents.length > 0);
 
   return (
     <div className="size-full">
       {currentPage === 'login' && <LoginPage onNavigate={handleNavigate} />}
-      {currentPage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
+      {currentPage === 'landing' && (
+        <LandingPage
+          onNavigate={handleNavigate}
+          events={fetchedEvents}
+          loading={loadingEvents}
+        />
+      )}
       {currentPage === 'mood-results' && pageData.mood && (
         <MoodResultsPage 
         mood={pageData.mood}
+        events={fetchedEvents}
         onNavigate={handleNavigate}
         bookmarkedEventIds={bookmarkedEventIds}
         rsvpedEventIds={rsvpedEventIds}
@@ -112,18 +153,22 @@ function ShellApp() {
         onRSVPChange={handleRSVPChange}
          />
       )}
+
       {currentPage === 'explore' && (
-        <EventExplorePage 
-          onNavigate={handleNavigate}
-          bookmarkedEventIds={bookmarkedEventIds}
-          rsvpedEventIds={rsvpedEventIds}
-          onBookmarkChange={handleBookmarkChange}
-          onRSVPChange={handleRSVPChange}
+      <EventExplorePage 
+        events={fetchedEvents}
+        onNavigate={handleNavigate}
+        bookmarkedEventIds={bookmarkedEventIds}
+        rsvpedEventIds={rsvpedEventIds}
+        onBookmarkChange={handleBookmarkChange}
+        onRSVPChange={handleRSVPChange}
         />
       )}
+
       {currentPage === 'event-info' && pageData.eventId && (
         <EventInfoPage 
           eventId={pageData.eventId} 
+          events={fetchedEvents}
           onNavigate={handleNavigate}
           onGoBack={handleGoBack}
           bookmarkedEventIds={bookmarkedEventIds}
@@ -138,6 +183,7 @@ function ShellApp() {
       
       {currentPage === 'profile' && (
         <ProfilePage 
+          events={fetchedEvents}
           onNavigate={handleNavigate}
           onGoBack={handleGoBack}
           bookmarkedEventIds={bookmarkedEventIds}

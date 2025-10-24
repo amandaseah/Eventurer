@@ -56,5 +56,12 @@
     server: {
       port: 3000,
       open: true,
+      proxy: {
+        '/eventbrite': {
+        target: 'https://www.eventbriteapi.com/v3',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/eventbrite/, '')
+    }
+  }
     },
   });

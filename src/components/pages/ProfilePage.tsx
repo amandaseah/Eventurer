@@ -1,47 +1,56 @@
 import ProfileHeader from "../features/profile/ProfileHeader";
 import AccountPanel from "../features/profile/AccountPanel";
+import { auth, db } from '../../lib/firebase';
+import { updateProfile, onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import SettingsPanel from "../features/profile/SettingsPanel";
 import EventsGrid from "../features/profile/EventsGrid";
 
-
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { Header } from '../Header';
-import { EventCard } from '../features/event/EventCard';
-import { events } from '../../lib/mockData';
+// import { events } from '../../lib/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { User, Bookmark, CheckCircle, Clock, Settings, ArrowLeft } from 'lucide-react';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
 
 interface ProfilePageProps {
   onNavigate: (page: string, data?: any) => void;
   onGoBack: () => void;
+  events: any[];
   bookmarkedEventIds: number[];
   rsvpedEventIds: number[];
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
   onRSVPChange: (eventId: number, isRSVPed: boolean) => void;
+  currentUser?: any;
 }
 
 export function ProfilePage({ 
   onNavigate, 
   onGoBack,
+  events,
   bookmarkedEventIds, 
   rsvpedEventIds, 
   onBookmarkChange,
-  onRSVPChange 
-}: ProfilePageProps) {
+  onRSVPChange,
+  currentUser,
+}: ProfilePageProps & { events: any[] }) {
   const [activeTab, setActiveTab] = useState('bookmarked');
   const [isEditingAccount, setIsEditingAccount] = useState(false);
-  const [userName, setUserName] = useState('Alex Chen');
-  const [userEmail, setUserEmail] = useState('alex.chen@example.com');
 
-  // Mock user data
-  const user = {
-    name: userName,
-    email: userEmail,
-    memberSince: 'January 2025',
-  };
+  // Local user display state (prefers ints from auth/db but editable locally)
+  const [userName, setUserName] = useState<string>(currentUser?.displayName || `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() || 'Alex Chen');
+  const [userEmail, setUserEmail] = useState<string>(currentUser?.email || 'alex.chen@example.com');
+  const [memberSince, setMemberSince] = useState<string>(() => {
+    if (currentUser?.createdAt) {
+      try {
+        const d = new Date(currentUser.createdAt);
+        return d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+      } catch { /* fallthrough */ }
+    }
+    return 'January 2025';
+  });
+
+  const user = { name: userName, email: userEmail, memberSince };
 
   // Filter events based on bookmarked and RSVP'd IDs
   const bookmarkedEvents = events.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
@@ -50,8 +59,80 @@ export function ProfilePage({
 
   const handleSaveProfile = () => {
     setIsEditingAccount(false);
-    // In a real app, this would save to backend
+    // If we have an authenticated user, persist changes to Firebase
+    // Otherwise this remains a local-only change
   };
+
+  const handleSaveProfileWithData = async (changes?: { firstName?: string; lastName?: string; email?: string }) => {
+    setIsEditingAccount(false);
+    // Update local preview
+    if (changes?.firstName || changes?.lastName) {
+      setUserName(`${changes?.firstName || ''} ${changes?.lastName || ''}`.trim());
+    }
+    if (changes?.email) setUserEmail(changes.email);
+
+    // Persist to Firebase if logged in
+    try {
+      const u = auth.currentUser;
+      if (!u) return;
+
+      const displayName = `${changes?.firstName || u.displayName || ''} ${changes?.lastName || ''}`.trim() || u.displayName || undefined;
+      if (displayName) await updateProfile(u, { displayName });
+
+      await setDoc(doc(db, 'users', u.uid), {
+        firstName: changes?.firstName ?? null,
+        lastName: changes?.lastName ?? null,
+        displayName: displayName ?? null,
+        email: changes?.email ?? u.email ?? null,
+      }, { merge: true });
+    } catch (err) {
+      console.warn('Failed to persist profile changes', err);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.warn('Sign out failed', e);
+    }
+    // navigate to login page
+    onNavigate('login');
+  };
+
+  // Listen for auth state changes so the page updates after signup/login
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      if (!u) return;
+      // update from auth first
+      setUserName(u.displayName || userName);
+      setUserEmail(u.email || userEmail);
+
+      // then try to enrich from Firestore user doc
+      try {
+        const snap = await getDoc(doc(db, 'users', u.uid));
+        if (!snap.exists()) return;
+        const data: any = snap.data();
+        if (data.firstName || data.lastName) setUserName(`${data.firstName || ''} ${data.lastName || ''}`.trim());
+        if (data.createdAt) {
+          const ts = data.createdAt;
+          const date = typeof ts.toDate === 'function' ? ts.toDate() : new Date(ts);
+          setMemberSince(date.toLocaleString(undefined, { month: 'long', year: 'numeric' }));
+        }
+      } catch (err) {
+        console.warn('Failed to read user doc', err);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  // Sync when parent-provided currentUser prop changes (e.g., after login)
+  useEffect(() => {
+    if (!currentUser) return;
+    if (currentUser.displayName) setUserName(currentUser.displayName);
+    else if (currentUser.firstName || currentUser.lastName) setUserName(`${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim());
+    if (currentUser.email) setUserEmail(currentUser.email);
+  }, [currentUser]);
 
   return (
     <div className="min-h-screen">
@@ -75,6 +156,7 @@ export function ProfilePage({
           name={user.name}
           email={user.email}
           memberSince={user.memberSince}
+          onSignOut={handleSignOut}
         />
 
         {/* Tabs */}
@@ -210,10 +292,7 @@ export function ProfilePage({
               memberSince={user.memberSince}
               onChangeName={setUserName}
               onChangeEmail={setUserEmail}
-              onSave={() => {
-                setIsEditingAccount(false);
-                // TODO: save to backend if needed
-              }}
+              onSave={handleSaveProfileWithData}
               onCancel={() => setIsEditingAccount(false)}
             />
             {!isEditingAccount && (
