@@ -151,17 +151,25 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
           transition={{ duration: 1, delay: 0.2 }}
           className="w-full"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[1.1] tracking-tight text-gray-900 px-4">
-            Your Journey to
-            <motion.span
-              className="inline-block bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              {' '}
-              Unforgettable{' '}
-            </motion.span>
-            Experiences
+          <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.3] tracking-tight text-gray-900 px-4">
+            <div className="mb-2">Your Journey to</div>
+            <div className="my-3">
+              <motion.span
+                className="inline-block bg-gradient-to-r from-purple-700 via-pink-600 to-purple-700 bg-clip-text text-transparent drop-shadow-sm"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                style={{
+                  backgroundImage: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #7c3aed 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+                }}
+              >
+                Unforgettable
+              </motion.span>
+            </div>
+            <div className="mt-2">Experiences</div>
           </h1>
         </motion.div>
 
@@ -237,7 +245,15 @@ function FeaturesSection() {
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-tight text-gray-900 px-4">
             Why Choose{' '}
-            <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+            <span 
+              style={{
+                backgroundImage: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #7c3aed 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+              }}
+            >
               Eventurer
             </span>
             ?
@@ -296,7 +312,15 @@ function TechSection() {
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight text-gray-900 px-4">
             Built with{' '}
-            <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+            <span 
+              style={{
+                backgroundImage: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #7c3aed 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+              }}
+            >
               Modern Tech
             </span>
           </h2>

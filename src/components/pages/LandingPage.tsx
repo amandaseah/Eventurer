@@ -26,7 +26,7 @@ export function LandingPage({ onNavigate, events = [], loading = false }: Landin
 
       
       {/* Hero + animated background */}
-      <section className="relative overflow-hidden py-12 md:py-20 mb-24 md:mb-32">
+      <section className="relative overflow-hidden pb-12 md:pt-3 mb-3 md:mb-3">
         <motion.div
           animate={{
             background: [
@@ -49,7 +49,7 @@ export function LandingPage({ onNavigate, events = [], loading = false }: Landin
         )}
 
         {/* bottom fade to prevent visual cutoff into next section */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 md:h-16 bg-gradient-to-b from-transparent to-white" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 md:h-12 bg-gradient-to-b from-transparent to-white" />
       </section>
 
       {/* Featured Events */}
