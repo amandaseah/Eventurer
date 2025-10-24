@@ -57,48 +57,45 @@ export interface TransformedEvent {
   status?: string;
 }
 
-// export async function fetchEventbriteEvents(
-//   location = 'Singapore',
-//   radius = '25km'
-// ): Promise<TransformedEvent[]> {
-//   try {
-//     if (!API_TOKEN) {
-//       console.warn('VITE_EVENTBRITE_API_TOKEN is missing. Did you restart Vite after creating .env.local?');
-//       return [];
-//     }
-//     const params = new URLSearchParams({
-//       'location.address': location,
-//       'location.within': radius,
-//       'expand': 'venue,ticket_availability,category',
-//       'status': 'live',
-//       'order_by': 'start_asc'
-//     });
+export async function fetchEventbriteEvents(
+  location = 'Singapore',
+  radius = '25km'
+): Promise<TransformedEvent[]> {
+  try {
+    const token = localStorage.getItem("eventbrite_token") || import.meta.env.VITE_EVENTBRITE_API_TOKEN;
+    console.log('[EB] Token check:', { 
+      hasLocalStorage: !!localStorage.getItem("eventbrite_token"),
+      hasEnvToken: !!import.meta.env.VITE_EVENTBRITE_API_TOKEN,
+      tokenLength: token?.length || 0,
+      tokenPreview: token ? token.substring(0, 10) + '...' : 'none'
+    });
+    
+    if (!token || token === 'your_eventbrite_api_token_here') {
+      console.warn('VITE_EVENTBRITE_API_TOKEN is missing or not configured. Please add your actual Eventbrite API token to .env.local');
+      return [];
+    }
+    
+    const params = {
+      'location.address': location,
+      'location.within': radius,
+      expand: 'venue,ticket_availability,category',
+      status: 'live',
+      order_by: 'start_asc',
+      page_size: 50
+    };
 
-//     const response = await fetch(
-//       `${API_BASE}/events/search/?${params}`,
-//       {
-//         headers: {
-//           'Authorization': `Bearer ${API_TOKEN}`,
-//           'Content-Type': 'application/json',
-//         },
-//       }
-//     );
+    const { data } = await eventbriteApi.get('/events/search/', { params });
+    console.log('[EB] /events/search response:', data);
 
-//     if (!response.ok) {
-//       throw new Error(`Eventbrite API error: ${response.status}`);
-//     }
-
-//     const data = await response.json();
-//     const events = data.events || [];
-
-//     return events.map((event: EventbriteEvent) => 
-//       transformEventbriteEvent(event)
-//     );
-//   } catch (error) {
-//     console.error('Error fetching Eventbrite events:', error);
-//     return [];
-//   }
-// }
+    const events = data.events || [];
+    return events.map((event: EventbriteEvent) => 
+      transformEventbriteEvent(event)
+    );
+  } catch (error: any) {
+    console.error('Error fetching Eventbrite events:', error.response?.data || error.message);
+    return [];
+  }
+}
 
 // export async function fetchEventbriteEvents(
 //   location = 'Singapore',
