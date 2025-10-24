@@ -1,6 +1,6 @@
 import ProfileHeader from "../features/profile/ProfileHeader";
 import AccountPanel from "../features/profile/AccountPanel";
-import { auth, db } from '../../lib/firebase.ts';
+import { auth, db } from '../../lib/firebase';
 import { updateProfile, onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import SettingsPanel from "../features/profile/SettingsPanel";

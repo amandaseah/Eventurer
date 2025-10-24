@@ -1,10 +1,47 @@
 import * as THREE from 'three'
 import gsap from 'gsap'
 import { Suspense, useEffect, useRef, useState, useCallback } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree, extend, Props } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, useCursor, useGLTF, Html, useProgress } from '@react-three/drei'
 import HomePreview from '../../pages/HomePreview'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
+import { 
+  Material, 
+  Object3D, 
+  Mesh, 
+  Group, 
+  Color, 
+  AmbientLight, 
+  DirectionalLight, 
+  PlaneGeometry, 
+  MeshBasicMaterial,
+  DoubleSide
+} from 'three'
+import type { ThreeEvent } from '@react-three/fiber'
+
+// Extend Three.js elements
+extend({ 
+  AmbientLight, 
+  DirectionalLight, 
+  Color, 
+  PlaneGeometry, 
+  MeshBasicMaterial,
+  Group,
+  Mesh
+})
+
+declare module '@react-three/fiber' {
+  interface ThreeElements {
+    group: Props<Group>
+    primitive: { object: Object3D }
+    mesh: Props<Mesh>
+    planeGeometry: Props<PlaneGeometry>
+    meshBasicMaterial: Props<MeshBasicMaterial>
+    color: Props<Color>
+    ambientLight: Props<AmbientLight>
+    directionalLight: Props<DirectionalLight>
+  }
+}
 
 type FocusKey = 'wide' | 'monitor'
 type ZoomState = 'WIDE' | 'ZOOMING_IN' | 'ZOOMED' | 'ZOOMING_OUT'
@@ -235,7 +272,7 @@ function DeskWithMonitor({
             </div>
             <iframe
               title='Eventurer'
-              src='/app'
+              src='/app?page=login'
               loading='eager'
               onLoad={() => setIframeLoaded(true)}
               style={{
@@ -773,7 +810,7 @@ export default function ThreeLanding() {
             background: '#000',
           }}
         >
-          <iframe title='Eventurer Monitor' src='/app' style={{ width: '100%', height: '100%', border: 'none' }} />
+          <iframe title='Eventurer Monitor' src='/app?page=login' style={{ width: '100%', height: '100%', border: 'none' }} />
         </div>
       </div>
       {showLoader && <GlobalLoader opacity={loaderOpacity} />}
