@@ -1,6 +1,6 @@
 import NewPostForm from "../features/forum/NewPostForm";
 import PostList from "../features/forum/PostList";
-import { ForumPost } from "../features/forum/types";
+// import { ForumPost } from "../features/forum/types";
 
 
 import { useState, useRef } from 'react';

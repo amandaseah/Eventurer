@@ -53,6 +53,8 @@ export interface TransformedEvent {
   deadline: string;
   isPast: boolean;
   eventbriteUrl: string;
+  listed?: boolean;
+  status?: string;
 }
 
 // export async function fetchEventbriteEvents(
@@ -127,22 +129,43 @@ export interface TransformedEvent {
 
 export async function fetchEventbriteEventsForMe(): Promise<TransformedEvent[]> {
   try {
-    const { data } = await eventbriteApi.get("/users/me/owned_events/", {
-      params: {
-        expand: "venue,ticket_availability,category",
-        status: "live",                // adjust if you want draft/past
-        order_by: "start_asc",
-        page_size: 50,                 // optional
-      },
-    });
+    // identification (the authenticated user)
+    const { data: me } = await eventbriteApi.get("/users/me/");
+    console.log("[EB] /users/me OK:", me);
 
-    const events = data.events || [];
-    return events.map(transformEventbriteEvent);
+    // get organisation ID(s)
+    const { data: orgData } = await eventbriteApi.get(`/users/${me.id}/organizations/`);
+    const orgs = orgData.organizations || [];
+
+    if (orgs.length === 0) {
+      console.warn("[EB] No organizations found for this user.");
+      return [];
+    }
+
+    // fetch all events under each organization
+    const allEvents: TransformedEvent[] = [];
+    for (const org of orgs) {
+      const { data } = await eventbriteApi.get(`/organizations/${org.id}/events/`, {
+        params: {
+          expand: "venue,ticket_availability,category",
+          status: "all", // 'all' = includes private, draft, live, ended
+          order_by: "start_asc",
+          page_size: 50,
+        },
+      });
+
+      const events = data.events || [];
+      allEvents.push(...events.map(transformEventbriteEvent));
+    }
+
+    console.log(`[EB] Total events fetched: ${allEvents.length}`);
+    return allEvents;
   } catch (err: any) {
-    console.error("EB /users/me/owned_events failed:", err.response?.data || err.message);
+    console.error("[EB] fetchEventbriteEventsForMe failed:", err.response?.data || err.message);
     return [];
   }
 }
+
 
 function transformEventbriteEvent(event: EventbriteEvent): TransformedEvent {
   const startDate = new Date(event.start.local);
