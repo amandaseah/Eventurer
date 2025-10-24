@@ -5,43 +5,7 @@ import { Canvas, useFrame, useThree, extend, Props } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, useCursor, useGLTF, Html, useProgress } from '@react-three/drei'
 import HomePreview from '../../pages/HomePreview'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
-import { 
-  Material, 
-  Object3D, 
-  Mesh, 
-  Group, 
-  Color, 
-  AmbientLight, 
-  DirectionalLight, 
-  PlaneGeometry, 
-  MeshBasicMaterial,
-  DoubleSide
-} from 'three'
-import type { ThreeEvent } from '@react-three/fiber'
-
-// Extend Three.js elements
-extend({ 
-  AmbientLight, 
-  DirectionalLight, 
-  Color, 
-  PlaneGeometry, 
-  MeshBasicMaterial,
-  Group,
-  Mesh
-})
-
-declare module '@react-three/fiber' {
-  interface ThreeElements {
-    group: Props<Group>
-    primitive: { object: Object3D }
-    mesh: Props<Mesh>
-    planeGeometry: Props<PlaneGeometry>
-    meshBasicMaterial: Props<MeshBasicMaterial>
-    color: Props<Color>
-    ambientLight: Props<AmbientLight>
-    directionalLight: Props<DirectionalLight>
-  }
-}
+import { useNavigate } from 'react-router-dom'
 
 type FocusKey = 'wide' | 'monitor'
 type ZoomState = 'WIDE' | 'ZOOMING_IN' | 'ZOOMED' | 'ZOOMING_OUT'
@@ -140,6 +104,7 @@ function DeskWithMonitor({
   onMonitorLeave,
   onModelReady,
   htmlPointerEnabled,
+  shouldRenderIframe,
   showInstruction,
   devMode,
   deskGroupRef,
@@ -148,15 +113,42 @@ function DeskWithMonitor({
   onMonitorLeave: () => void
   onModelReady: (object: THREE.Object3D) => void
   htmlPointerEnabled: boolean
+  shouldRenderIframe: boolean
   showInstruction: boolean
   devMode: boolean
   deskGroupRef: React.MutableRefObject<THREE.Group | null>
 }) {
-  const { scene } = useGLTF('/finaldeets.glb') as any
+  const { scene } = useGLTF('/pinkfinal.glb') as any
   const readyRef = useRef(false)
   const [iframeLoaded, setIframeLoaded] = useState(false)
+  const recoloredMaterialsRef = useRef(new WeakSet<THREE.Material>())
 
   useEffect(() => {
+    if (!shouldRenderIframe) {
+      setIframeLoaded(false)
+    }
+  }, [shouldRenderIframe])
+
+  useEffect(() => {
+    const monitorTint = new THREE.Color('#f6a8df')
+    const keyboardTint = new THREE.Color('#f8b9eb')
+    const chairTint = new THREE.Color('#2d4c8f')
+    const wallTint = new THREE.Color('#f1e4d8')
+
+    const hasAncestor = (object: THREE.Object3D | null, predicate: (node: THREE.Object3D) => boolean) => {
+      let current: THREE.Object3D | null = object
+      while (current) {
+        if (predicate(current)) {
+          return true
+        }
+        current = current.parent ?? null
+      }
+      return false
+    }
+
+    const getLuminance = (color: THREE.Color) => 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b
+    const recoloredMaterials = recoloredMaterialsRef.current
+
     scene.traverse((child: any) => {
       if (child.isMesh) {
         if (child.geometry && !child.userData.__geometryPrepared) {
@@ -181,6 +173,142 @@ function DeskWithMonitor({
           if ('shadowSide' in material) {
             material.shadowSide = THREE.FrontSide
           }
+        })
+
+        const isMonitorMesh = hasAncestor(child as THREE.Object3D, (node) => node.name === 'Cube')
+        const isKeyboardMesh = hasAncestor(child as THREE.Object3D, (node) => {
+          const { name } = node
+          if (!name) return false
+          return (
+            name === 'scene004' ||
+            name === 'root002' ||
+            name === 'Sketchfab_model004' ||
+            name.startsWith('GLTF_SceneRootNode002')
+          )
+        })
+
+        const shouldSkipMonitorTint = isMonitorMesh && (child.name === 'Cube003_2' || child.name === 'Cube003_2_0')
+        const isChairMesh = hasAncestor(child as THREE.Object3D, (node) => node.name === 'Cadeira')
+        const isWallMesh =
+          child.name.startsWith('Plane') ||
+          hasAncestor(child as THREE.Object3D, (node) => node.name?.startsWith('Plane') ?? false)
+
+        if (isChairMesh) {
+          materials.forEach((material) => {
+            if (!material) return
+            const hasColor = 'color' in material && material.color instanceof THREE.Color
+            if (!hasColor) return
+
+            const currentColor = material.color as THREE.Color
+            currentColor.lerp(chairTint, 0.35)
+
+            if ('emissive' in material && material.emissive instanceof THREE.Color) {
+              material.emissive.multiplyScalar(0.25)
+            }
+
+            if ('metalness' in material && typeof material.metalness === 'number') {
+              material.metalness = Math.min(material.metalness, 0.3)
+            }
+
+            material.needsUpdate = true
+            recoloredMaterials.add(material)
+          })
+          return
+        }
+
+        if (isWallMesh) {
+          materials.forEach((material) => {
+            if (!material || recoloredMaterials.has(material)) return
+            const hasColor = 'color' in material && material.color instanceof THREE.Color
+            if (!hasColor) return
+
+            const currentColor = material.color as THREE.Color
+            currentColor.lerp(wallTint, 0.75)
+
+            if ('emissive' in material && material.emissive instanceof THREE.Color) {
+              material.emissive.lerp(wallTint.clone().multiplyScalar(0.25), 0.6)
+            }
+
+            if ('roughness' in material && typeof material.roughness === 'number') {
+              material.roughness = THREE.MathUtils.clamp(material.roughness, 0.5, 0.85)
+            }
+
+            material.needsUpdate = true
+            recoloredMaterials.add(material)
+          })
+          return
+        }
+
+        const isMonitorScreen = shouldSkipMonitorTint
+        if (isMonitorScreen) {
+          materials.forEach((material) => {
+            if (!material) return
+            const hasColor = 'color' in material && material.color instanceof THREE.Color
+            if (!hasColor) return
+
+            const screenColor = new THREE.Color('#050505')
+            ;(material.color as THREE.Color).lerp(screenColor, 0.9)
+
+            if ('emissive' in material && material.emissive instanceof THREE.Color) {
+              material.emissive.multiplyScalar(0.1)
+            }
+
+            if ('metalness' in material && typeof material.metalness === 'number') {
+              material.metalness = Math.min(material.metalness, 0.1)
+            }
+
+            if ('roughness' in material && typeof material.roughness === 'number') {
+              material.roughness = THREE.MathUtils.clamp(material.roughness, 0.6, 0.95)
+            }
+
+            material.needsUpdate = true
+          })
+          return
+        }
+
+        const isMonitorFrameMesh = isMonitorMesh && !shouldSkipMonitorTint
+
+        if (!isMonitorFrameMesh && !isKeyboardMesh) {
+          return
+        }
+
+        const targetTint = isMonitorFrameMesh ? monitorTint : keyboardTint
+
+        materials.forEach((material) => {
+          if (!material || recoloredMaterials.has(material)) {
+            return
+          }
+
+          const hasColor = 'color' in material && material.color instanceof THREE.Color
+          if (!hasColor) {
+            return
+          }
+
+          const currentColor = material.color as THREE.Color
+          const luminance = getLuminance(currentColor)
+
+          if (isKeyboardMesh && luminance > 0.85) {
+            // Preserve bright legends so keycaps stay readable.
+            return
+          }
+
+          const blendStrength = isMonitorFrameMesh && luminance > 0.65 ? 0.45 : 0.95
+          currentColor.lerp(targetTint, blendStrength)
+
+          if ('emissive' in material && material.emissive instanceof THREE.Color) {
+            const emissiveTint = targetTint.clone().multiplyScalar(isMonitorFrameMesh ? 0.22 : 0.15)
+            material.emissive.lerp(emissiveTint, 0.7)
+          }
+
+          if ('metalness' in material && typeof material.metalness === 'number') {
+            material.metalness = Math.min(material.metalness, 0.2)
+          }
+          if ('roughness' in material && typeof material.roughness === 'number') {
+            material.roughness = THREE.MathUtils.clamp(material.roughness, 0.4, 0.85)
+          }
+
+          material.needsUpdate = true
+          recoloredMaterials.add(material)
         })
       }
     })
@@ -270,23 +398,25 @@ function DeskWithMonitor({
                 <HomePreview />
               </div>
             </div>
-            <iframe
-              title='Eventurer'
-              src='/app?page=login'
-              loading='eager'
-              onLoad={() => setIframeLoaded(true)}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                border: 'none',
-                background: '#fff0f6',
-                opacity: iframeLoaded && htmlPointerEnabled ? 1 : iframeLoaded ? 0 : 0,
-                pointerEvents: htmlPointerEnabled ? 'auto' : 'none',
-                transition: 'opacity 320ms ease',
-              }}
-            />
+            {shouldRenderIframe && (
+              <iframe
+                title='Eventurer'
+                src='/app'
+                loading='lazy'
+                onLoad={() => setIframeLoaded(true)}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                  background: '#fff0f6',
+                  opacity: iframeLoaded && htmlPointerEnabled ? 1 : iframeLoaded ? 0 : 0,
+                  pointerEvents: htmlPointerEnabled ? 'auto' : 'none',
+                  transition: 'opacity 320ms ease',
+                }}
+              />
+            )}
           </div>
         </Html>
         {showInstruction && (
@@ -315,7 +445,7 @@ function DeskWithMonitor({
   )
 }
 
-useGLTF.preload('/finaldeets.glb')
+useGLTF.preload('/pinkfinal.glb')
 
 function ControlsUpdater({ controlsRef }: { controlsRef: React.MutableRefObject<OrbitControlsImpl | null> }) {
   useFrame(() => {
@@ -519,6 +649,7 @@ function GlobalLoader({ opacity }: { opacity: number }) {
 }
 
 export default function ThreeLanding() {
+  const navigate = useNavigate()
   const controlsRef = useRef<OrbitControlsImpl | null>(null)
   const modelRef = useRef<THREE.Object3D | null>(null)
   const deskGroupRef = useRef<THREE.Group | null>(null)
@@ -533,6 +664,8 @@ export default function ThreeLanding() {
   const [canvasDpr, setCanvasDpr] = useState<[number, number]>([1, 1.6])
   const [showLoader, setShowLoader] = useState(true)
   const [loaderOpacity, setLoaderOpacity] = useState(1)
+  const [iframeActive, setIframeActive] = useState(false)
+  const [overlayContentVisible, setOverlayContentVisible] = useState(false)
   useCursor(isHovering)
 
   const isZoomed = currentZoomState === 'ZOOMED'
@@ -546,7 +679,7 @@ export default function ThreeLanding() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const deviceCap = Math.min(window.devicePixelRatio || 1, 1.6)
+    const deviceCap = Math.min(window.devicePixelRatio || 1, 1.25)
     setCanvasDpr([1, deviceCap])
   }, [])
 
@@ -559,6 +692,15 @@ export default function ThreeLanding() {
     setShowLoader(true)
     setLoaderOpacity(1)
   }, [modelReady])
+
+  useEffect(() => {
+    if (overlayOpen) {
+      setOverlayContentVisible(true)
+      return
+    }
+    const timeout = window.setTimeout(() => setOverlayContentVisible(false), 240)
+    return () => window.clearTimeout(timeout)
+  }, [overlayOpen])
 
   useEffect(() => {
     const controls = controlsRef.current
@@ -635,6 +777,7 @@ export default function ThreeLanding() {
     dwellTimerRef.current = window.setTimeout(() => {
       dwellTimerRef.current = null
       if (zoomStateRef.current !== 'WIDE') return
+      setIframeActive(true)
       runTransition('monitor', 'ZOOMING_IN', 'ZOOMED')
     }, DWELL_DELAY_MS)
   }, [runTransition])
@@ -667,6 +810,11 @@ export default function ThreeLanding() {
     }
   }, [overlayOpen, runTransition])
 
+  const handleBackToMarketing = useCallback(() => {
+    setOverlayOpen(false)
+    navigate('/')
+  }, [navigate])
+
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -679,6 +827,30 @@ export default function ThreeLanding() {
 
   return (
     <>
+      <button
+        type='button'
+        onClick={handleBackToMarketing}
+        style={{
+          position: 'fixed',
+          top: 24,
+          left: 24,
+          zIndex: 70,
+          padding: '0.55rem 1.1rem',
+          borderRadius: 999,
+          border: '1px solid rgba(255,255,255,0.22)',
+          background: 'rgba(12,12,15,0.75)',
+          color: '#f9f4ff',
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          boxShadow: '0 8px 24px rgba(15,10,30,0.32)',
+          backdropFilter: 'blur(8px)',
+        }}
+      >
+        ← Back
+      </button>
       <Canvas
         dpr={canvasDpr}
         shadows
@@ -692,10 +864,10 @@ export default function ThreeLanding() {
         }}
         performance={{ min: 0.6, debounce: 200 }}
         onCreated={({ gl, camera }) => {
-          gl.setClearColor('#0e0e10', 1)
+          gl.setClearColor('#1a1418', 1)
           gl.outputColorSpace = THREE.SRGBColorSpace
           gl.toneMapping = THREE.ACESFilmicToneMapping
-          gl.toneMappingExposure = 0.85
+          gl.toneMappingExposure = 0.88
           gl.shadowMap.enabled = true
           gl.shadowMap.type = THREE.PCFSoftShadowMap
           if ('useLegacyLights' in gl) {
@@ -713,28 +885,31 @@ export default function ThreeLanding() {
         style={{
           width: '100vw',
           height: '100vh',
-          background: '#0e0e10',
+          background:
+            'radial-gradient(circle at 32% 30%, rgba(236, 209, 186, 0.38) 0%, rgba(148, 102, 94, 0.3) 36%, rgba(28, 20, 26, 0.9) 78%)',
           opacity: modelReady ? 1 : 0,
           transition: 'opacity 320ms ease',
         }}
       >
         <Suspense fallback={null}>
-          <color attach='background' args={['#0e0e10']} />
-          <ambientLight intensity={0.35} color='#ffe8d2' />
+          <color attach='background' args={['#1a1418']} />
+          <ambientLight intensity={0.32} color='#f1e4d8' />
+          <hemisphereLight args={['#f5e7dc', '#2a1722', 0.28]} />
           <directionalLight
             position={[4, 6, 2]}
-            intensity={0.55}
-            color='#f4c89d'
+            intensity={0.48}
+            color='#f0c9a6'
             castShadow
             shadow-bias={-0.0008}
             shadow-normalBias={0.04}
             shadow-mapSize-width={1024}
             shadow-mapSize-height={1024}
           />
-          <Environment preset='studio' environmentIntensity={0.7} />
+          <Environment preset='apartment' environmentIntensity={0.7} />
           <DeskWithMonitor
             devMode={devMode}
             htmlPointerEnabled={isZoomed}
+            shouldRenderIframe={iframeActive}
             showInstruction={!overlayOpen && currentZoomState === 'WIDE'}
             deskGroupRef={deskGroupRef}
             onMonitorEnter={handleMonitorEnter}
@@ -780,38 +955,47 @@ export default function ThreeLanding() {
           background: 'rgba(14,14,16,0.9)',
         }}
       >
-        <button
-          type='button'
-          onClick={closeOverlay}
-          style={{
-            position: 'absolute',
-            top: 24,
-            right: 24,
-            padding: '0.6rem 1.2rem',
-            borderRadius: 999,
-            border: '1px solid rgba(255,255,255,0.25)',
-            background: 'rgba(10,10,12,0.8)',
-            color: '#fff',
-            fontSize: '0.9rem',
-            fontWeight: 600,
-            letterSpacing: '0.2em',
-            cursor: 'pointer',
-          }}
-        >
-          Exit
-        </button>
-        <div
-          style={{
-            width: 'min(90vw, 1200px)',
-            height: 'min(85vh, 720px)',
-            borderRadius: 16,
-            overflow: 'hidden',
-            boxShadow: '0 40px 120px rgba(0,0,0,0.45)',
-            background: '#000',
-          }}
-        >
-          <iframe title='Eventurer Monitor' src='/app?page=login' style={{ width: '100%', height: '100%', border: 'none' }} />
-        </div>
+        {overlayContentVisible && (
+          <>
+            <button
+              type='button'
+              onClick={closeOverlay}
+              style={{
+                position: 'absolute',
+                top: 24,
+                right: 24,
+                padding: '0.6rem 1.2rem',
+                borderRadius: 999,
+                border: '1px solid rgba(255,255,255,0.25)',
+                background: 'rgba(10,10,12,0.8)',
+                color: '#fff',
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                letterSpacing: '0.2em',
+                cursor: 'pointer',
+              }}
+            >
+              Exit
+            </button>
+            <div
+              style={{
+                width: 'min(90vw, 1200px)',
+                height: 'min(85vh, 720px)',
+                borderRadius: 16,
+                overflow: 'hidden',
+                boxShadow: '0 40px 120px rgba(0,0,0,0.45)',
+                background: '#000',
+              }}
+            >
+              <iframe
+                title='Eventurer Monitor'
+                src='/app'
+                loading='lazy'
+                style={{ width: '100%', height: '100%', border: 'none' }}
+              />
+            </div>
+          </>
+        )}
       </div>
       {showLoader && <GlobalLoader opacity={loaderOpacity} />}
     </>
