@@ -19,3 +19,10 @@ yarn.lock
 build/
 *.glb
 public/*.glb
+
+# Large 3D assets
+public/*.glb
+*.glb
+/build
+public/*.glb
+!public/final-optimized.glb
