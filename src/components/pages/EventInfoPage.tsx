@@ -6,7 +6,8 @@ import EventDetails from "../features/eventInfo/EventDetails";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Header } from "../Header";
-import { events, forumPosts } from "../../lib/mockData";
+// import { events, forumPosts } from "../../lib/mockData";
+import { forumPosts } from '../../lib/mockData';
 import Image from "../common/Image";
 import {
   Calendar,
@@ -35,6 +36,7 @@ import { formatDateToDDMMYYYY } from "../../lib/dateUtils";
 
 interface EventInfoPageProps {
   eventId: number;
+  events: any[];
   onNavigate: (page: string, data?: any) => void;
   onGoBack: () => void;
   bookmarkedEventIds: number[];
@@ -48,6 +50,7 @@ interface EventInfoPageProps {
 
 export function EventInfoPage({
   eventId,
+  events,
   onNavigate,
   onGoBack,
   bookmarkedEventIds,
@@ -55,7 +58,7 @@ export function EventInfoPage({
   onBookmarkChange,
   onRSVPChange,
 }: EventInfoPageProps) {
-  const event = events.find((e) => e.id === eventId);
+  const event = events.find((e) => String(e.id) === String(eventId));
   const [isBookmarked, setIsBookmarked] = useState(
     bookmarkedEventIds.includes(eventId),
   );
@@ -69,9 +72,11 @@ export function EventInfoPage({
     return <div>Event not found</div>;
   }
 
-  const eventForumPosts = forumPosts
-    .filter((p) => p.eventId === eventId)
-    .slice(0, 3);
+  // const eventForumPosts = forumPosts
+  //   .filter((p) => p.eventId === eventId)
+  //   .slice(0, 3);
+
+  const eventForumPosts: any[] = [];
 
   const handleBookmark = () => {
     const newBookmarked = !isBookmarked;
