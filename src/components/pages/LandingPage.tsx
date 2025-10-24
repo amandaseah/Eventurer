@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
-import { events } from '../../lib/mockData';
+// import { events } from '../../lib/mockData';
 
 
 import Hero from '../features/landing/Hero';
@@ -10,11 +10,15 @@ import FeaturedEvents from '../features/landing/FeaturedEvents';
 
 interface LandingPageProps {
   onNavigate: (page: string, data?: any) => void;
+  events: any[];
+  loading?: boolean;
 }
 
-export function LandingPage({ onNavigate }: LandingPageProps) {
+export function LandingPage({ onNavigate, events = [], loading = false }: LandingPageProps) {
   const [quizStarted, setQuizStarted] = useState(false);
-  const featuredEvents = events.slice(0, 3);
+  const featuredEvents = (events ?? []).slice(0, 3); // guard against undefined
+
+
 
   return (
     <div className="min-h-screen">
