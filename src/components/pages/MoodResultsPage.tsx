@@ -2,13 +2,22 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
-import { events, moods } from '../../lib/mockData';
+// import { moods } from '../../lib/mockData';
+import { categorizeEvent } from '../../lib/eventCategoriser';
 import { SlidersHorizontal, ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Calendar } from '../ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Button } from '../ui/button';
 import { formatDateObjectToDDMMYYYY } from '../../lib/dateUtils';
+
+const MOOD_DISPLAY: Record<string, { emoji: string; color: string; name: string }> = {
+  chill:       { emoji: "🌿", color: "#7BD389", name: "Chill & Relax" },
+  active:      { emoji: "⚡", color: "#FFB84D", name: "Active" },
+  social:      { emoji: "🎉", color: "#FF6B6B", name: "Social" },
+  educational: { emoji: "📚", color: "#6B9EFF", name: "Educational" },
+};
+
 
 
 
@@ -24,19 +33,33 @@ interface MoodResultsPageProps {
 
 export function MoodResultsPage({
   mood,
+  events,
   onNavigate,
   bookmarkedEventIds,
   rsvpedEventIds,
   onBookmarkChange,
   onRSVPChange,
- }: MoodResultsPageProps) {
+}: MoodResultsPageProps & { events: any[] }) {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [priceFilter, setPriceFilter] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
 
-  const moodData = moods.find(m => m.id === mood);
-  let filteredEvents = events.filter(e => e.mood === mood && !e.isPast);
+  const moodData = MOOD_DISPLAY[mood];
+  // auto-categorise events
+  const categorized = events.map((e) => {
+    if (e.mood && e.category) return e; // already transformed by eventbriteService
+    const { mood: eventMood, category } = categorizeEvent(
+      e.title || e.name?.text || "",          // title string if transformed, else raw
+      e.description || e.description?.text || "", // description string if transformed, else raw
+      e.category?.name || e.category          // category string if transformed, else raw name
+    );
+    return { ...e, mood: eventMood, category };
+  });
+
+  // Filter events matching quiz mood
+  let filteredEvents = categorized.filter(e => e.mood === mood && !e.isPast);
+
 
   // Apply category filter
   if (categoryFilter !== 'all') {

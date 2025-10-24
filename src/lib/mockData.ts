@@ -38,7 +38,31 @@ export const quizQuestions = [
   },
 ];
 
-export const events = [
+export type EventData = {
+  id: number;
+  title: string;
+  description: string;
+  imageUrl: string;
+  date: string;
+  time: string;
+  location: string;
+  price: string;
+  organizer: string;
+  mood: string;
+  category: string;
+  saves: number;
+  deadline: string;
+  isPast: boolean;
+  userComment?: string;
+  mapLocation?: {
+    lat: number;
+    lng: number;
+    address?: string;
+    query?: string;
+  };
+};
+
+export const events: EventData[] = [
   {
     id: 1,
     title: "Sunset Yoga by the Bay",
@@ -47,6 +71,11 @@ export const events = [
     date: "2025-10-15",
     time: "18:00",
     location: "Marina Bay",
+    mapLocation: {
+      lat: 1.2834,
+      lng: 103.8607,
+      address: "Marina Bay Sands Event Plaza, 10 Bayfront Ave, Singapore 018956",
+    },
     price: "Free",
     organizer: "Wellness Warriors",
     mood: 'chill',
@@ -63,6 +92,11 @@ export const events = [
     date: "2025-10-18",
     time: "20:00",
     location: "MacRitchie Reservoir",
+    mapLocation: {
+      lat: 1.3446,
+      lng: 103.8345,
+      address: "MacRitchie Reservoir Park, 181 Lornie Rd, Singapore 298734",
+    },
     price: "$15",
     organizer: "Trail Blazers SG",
     mood: 'active',
@@ -79,6 +113,11 @@ export const events = [
     date: "2025-10-20",
     time: "19:00",
     location: "Startup Hub, One-North",
+    mapLocation: {
+      lat: 1.2989,
+      lng: 103.7873,
+      address: "LaunchPad @ one-north, 79 Ayer Rajah Crescent, Singapore 139955",
+    },
     price: "$20",
     organizer: "TechConnect SG",
     mood: 'social',
@@ -95,6 +134,11 @@ export const events = [
     date: "2025-10-22",
     time: "14:00",
     location: "National Library",
+    mapLocation: {
+      lat: 1.2976,
+      lng: 103.8486,
+      address: "National Library Building, 100 Victoria St, Singapore 188064",
+    },
     price: "$30",
     organizer: "CodeCraft Academy",
     mood: 'educational',
@@ -111,6 +155,11 @@ export const events = [
     date: "2025-09-25",
     time: "10:00",
     location: "Gillman Barracks",
+    mapLocation: {
+      lat: 1.2764,
+      lng: 103.8057,
+      address: "Gillman Barracks, 9 Lock Rd, Singapore 108937",
+    },
     price: "Free",
     organizer: "Creative Collective",
     mood: 'chill',
@@ -128,6 +177,11 @@ export const events = [
     date: "2025-09-15",
     time: "20:00",
     location: "The Substation",
+    mapLocation: {
+      lat: 1.2965,
+      lng: 103.8499,
+      address: "The Substation (Armenian Street), 45 Armenian St, Singapore 179936",
+    },
     price: "$25",
     organizer: "Latino Vibes SG",
     mood: 'social',
@@ -145,6 +199,11 @@ export const events = [
     date: "2025-10-27",
     time: "09:00",
     location: "Chinatown",
+    mapLocation: {
+      lat: 1.2839,
+      lng: 103.8441,
+      address: "Chinatown Visitor Centre, 2 Banda St, Singapore 059962",
+    },
     price: "$18",
     organizer: "Shutter Stories",
     mood: 'educational',
@@ -161,6 +220,11 @@ export const events = [
     date: "2025-10-28",
     time: "16:00",
     location: "Climb Central",
+    mapLocation: {
+      lat: 1.2934,
+      lng: 103.8537,
+      address: "Climb Central Funan, 107 North Bridge Rd, #B2-19 Funan, Singapore 179105",
+    },
     price: "$35",
     organizer: "Vertical Ventures",
     mood: 'active',

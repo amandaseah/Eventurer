@@ -9,13 +9,14 @@ import EventsGrid from "../features/profile/EventsGrid";
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
-import { events } from '../../lib/mockData';
+// import { events } from '../../lib/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { User, Bookmark, CheckCircle, Clock, Settings, ArrowLeft } from 'lucide-react';
 
 interface ProfilePageProps {
   onNavigate: (page: string, data?: any) => void;
   onGoBack: () => void;
+  events: any[];
   bookmarkedEventIds: number[];
   rsvpedEventIds: number[];
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
@@ -26,12 +27,13 @@ interface ProfilePageProps {
 export function ProfilePage({ 
   onNavigate, 
   onGoBack,
+  events,
   bookmarkedEventIds, 
   rsvpedEventIds, 
   onBookmarkChange,
   onRSVPChange,
   currentUser,
-}: ProfilePageProps) {
+}: ProfilePageProps & { events: any[] }) {
   const [activeTab, setActiveTab] = useState('bookmarked');
   const [isEditingAccount, setIsEditingAccount] = useState(false);
 
