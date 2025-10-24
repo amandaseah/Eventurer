@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
-import { events } from '../../lib/mockData';
+// import { events } from '../../lib/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { User, Bookmark, CheckCircle, Clock, Settings, ArrowLeft } from 'lucide-react';
 import { Input } from '../ui/input';
@@ -17,6 +17,7 @@ import { Button } from '../ui/button';
 interface ProfilePageProps {
   onNavigate: (page: string, data?: any) => void;
   onGoBack: () => void;
+  events: any[];
   bookmarkedEventIds: number[];
   rsvpedEventIds: number[];
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
@@ -26,11 +27,12 @@ interface ProfilePageProps {
 export function ProfilePage({ 
   onNavigate, 
   onGoBack,
+  events,
   bookmarkedEventIds, 
   rsvpedEventIds, 
   onBookmarkChange,
   onRSVPChange 
-}: ProfilePageProps) {
+}: ProfilePageProps & { events: any[] }) {
   const [activeTab, setActiveTab] = useState('bookmarked');
   const [isEditingAccount, setIsEditingAccount] = useState(false);
   const [userName, setUserName] = useState('Alex Chen');
