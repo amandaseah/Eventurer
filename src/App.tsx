@@ -127,9 +127,6 @@ function ShellApp() {
     }
   };
 
-  const bookmarkedEvents = events.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
-  const rsvpedEvents = events.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
-
   const showCountdownWidget =
     currentPage !== 'login' &&
     (bookmarkedEvents.length > 0 || rsvpedEvents.length > 0);

@@ -6,7 +6,6 @@ import { OrbitControls, Environment, ContactShadows, useCursor, useGLTF, Html, u
 import { useNavigate } from 'react-router-dom'
 import HomePreview from '../../pages/HomePreview'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
-import { useNavigate } from 'react-router-dom'
 
 type FocusKey = 'wide' | 'monitor'
 type ZoomState = 'WIDE' | 'ZOOMING_IN' | 'ZOOMED' | 'ZOOMING_OUT'
