@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
   "rewrites": [
     { "source": "/home", "destination": "/" },
     { "source": "/app", "destination": "/" },
