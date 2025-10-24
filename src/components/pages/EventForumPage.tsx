@@ -1,15 +1,13 @@
 import NewPostForm from "../features/forum/NewPostForm";
 import PostList from "../features/forum/PostList";
-// import type { ForumPost } from "../features/forum/types";
+import type { ForumPost } from "../features/forum/types";
 
 
 import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { events, forumPosts as initialForumPosts } from '../../lib/mockData';
-import { ThumbsUp, Send, MessageSquare, Image as ImageIcon, X, Reply, ArrowLeft } from 'lucide-react';
-import { Textarea } from '../ui/textarea';
-import { Button } from '../ui/button';
+import { MessageSquare, ArrowLeft } from 'lucide-react';
 
 
 interface EventForumPageProps {
