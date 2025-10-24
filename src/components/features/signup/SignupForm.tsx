@@ -4,7 +4,7 @@ import { Mail, Lock, AlertTriangle, User } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
-import { signUpWithEmail } from '../../../lib/firebase.ts';
+import { signUpWithEmail } from '../../../lib/firebase';
 
 interface SignupFormProps {
   onNavigate: (page: string) => void;
