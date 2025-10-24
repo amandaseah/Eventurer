@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import gsap from 'gsap'
 import { Suspense, useEffect, useRef, useState, useCallback } from 'react'
 import { Canvas, useFrame, useThree, extend, Props } from '@react-three/fiber'
-import { OrbitControls, Environment, ContactShadows, useCursor, useGLTF, Html, useProgress } from '@react-three/drei'
+import { OrbitControls, Environment, ContactShadows, useCursor, useGLTF, Html, useProgress, PerformanceMonitor } from '@react-three/drei'
+import { useNavigate } from 'react-router-dom'
 import HomePreview from '../../pages/HomePreview'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { useNavigate } from 'react-router-dom'
@@ -118,7 +119,7 @@ function DeskWithMonitor({
   devMode: boolean
   deskGroupRef: React.MutableRefObject<THREE.Group | null>
 }) {
-  const { scene } = useGLTF('/pinkfinal.glb') as any
+  const { scene } = useGLTF('/final-optimized.glb', true) as any
   const readyRef = useRef(false)
   const [iframeLoaded, setIframeLoaded] = useState(false)
   const recoloredMaterialsRef = useRef(new WeakSet<THREE.Material>())
@@ -130,9 +131,9 @@ function DeskWithMonitor({
   }, [shouldRenderIframe])
 
   useEffect(() => {
-    const monitorTint = new THREE.Color('#f6a8df')
+    const monitorTint = new THREE.Color('#c21880')
     const keyboardTint = new THREE.Color('#f8b9eb')
-    const chairTint = new THREE.Color('#2d4c8f')
+    const chairTint = new THREE.Color('#c21880')
     const wallTint = new THREE.Color('#f1e4d8')
 
     const hasAncestor = (object: THREE.Object3D | null, predicate: (node: THREE.Object3D) => boolean) => {
@@ -445,7 +446,7 @@ function DeskWithMonitor({
   )
 }
 
-useGLTF.preload('/pinkfinal.glb')
+useGLTF.preload('/final-optimized.glb', true)
 
 function ControlsUpdater({ controlsRef }: { controlsRef: React.MutableRefObject<OrbitControlsImpl | null> }) {
   useFrame(() => {
@@ -656,6 +657,7 @@ export default function ThreeLanding() {
   const dwellTimerRef = useRef<number | null>(null)
   const zoomStateRef = useRef<ZoomState>('WIDE')
   const mouse = useRef({ x: 0, y: 0 })
+  const deviceMaxDprRef = useRef(1)
   const [devMode] = useState(false)
   const [modelReady, setModelReady] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
@@ -680,6 +682,7 @@ export default function ThreeLanding() {
   useEffect(() => {
     if (typeof window === 'undefined') return
     const deviceCap = Math.min(window.devicePixelRatio || 1, 1.25)
+    deviceMaxDprRef.current = deviceCap
     setCanvasDpr([1, deviceCap])
   }, [])
 
@@ -885,12 +888,24 @@ export default function ThreeLanding() {
         style={{
           width: '100vw',
           height: '100vh',
-          background:
-            'radial-gradient(circle at 32% 30%, rgba(236, 209, 186, 0.38) 0%, rgba(148, 102, 94, 0.3) 36%, rgba(28, 20, 26, 0.9) 78%)',
-          opacity: modelReady ? 1 : 0,
-          transition: 'opacity 320ms ease',
-        }}
-      >
+      background:
+        'radial-gradient(circle at 32% 30%, rgba(236, 209, 186, 0.38) 0%, rgba(148, 102, 94, 0.3) 36%, rgba(28, 20, 26, 0.9) 78%)',
+      opacity: modelReady ? 1 : 0,
+      transition: 'opacity 320ms ease',
+    }}
+  >
+        <PerformanceMonitor
+          onDecline={() => {
+            setCanvasDpr((prev) => {
+              const [minDpr, currentMax] = prev
+              const nextMax = Math.max(0.85, currentMax - 0.25)
+              return [minDpr, nextMax]
+            })
+          }}
+          onIncline={() => {
+            setCanvasDpr((prev) => [prev[0], deviceMaxDprRef.current])
+          }}
+        />
         <Suspense fallback={null}>
           <color attach='background' args={['#1a1418']} />
           <ambientLight intensity={0.32} color='#f1e4d8' />
