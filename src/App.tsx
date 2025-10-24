@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { LoginPage } from './components/pages/LoginPage';
 import { SignupPage } from './components/pages/SignupPage';
 import { LandingPage } from './components/pages/LandingPage';
+import { MarketingLandingPage } from './components/pages/MarketingLandingPage';
 import { MoodResultsPage } from './components/pages/MoodResultsPage';
 import { EventExplorePage } from './components/pages/EventExplorePage';
 import { EventInfoPage } from './components/pages/EventInfoPage';
@@ -12,7 +13,7 @@ import { Toaster } from './components/ui/sonner';
 import { events } from './lib/mockData';
 import { loadGoogleMapsScript } from './lib/loadGoogleMaps';
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import ThreeLanding from './components/features/landing3D/ThreeLanding'
 import HomePreview from './components/pages/HomePreview'
 
@@ -42,13 +43,9 @@ interface PageData {
 }
 
 function ShellApp() {
-  // Get initial page from URL parameters
-  const params = new URLSearchParams(window.location.search);
-  const initialPage = (params.get('page') as Page) || 'landing';
-  
-  const [currentPage, setCurrentPage] = useState<Page>(initialPage);
+  const [currentPage, setCurrentPage] = useState<Page>('login');
   const [pageData, setPageData] = useState<PageData>({});
-  const [navigationHistory, setNavigationHistory] = useState<Page[]>([initialPage]);
+  const [navigationHistory, setNavigationHistory] = useState<Page[]>(['login']);
   const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([1, 2, 3, 4]);
   const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([3, 4, 7]);
 
@@ -130,10 +127,15 @@ function ShellApp() {
     }
   };
 
-  const showCountdownWidget = currentPage !== 'login' && (bookmarkedEvents.length > 0 || rsvpedEvents.length > 0);
+  const bookmarkedEvents = events.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
+  const rsvpedEvents = events.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
+
+  const showCountdownWidget =
+    currentPage !== 'login' &&
+    (bookmarkedEvents.length > 0 || rsvpedEvents.length > 0);
 
   return (
-    <div className="size-full">
+    <div className="size-full bg-white">
       {currentPage === 'login' && <LoginPage onNavigate={handleNavigate} />}
       {currentPage === 'landing' && (
         <LandingPage
@@ -211,8 +213,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 3D landing at root */}
-        <Route path="/" element={<ThreeLanding />} />
+        {/* Marketing landing as entry point */}
+        <Route path="/" element={<MarketingScreen />} />
+        {/* 3D landing experience */}
+        <Route path="/immersive" element={<ThreeLanding />} />
         {/* The page shown inside the monitor iframe */}
         <Route path="/home" element={<HomePreview />} />
         {/* Your existing app (state-based navigation) lives under /app */}
@@ -221,5 +225,15 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+  );
+}
+
+function MarketingScreen() {
+  const navigate = useNavigate();
+  return (
+    <MarketingLandingPage
+      onExplore={() => navigate('/immersive')}
+      onDemo={() => navigate('/immersive')}
+    />
   );
 }

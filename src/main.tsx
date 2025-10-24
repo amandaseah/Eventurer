@@ -8,6 +8,8 @@ import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
   import icon from 'leaflet/dist/images/marker-icon.png';
   import shadow from 'leaflet/dist/images/marker-shadow.png';
 
+
+  import './index.css'; 
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: icon2x,
     iconUrl: icon,

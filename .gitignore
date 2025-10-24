@@ -15,3 +15,14 @@ yarn.lock
 .env
 .env.local
 .env
+
+build/
+*.glb
+public/*.glb
+
+# Large 3D assets
+public/*.glb
+*.glb
+/build
+public/*.glb
+!public/final-optimized.glb

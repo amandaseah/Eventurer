@@ -126,7 +126,7 @@ export function EventExplorePage({
     <div className="min-h-screen">
       <Header currentPage="explore" onNavigate={onNavigate} />
 
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-6 py-8">
         {/* Back Button - Fixed */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
@@ -142,12 +142,12 @@ export function EventExplorePage({
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl mb-8 text-center"
+          className="text-4xl mb-6 text-center"
         >
           Explore Events
         </motion.h1>
 
-        <div className="w-full">
+        <div className="w-full space-y-6">
           {/* Carousel Section */}
           <RecommendationPanel
             events={events}
@@ -157,6 +157,7 @@ export function EventExplorePage({
             onBookmarkChange={onBookmarkChange}
             onRSVPChange={onRSVPChange}
           />
+          
           {/* Filters */}
           <FiltersPanel
             title="Filter & Sort All Events"
@@ -168,7 +169,7 @@ export function EventExplorePage({
 
           {/* All Events Grid */}
           <div>
-            <h2 className="text-2xl mb-6">All Events</h2>
+            <h2 className="text-2xl mb-4">All Events</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {allEvents.map((event, idx) => (
                 <motion.div
