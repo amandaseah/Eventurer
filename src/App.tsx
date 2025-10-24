@@ -1,5 +1,6 @@
 import { useState, useEffect} from 'react';
 import { LoginPage } from './components/pages/LoginPage';
+import { SignupPage } from './components/pages/SignupPage';
 import { LandingPage } from './components/pages/LandingPage';
 import { MoodResultsPage } from './components/pages/MoodResultsPage';
 import { EventExplorePage } from './components/pages/EventExplorePage';
@@ -29,6 +30,7 @@ interface Discussion {
 
 type Page =
   | 'login'
+  | 'signup'
   | 'landing'
   | 'mood-results'
   | 'explore'
@@ -42,9 +44,13 @@ interface PageData {
 }
 
 function ShellApp() {
-  const [currentPage, setCurrentPage] = useState<Page>('landing');
+  // Get initial page from URL parameters
+  const params = new URLSearchParams(window.location.search);
+  const initialPage = (params.get('page') as Page) || 'landing';
+  
+  const [currentPage, setCurrentPage] = useState<Page>(initialPage);
   const [pageData, setPageData] = useState<PageData>({});
-  const [navigationHistory, setNavigationHistory] = useState<Page[]>(['landing']);
+  const [navigationHistory, setNavigationHistory] = useState<Page[]>([initialPage]);
   const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([1, 2, 3, 4]);
   const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([3, 4, 7]);
 
