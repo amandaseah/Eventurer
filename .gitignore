@@ -3,9 +3,15 @@ dist
 .vite
 pnpm-lock.yaml
 yarn.lock
+.env.local
 
 .DS_Store
 
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+
+# env files
+.env
+.env.local
+.env
