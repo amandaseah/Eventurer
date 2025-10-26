@@ -52,7 +52,7 @@ export default function Hero({ onStart }: { onStart: () => void }) {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
           >
-            Take our quick mood quiz and discover the perfect events for you
+            Discover amazing events that align with your current mood
           </motion.p>
 
           {/* Enhanced quiz button */}
@@ -135,38 +135,6 @@ export default function Hero({ onStart }: { onStart: () => void }) {
             ))}
           </motion.div>
 
-          {/* Additional decorative elements */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 1 }}
-            className="mt-16 flex justify-center gap-8 text-sm text-gray-500"
-          >
-            <motion.div
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="flex items-center gap-2"
-            >
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
-              <span>Quick & Easy</span>
-            </motion.div>
-            <motion.div
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-              className="flex items-center gap-2"
-            >
-              <div className="w-2 h-2 bg-blue-400 rounded-full" />
-              <span>Personalized</span>
-            </motion.div>
-            <motion.div
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-              className="flex items-center gap-2"
-            >
-              <div className="w-2 h-2 bg-purple-400 rounded-full" />
-              <span>Free to Use</span>
-            </motion.div>
-          </motion.div>
         </motion.div>
       </div>
     </section>

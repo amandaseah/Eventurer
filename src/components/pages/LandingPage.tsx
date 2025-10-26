@@ -22,36 +22,35 @@ export function LandingPage({ onNavigate, events = [], loading = false }: Landin
     <div className="min-h-screen relative overflow-hidden">
       <Header currentPage="landing" onNavigate={onNavigate} />
 
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 pointer-events-none">
-        {/* Floating particles */}
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-purple-300 rounded-full opacity-60"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              x: [0, Math.random() * 20 - 10, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-        
-        {/* Large floating shapes */}
+      {/* Elegant Background Elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Geometric grid pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="grid grid-cols-12 grid-rows-12 h-full w-full">
+            {[...Array(144)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="border border-purple-200"
+                animate={{
+                  opacity: [0.1, 0.3, 0.1],
+                }}
+                transition={{
+                  duration: 4 + Math.random() * 2,
+                  repeat: Infinity,
+                  delay: Math.random() * 4,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Floating geometric shapes */}
         <motion.div
-          className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full opacity-20"
+          className="absolute top-20 left-16 w-16 h-16 border-2 border-purple-300/30 rotate-45"
           animate={{
-            y: [0, -20, 0],
-            rotate: [0, 180, 360],
+            y: [0, -30, 0],
+            rotate: [45, 225, 45],
+            scale: [1, 1.1, 1],
           }}
           transition={{
             duration: 8,
@@ -59,12 +58,13 @@ export function LandingPage({ onNavigate, events = [], loading = false }: Landin
             ease: "easeInOut",
           }}
         />
+        
         <motion.div
-          className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-blue-200 to-cyan-200 rounded-full opacity-20"
+          className="absolute top-32 right-24 w-12 h-12 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-sm"
           animate={{
-            y: [0, 30, 0],
-            x: [0, 10, 0],
-            rotate: [0, -180, -360],
+            y: [0, 20, 0],
+            x: [0, -10, 0],
+            rotate: [0, 90, 0],
           }}
           transition={{
             duration: 6,
@@ -72,14 +72,66 @@ export function LandingPage({ onNavigate, events = [], loading = false }: Landin
             ease: "easeInOut",
           }}
         />
+
         <motion.div
-          className="absolute bottom-40 left-1/4 w-20 h-20 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full opacity-20"
+          className="absolute bottom-32 left-1/3 w-8 h-8 border border-pink-300/40 rounded-full"
           animate={{
             y: [0, -25, 0],
-            scale: [1, 1.1, 1],
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.6, 0.3],
           }}
           transition={{
             duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Subtle diagonal lines */}
+        <motion.div
+          className="absolute top-0 left-0 w-full h-full"
+          style={{
+            background: 'linear-gradient(45deg, transparent 48%, rgba(147, 51, 234, 0.05) 49%, rgba(147, 51, 234, 0.05) 51%, transparent 52%)',
+            backgroundSize: '60px 60px',
+          }}
+          animate={{
+            backgroundPosition: ['0px 0px', '60px 60px'],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        />
+
+        {/* Floating hexagons */}
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-6 h-6 bg-gradient-to-br from-purple-200/30 to-pink-200/30"
+          style={{
+            clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
+          }}
+          animate={{
+            y: [0, -20, 0],
+            rotate: [0, 120, 240, 360],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        <motion.div
+          className="absolute bottom-1/4 left-1/4 w-4 h-4 bg-gradient-to-br from-blue-200/30 to-purple-200/30"
+          style={{
+            clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
+          }}
+          animate={{
+            y: [0, 15, 0],
+            rotate: [360, 240, 120, 0],
+          }}
+          transition={{
+            duration: 8,
             repeat: Infinity,
             ease: "easeInOut",
           }}
@@ -185,7 +237,7 @@ export function LandingPage({ onNavigate, events = [], loading = false }: Landin
                     transition: { duration: 0.2 }
                   }}
                 >
-                  <EventCard event={event} onEventClick={onNavigate} />
+                  <EventCard event={event} onEventClick={(id) => onNavigate('event-info', { eventId: id })} />
                 </motion.div>
               ))}
             </div>
