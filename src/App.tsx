@@ -12,6 +12,8 @@ import { CountdownWidget } from './components/CountdownWidget';
 import { Toaster } from './components/ui/sonner';
 import { events } from './lib/mockData';
 import { loadGoogleMapsScript } from './lib/loadGoogleMaps';
+import { fetchEventbriteEvents, fetchEventbriteEventsForMe, sanityCheckMe } from './lib/eventbriteService';
+import { categorizeEvent } from './lib/eventCategoriser';
 
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import ThreeLanding from './components/features/landing3D/ThreeLanding'
@@ -67,18 +69,33 @@ function ShellApp() {
     (async () => {
       try {
         setLoadingEvents(true);
-        await sanityCheckMe();
-        const data = await fetchEventbriteEventsForMe();
+        // Try public events search first, fallback to user events if needed
+        let data = await fetchEventbriteEvents('Singapore', '25km');
+        
+        // If no public events found, try user's events as fallback
+        if (data.length === 0) {
+          console.log('[App] No public events found, trying user events...');
+          try {
+            await sanityCheckMe();
+            data = await fetchEventbriteEventsForMe();
+          } catch (userErr) {
+            console.warn('[App] User events also failed:', userErr);
+          }
+        }
+        
+        // If still no events, show error message
+        if (data.length === 0) {
+          console.error('[App] No Eventbrite events found. Please check your API token configuration.');
+        }
         const enriched = data.map((e: any) => {
-        const { mood, category } = categorizeEvent(
-          e.name?.text || e.name || "",
-          e.description?.text || e.description || "",
-          e.category?.name || e.category
-        );
-        return { ...e, mood, category };
-      });
-        setFetchedEvents(enriched);
-        if (mounted) setFetchedEvents(data);
+          const { mood, category } = categorizeEvent(
+            e.title || e.name?.text || e.name || "",
+            e.description || e.description?.text || "",
+            e.category || e.category?.name || ""
+          );
+          return { ...e, mood, category };
+        });
+        if (mounted) setFetchedEvents(enriched);
       } catch (err) {
         console.error("[App] failed fetching events:", err);
       } finally {
