@@ -107,6 +107,19 @@ function ShellApp() {
 
   const bookmarkedEvents = fetchedEvents.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
   const rsvpedEvents    = fetchedEvents.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
+  const sortedUpcomingEvents = fetchedEvents
+    .filter(e => !e.isPast)
+    .sort((a, b) => {
+      const aDate = eDateValue(a);
+      const bDate = eDateValue(b);
+      return aDate - bDate;
+    });
+
+  function eDateValue(event: any) {
+    const rawDate = event?.date || event?.start?.local || event?.start?.utc || event?.startDate;
+    const parsed = rawDate ? new Date(rawDate).getTime() : Number.POSITIVE_INFINITY;
+    return Number.isNaN(parsed) ? Number.POSITIVE_INFINITY : parsed;
+  }
 
 
   const handleNavigate: (page: string, data?: any) => void = (page, data) => {
@@ -146,7 +159,7 @@ function ShellApp() {
 
   const showCountdownWidget =
     currentPage !== 'login' &&
-    (bookmarkedEvents.length > 0 || rsvpedEvents.length > 0);
+    sortedUpcomingEvents.length > 0;
 
   return (
     <div className="size-full bg-white">
@@ -212,7 +225,8 @@ function ShellApp() {
       {showCountdownWidget && (
         <CountdownWidget
           bookmarkedEvents={bookmarkedEvents}
-          upcomingEvents={rsvpedEvents}
+          rsvpedEvents={rsvpedEvents}
+          fallbackEvents={sortedUpcomingEvents}
           onEventClick={(id) => handleNavigate('event-info', { eventId: id })}
         />
       )}

@@ -10,8 +10,13 @@ type Props = React.ImgHTMLAttributes<HTMLImageElement> & {
 };
 
 
-export default function Image({ fallbackSrc, onError, ...rest }: Props) {
-  const [src, setSrc] = React.useState(rest.src);
+export default function Image({
+  fallbackSrc,
+  onError,
+  src: propSrc,
+  ...rest
+}: Props) {
+  const [src, setSrc] = React.useState(propSrc);
   const [failedOnce, setFailedOnce] = React.useState(false);
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -24,6 +29,11 @@ export default function Image({ fallbackSrc, onError, ...rest }: Props) {
     setSrc(ERROR_IMG_SRC);
     onError?.(e);
   };
+
+  React.useEffect(() => {
+    setSrc(propSrc);
+    setFailedOnce(false);
+  }, [propSrc]);
 
   return <img {...rest} src={src} onError={handleError} />;
 }
