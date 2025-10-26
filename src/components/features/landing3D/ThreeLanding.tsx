@@ -3,6 +3,8 @@ import gsap from 'gsap'
 import { Suspense, useEffect, useRef, useState, useCallback } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, useCursor, useGLTF, Html, useProgress } from '@react-three/drei'
+import { ArrowLeft, Home } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import HomePreview from '../../pages/HomePreview'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 
@@ -482,6 +484,7 @@ function GlobalLoader({ opacity }: { opacity: number }) {
 }
 
 export default function ThreeLanding() {
+  const navigate = useNavigate()
   const controlsRef = useRef<OrbitControlsImpl | null>(null)
   const modelRef = useRef<THREE.Object3D | null>(null)
   const deskGroupRef = useRef<THREE.Group | null>(null)
@@ -776,6 +779,51 @@ export default function ThreeLanding() {
           <iframe title='Eventurer Monitor' src='/app' style={{ width: '100%', height: '100%', border: 'none' }} />
         </div>
       </div>
+      
+      {/* Back Button */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '24px',
+          left: '24px',
+          zIndex: 1000,
+          pointerEvents: 'auto',
+        }}
+      >
+        <button
+          onClick={() => navigate('/')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '12px 16px',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            borderRadius: '12px',
+            color: '#374151',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)'
+            e.currentTarget.style.transform = 'translateY(-2px)'
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.2)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'
+            e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)'
+          }}
+        >
+          <ArrowLeft size={16} />
+          <span>Back to Home</span>
+        </button>
+      </div>
+      
       {showLoader && <GlobalLoader opacity={loaderOpacity} />}
     </>
   )
