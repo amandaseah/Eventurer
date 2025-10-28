@@ -53,7 +53,6 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
         {/* Login Form */}
         <LoginForm onNavigate={onNavigate} />
 
-        {/* Social login removed */}
       </motion.div>
     </div>
   );
