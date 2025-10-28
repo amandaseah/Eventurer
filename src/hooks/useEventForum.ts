@@ -117,6 +117,7 @@ export function useEventForum(eventId: number) {
 
   // 5️ Upvote a post or reply (recursive)
   const upvotePost = (postId: string) => {
+  const upvotePost = (postId: string, username: string) => {
     setPosts(prevPosts =>
       prevPosts.map(post => {
         const upvoteRecursive = (p: Post | Reply): Post | Reply => {

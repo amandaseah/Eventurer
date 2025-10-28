@@ -119,4 +119,3 @@ export function EventForumPage({ eventId, onGoBack, onNavigate, username }: Even
       </div>
     </div>
   );
-}
