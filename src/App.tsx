@@ -129,6 +129,7 @@ function ShellApp() {
   return (
     <div className="size-full">
       {currentPage === 'login' && <LoginPage onNavigate={handleNavigate} />}
+      {currentPage === 'signup' && <SignupPage onNavigate={handleNavigate} />}
       {currentPage === 'landing' && (
         <LandingPage
           onNavigate={handleNavigate}

@@ -5,6 +5,7 @@ import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { signUpWithEmail } from '../../../lib/firebase';
+import { friendlyAuthError } from '../../../lib/authErrorMessages';
 
 interface SignupFormProps {
   onNavigate: (page: string) => void;
@@ -26,6 +27,7 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
     if (!lastName) return setError('Please enter your last name');
     if (!email) return setError('Please enter an email');
     if (!password) return setError('Please enter a password');
+    if (password.length < 6) return setError('Password must be at least 6 characters');
     if (password !== confirm) return setError("Passwords don't match");
     setLoading(true);
     try {
@@ -33,7 +35,7 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
       // on success navigate to landing
       onNavigate('landing');
     } catch (err: any) {
-      setError(err?.message || 'Unable to create account');
+      setError(friendlyAuthError(err, 'Unable to create account'));
     } finally {
       setLoading(false);
     }
