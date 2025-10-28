@@ -5,6 +5,7 @@ import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { signInWithEmail } from '../../../lib/firebase';
+import { friendlyAuthError } from '../../../lib/authErrorMessages';
 
 interface LoginFormProps {
   onNavigate: (page: string) => void;
@@ -24,11 +25,11 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
 
     setLoading(true);
     try {
-  await signInWithEmail({ email, password });
-  // after successful login, navigate to landing
-  onNavigate('landing');
+      await signInWithEmail({ email, password });
+      // after successful login, navigate to landing
+      onNavigate('landing');
     } catch (err: any) {
-      setError(err?.message || 'Unable to sign in');
+      setError(friendlyAuthError(err, 'Unable to sign in'));
     } finally {
       setLoading(false);
     }
