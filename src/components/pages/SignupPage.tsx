@@ -1,7 +1,7 @@
 import SignupForm from '../features/signup/SignupForm';
 
 import { motion } from 'motion/react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, ChevronLeft } from 'lucide-react';
 
 interface SignupPageProps {
   onNavigate: (page: string) => void;
@@ -27,6 +27,14 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
         transition={{ duration: 0.5 }}
         className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-md mx-4 relative z-10"
       >
+        {/* Back button to go to login */}
+        <button
+          onClick={() => onNavigate('login')}
+          className="absolute left-4 top-4 p-2 rounded-full hover:bg-gray-100 transition-colors z-20"
+          aria-label="Back to login"
+        >
+          <ChevronLeft className="w-5 h-5 text-gray-600" />
+        </button>
         <motion.div
           initial={{ y: -20 }}
           animate={{ y: 0 }}

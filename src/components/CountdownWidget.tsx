@@ -118,18 +118,15 @@ export function CountdownWidget({
     return unique.sort((a, b) => a.eventDate.getTime() - b.eventDate.getTime());
   };
 
+  // Only show events from bookmarked or rsvped lists. Do not fall back to general events.
   const visibleEvents = useMemo(() => {
-    const prioritized = dedupeAndSort([
+    const combined = dedupeAndSort([
       ...normalizeEvents(bookmarkedEvents, 'bookmarked'),
       ...normalizeEvents(rsvpedEvents, 'rsvped'),
     ]);
 
-    if (prioritized.length > 0) {
-      return prioritized.slice(0, MAX_DISPLAYED_EVENTS);
-    }
-
-    return dedupeAndSort(normalizeEvents(fallbackEvents, 'general')).slice(0, MAX_DISPLAYED_EVENTS);
-  }, [bookmarkedEvents, rsvpedEvents, fallbackEvents]);
+    return combined.slice(0, MAX_DISPLAYED_EVENTS);
+  }, [bookmarkedEvents, rsvpedEvents]);
 
   if (visibleEvents.length === 0) return null;
 
@@ -149,7 +146,7 @@ export function CountdownWidget({
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-white rounded-3xl shadow-2xl w-72 max-h-[22rem] overflow-hidden flex flex-col"
+            className="bg-white rounded-3xl shadow-2xl w-80 max-h-[28rem] overflow-hidden flex flex-col"
           >
             <div className="flex items-center justify-between px-5 py-4 sticky top-0 bg-white z-10 border-b border-gray-100">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
@@ -198,17 +195,14 @@ export function CountdownWidget({
                                 {sourceLabel}
                               </span>
                             )}
-                            <span className="text-xs text-gray-600">
-                              {formatDateObjectToDDMMYYYY(event.eventDate)}
-                            </span>
                           </div>
                         </div>
                         <motion.div
-                          animate={{ scale: [1, 1.05, 1] }}
+                          animate={{ scale: [1, 1.03, 1] }}
                           transition={{ duration: 2, repeat: Infinity }}
-                          className="text-right bg-white rounded-xl px-3 py-2 min-w-[60px]"
+                          className="text-right bg-white rounded-xl px-3 py-2 min-w-[72px] flex flex-col items-end justify-center flex-none"
                         >
-                          <div className="text-xl font-semibold text-purple-600 leading-none">
+                          <div className="text-2xl font-semibold text-purple-600 leading-none">
                             {event.countdownDays}
                           </div>
                           <div className="text-xs text-gray-500 leading-none mt-1">
@@ -230,7 +224,7 @@ export function CountdownWidget({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsExpanded(true)}
-            className="relative bg-gradient-to-br from-purple-500 to-pink-400 text-white rounded-3xl px-4 py-3 shadow-2xl flex flex-col items-center gap-1 min-w-[96px]"
+            className="relative bg-gradient-to-br from-purple-500 to-pink-400 text-white rounded-3xl px-4 py-3 shadow-2xl flex flex-col items-center gap-1 min-w-[128px]"
           >
             <Calendar className="w-4 h-4 opacity-90" />
             <div className="flex items-baseline gap-1 leading-none">
@@ -238,7 +232,9 @@ export function CountdownWidget({
               <span className="text-sm uppercase tracking-wide">{pluraliseDays(nextEvent.countdownDays)}</span>
             </div>
             {sourceLabels[nextEvent.source] && (
-              <span className="text-[10px] uppercase tracking-[0.2em] opacity-90">
+              <span
+                className={`mt-1 text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses[nextEvent.source]}`}
+              >
                 {sourceLabels[nextEvent.source]}
               </span>
             )}
