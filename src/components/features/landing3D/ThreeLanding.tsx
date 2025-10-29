@@ -103,6 +103,7 @@ function tweenFocus(
 function DeskWithMonitor({
   onMonitorEnter,
   onMonitorLeave,
+  onMonitorActivate,
   onModelReady,
   htmlPointerEnabled,
   showInstruction,
@@ -111,6 +112,7 @@ function DeskWithMonitor({
 }: {
   onMonitorEnter: () => void
   onMonitorLeave: () => void
+  onMonitorActivate: () => void
   onModelReady: (object: THREE.Object3D) => void
   htmlPointerEnabled: boolean
   showInstruction: boolean
@@ -184,6 +186,14 @@ function DeskWithMonitor({
         onPointerOut={(event) => {
           event.stopPropagation()
           onMonitorLeave()
+        }}
+        onDoubleClick={(event) => {
+          event.stopPropagation()
+          onMonitorActivate()
+        }}
+        onClick={(event) => {
+          event.stopPropagation()
+          onMonitorActivate()
         }}
       >
         <planeGeometry args={planeSize} />
@@ -272,7 +282,7 @@ function DeskWithMonitor({
               
             }}
           >
-            hover over the screen to explore Eventurer ✨
+            hover over/click the screen to explore Eventurer ✨
           </Html>
         )}
       </mesh>
@@ -619,6 +629,13 @@ export default function ThreeLanding() {
     }
   }, [clearDwell, overlayOpen, runTransition])
 
+  const handleMonitorActivate = useCallback(() => {
+    clearDwell()
+    const state = zoomStateRef.current
+    if (state === 'ZOOMING_IN' || state === 'ZOOMED') return
+    runTransition('monitor', 'ZOOMING_IN', 'ZOOMED')
+  }, [clearDwell, runTransition])
+
   useEffect(() => {
     return () => {
       clearDwell()
@@ -705,6 +722,7 @@ export default function ThreeLanding() {
             deskGroupRef={deskGroupRef}
             onMonitorEnter={handleMonitorEnter}
             onMonitorLeave={handleMonitorLeave}
+            onMonitorActivate={handleMonitorActivate}
             onModelReady={handleDeskReady}
           />
           <ContactShadows position={[0, -0.001, 0]} opacity={0.35} scale={10} blur={2} frames={1} />
