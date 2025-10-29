@@ -210,9 +210,16 @@ function ShellApp() {
           onRSVPChange={handleRSVPChange}
         />
       )}
-      {currentPage === 'event-forum' && pageData.eventId && (
-        <EventForumPage eventId={pageData.eventId} onNavigate={handleNavigate} />
+
+      {currentPage === "event-forum" && pageData.eventId && (
+        <EventForumPage 
+          eventId={pageData.eventId}
+          onGoBack={handleGoBack}
+          onNavigate={handleNavigate}
+          username={pageData?.username || "Guest"}
+        />
       )}
+
       
       {currentPage === 'profile' && (
         <ProfilePage 
