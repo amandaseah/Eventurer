@@ -49,9 +49,9 @@ export default function AccountPanel({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-3xl p-8 shadow-md"
+      className="bg-white rounded-3xl p-4 sm:p-6 md:p-8 shadow-md"
     >
-      <h2 className="text-2xl mb-6">Account Information</h2>
+      <h2 className="text-xl sm:text-2xl mb-4 sm:mb-6">Account Information</h2>
 
       {isEditing ? (
         <div className="space-y-4">

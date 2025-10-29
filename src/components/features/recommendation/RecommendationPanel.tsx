@@ -45,7 +45,18 @@ export default function RecommendationPanel({
 
   return (
     <section className="mb-12">
-      <h2 className="text-2xl mb-6 text-center">{title}</h2>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-8"
+      >
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+          {title}
+        </h2>
+        <p className="text-xs sm:text-sm text-gray-500">
+          Curated picks just for you
+        </p>
+      </motion.div>
 
       <div className="relative max-w-2xl mx-auto">
         <div className="overflow-hidden rounded-3xl">

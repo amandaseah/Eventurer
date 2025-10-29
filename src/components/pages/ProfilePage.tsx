@@ -138,16 +138,16 @@ export function ProfilePage({
     <div className="min-h-screen">
       <Header currentPage="profile" onNavigate={onNavigate} />
 
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Back Button - Fixed */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           whileHover={{ x: -4 }}
           onClick={onGoBack}
-          className="fixed top-24 left-6 z-50 flex items-center gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md"
+          className="fixed top-20 sm:top-24 left-4 sm:left-6 z-50 flex items-center gap-1.5 sm:gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-2.5 sm:px-4 py-2 rounded-full shadow-md text-xs sm:text-base"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           <span>Back</span>
         </motion.button>
 
@@ -161,50 +161,52 @@ export function ProfilePage({
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8 bg-white rounded-2xl p-1 shadow-md h-auto">
-            <TabsTrigger 
-              value="bookmarked" 
-              className="rounded-xl data-[state=active]:bg-purple-100 py-3 data-[state=active]:rounded-l-xl data-[state=active]:rounded-r-xl first:data-[state=active]:rounded-l-2xl last:data-[state=active]:rounded-r-2xl"
-            >
-              <Bookmark className="w-4 h-4 mr-2" />
-              Bookmarked
-            </TabsTrigger>
-            <TabsTrigger 
-              value="upcoming" 
-              className="rounded-xl data-[state=active]:bg-green-100 py-3"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Upcoming
-            </TabsTrigger>
-            <TabsTrigger 
-              value="past" 
-              className="rounded-xl data-[state=active]:bg-gray-100 py-3"
-            >
-              <Clock className="w-4 h-4 mr-2" />
-              Past Events
-            </TabsTrigger>
-            <TabsTrigger 
-              value="account" 
-              className="rounded-xl data-[state=active]:bg-blue-100 py-3"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Account
-            </TabsTrigger>
-            <TabsTrigger 
-              value="settings" 
-              className="rounded-xl data-[state=active]:bg-orange-100 py-3 data-[state=active]:rounded-l-xl data-[state=active]:rounded-r-xl first:data-[state=active]:rounded-l-2xl last:data-[state=active]:rounded-r-2xl"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </TabsTrigger>
-          </TabsList>
+          <div className="md:block flex flex-row gap-3">
+            <TabsList className="!flex !flex-col md:!grid w-auto md:w-full md:grid-cols-5 mb-4 md:mb-8 bg-white rounded-2xl !p-1 shadow-md !h-auto !gap-0.5 shrink-0">
+              <TabsTrigger
+                value="bookmarked"
+                className="!rounded-lg data-[state=active]:bg-purple-100 !py-2 md:!py-1.5 !px-2 md:!px-1 !text-xs md:!text-[10px] lg:!text-xs !flex !items-center !justify-start md:!justify-center !gap-1.5 md:!gap-0.5 !h-auto !min-h-0 !border-0"
+              >
+                <Bookmark className="w-3.5 h-3.5 md:w-3 md:h-3 shrink-0" />
+                <span className="md:truncate">Bookmarked</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="upcoming"
+                className="!rounded-lg data-[state=active]:bg-green-100 !py-2 md:!py-1.5 !px-2 md:!px-1 !text-xs md:!text-[10px] lg:!text-xs !flex !items-center !justify-start md:!justify-center !gap-1.5 md:!gap-0.5 !h-auto !min-h-0 !border-0"
+              >
+                <CheckCircle className="w-3.5 h-3.5 md:w-3 md:h-3 shrink-0" />
+                <span className="md:truncate">Upcoming</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="past"
+                className="!rounded-lg data-[state=active]:bg-gray-100 !py-2 md:!py-1.5 !px-2 md:!px-1 !text-xs md:!text-[10px] lg:!text-xs !flex !items-center !justify-start md:!justify-center !gap-1.5 md:!gap-0.5 !h-auto !min-h-0 !border-0"
+              >
+                <Clock className="w-3.5 h-3.5 md:w-3 md:h-3 shrink-0" />
+                <span className="md:truncate">Past</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="account"
+                className="!rounded-lg data-[state=active]:bg-blue-100 !py-2 md:!py-1.5 !px-2 md:!px-1 !text-xs md:!text-[10px] lg:!text-xs !flex !items-center !justify-start md:!justify-center !gap-1.5 md:!gap-0.5 !h-auto !min-h-0 !border-0"
+              >
+                <User className="w-3.5 h-3.5 md:w-3 md:h-3 shrink-0" />
+                <span className="md:truncate">Account</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="settings"
+                className="!rounded-lg data-[state=active]:bg-orange-100 !py-2 md:!py-1.5 !px-2 md:!px-1 !text-xs md:!text-[10px] lg:!text-xs !flex !items-center !justify-start md:!justify-center !gap-1.5 md:!gap-0.5 !h-auto !min-h-0 !border-0"
+              >
+                <Settings className="w-3.5 h-3.5 md:w-3 md:h-3 shrink-0" />
+                <span className="md:truncate">Settings</span>
+              </TabsTrigger>
+            </TabsList>
 
+            <div className="flex-1 min-w-0 w-full md:w-auto">
           {/* Bookmarked Events */}
           <TabsContent value="bookmarked">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <div className="mb-6">
-                <h2 className="text-2xl mb-2">Bookmarked Events</h2>
-                <p className="text-gray-600">Events you've saved for later</p>
+                <h2 className="text-xl sm:text-2xl mb-2">Bookmarked Events</h2>
+                <p className="text-sm sm:text-base text-gray-600">Events you've saved for later</p>
               </div>
 
               {bookmarkedEvents.length > 0 ? (
@@ -233,8 +235,8 @@ export function ProfilePage({
           <TabsContent value="upcoming">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <div className="mb-6">
-                  <h2 className="text-2xl mb-2">Upcoming Events</h2>
-                  <p className="text-gray-600">Events you've RSVP'd to</p>
+                  <h2 className="text-xl sm:text-2xl mb-2">Upcoming Events</h2>
+                  <p className="text-sm sm:text-base text-gray-600">Events you've RSVP'd to</p>
                 </div>
 
                 {rsvpedEvents.length > 0 ? (
@@ -261,8 +263,8 @@ export function ProfilePage({
           <TabsContent value="past">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <div className="mb-6">
-                <h2 className="text-2xl mb-2">Past Events</h2>
-                <p className="text-gray-600">Events you've attended</p>
+                <h2 className="text-xl sm:text-2xl mb-2">Past Events</h2>
+                <p className="text-sm sm:text-base text-gray-600">Events you've attended</p>
               </div>
 
               {pastEvents.length > 0 ? (
@@ -313,7 +315,8 @@ export function ProfilePage({
           <TabsContent value="settings">
             <SettingsPanel />
           </TabsContent>
-
+            </div>
+          </div>
         </Tabs>
       </div>
     </div>

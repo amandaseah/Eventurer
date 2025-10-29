@@ -126,26 +126,32 @@ export function EventExplorePage({
     <div className="min-h-screen">
       <Header currentPage="explore" onNavigate={onNavigate} />
 
-      <div className="container mx-auto px-6 py-8">
-        {/* Back Button - Fixed */}
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Back Button */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           whileHover={{ x: -4 }}
           onClick={() => onNavigate('landing')}
-          className="fixed top-24 left-6 z-50 flex items-center gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md"
+          className="flex items-center gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-md text-sm sm:text-base mb-6 sm:mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Home</span>
         </motion.button>
 
-        <motion.h1
+        {/* Main Title */}
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl mb-6 text-center"
+          className="text-center mb-10 sm:mb-12"
         >
-          Explore Events
-        </motion.h1>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent mb-3">
+            Explore Events
+          </h1>
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover amazing events tailored to your interests and mood
+          </p>
+        </motion.div>
 
         <div className="w-full space-y-6">
           {/* Carousel Section */}
@@ -169,8 +175,19 @@ export function EventExplorePage({
 
           {/* All Events Grid */}
           <div>
-            <h2 className="text-2xl mb-4">All Events</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6"
+            >
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">
+                All Events
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500">
+                Browse all available events
+              </p>
+            </motion.div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {allEvents.map((event, idx) => (
                 <motion.div
                   key={event.id}
