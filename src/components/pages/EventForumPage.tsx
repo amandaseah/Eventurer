@@ -4,19 +4,7 @@ import { events } from '../../lib/mockData';
 import { MessageSquare, ArrowLeft, Wifi, WifiOff, Loader2 } from 'lucide-react';
 import NewPostForm from "../features/forum/NewPostForm";
 import PostList from "../features/forum/PostList";
-<<<<<<< HEAD
-import type { ForumPost } from "../features/forum/types";
-
-
-import { useState, useRef } from 'react';
-import { motion } from 'motion/react';
-import { Header } from '../Header';
-import { events, forumPosts as initialForumPosts } from '../../lib/mockData';
-import { MessageSquare, ArrowLeft } from 'lucide-react';
-
-=======
 import { useEventForum } from "../../hooks/useEventForum";
->>>>>>> feature/forum
 
 interface EventForumPageProps {
   eventId: number;
