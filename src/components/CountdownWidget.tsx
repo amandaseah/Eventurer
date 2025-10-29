@@ -246,22 +246,9 @@ export function CountdownWidget({
               <span className="text-2xl font-semibold">{nextEvent.countdownDays}</span>
               <span className="text-sm uppercase tracking-wide">{pluraliseDays(nextEvent.countdownDays)}</span>
             </div>
-            <div className="flex gap-1 mt-1 flex-wrap justify-center">
-              {nextEvent.sources.includes('bookmarked') && (
-                <span
-                  className={`text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses['bookmarked']}`}
-                >
-                  {sourceLabels['bookmarked']}
-                </span>
-              )}
-              {nextEvent.sources.includes('rsvped') && (
-                <span
-                  className={`text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses['rsvped']}`}
-                >
-                  {sourceLabels['rsvped']}
-                </span>
-              )}
-            </div>
+            <span className="text-[11px] mt-1 opacity-90 text-center">
+              until your next event!
+            </span>
             {additionalEventCount > 0 && (
               <div className="absolute -top-2 -right-2 bg-white text-purple-600 rounded-full px-2 py-[2px] text-xs font-medium shadow-lg border border-purple-100">
                 +{additionalEventCount}
