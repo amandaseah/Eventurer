@@ -161,52 +161,52 @@ export function ProfilePage({
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="md:block flex flex-row gap-3">
-            <TabsList className="!flex !flex-col md:!grid w-auto md:w-full md:grid-cols-5 mb-4 md:mb-8 bg-white rounded-2xl !p-1 shadow-md !h-auto !gap-0.5 shrink-0">
+          <div className="flex flex-row sm:flex-col gap-3 sm:gap-0">
+            <TabsList className="!flex !flex-col sm:!grid w-auto sm:w-full sm:grid-cols-5 mb-4 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto !gap-0.5 sm:!gap-1 shrink-0">
               <TabsTrigger
                 value="bookmarked"
-                className="!rounded-lg data-[state=active]:bg-purple-100 !py-2 md:!py-1.5 !px-2 md:!px-1 !text-xs md:!text-[10px] lg:!text-xs !flex !items-center !justify-start md:!justify-center !gap-1.5 md:!gap-0.5 !h-auto !min-h-0 !border-0"
+                className="!rounded-lg data-[state=active]:bg-purple-100 !py-2 sm:!py-2.5 !px-2 sm:!px-4 !text-xs sm:!text-sm !flex !items-center !justify-start sm:!justify-center !gap-1.5 sm:!gap-2 !h-auto !min-h-0 !border-0 !font-medium"
               >
-                <Bookmark className="w-3.5 h-3.5 md:w-3 md:h-3 shrink-0" />
-                <span className="md:truncate">Bookmarked</span>
+                <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="sm:truncate">Bookmarked</span>
               </TabsTrigger>
               <TabsTrigger
                 value="upcoming"
-                className="!rounded-lg data-[state=active]:bg-green-100 !py-2 md:!py-1.5 !px-2 md:!px-1 !text-xs md:!text-[10px] lg:!text-xs !flex !items-center !justify-start md:!justify-center !gap-1.5 md:!gap-0.5 !h-auto !min-h-0 !border-0"
+                className="!rounded-lg data-[state=active]:bg-green-100 !py-2 sm:!py-2.5 !px-2 sm:!px-4 !text-xs sm:!text-sm !flex !items-center !justify-start sm:!justify-center !gap-1.5 sm:!gap-2 !h-auto !min-h-0 !border-0 !font-medium"
               >
-                <CheckCircle className="w-3.5 h-3.5 md:w-3 md:h-3 shrink-0" />
-                <span className="md:truncate">Upcoming</span>
+                <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="sm:truncate">Upcoming</span>
               </TabsTrigger>
               <TabsTrigger
                 value="past"
-                className="!rounded-lg data-[state=active]:bg-gray-100 !py-2 md:!py-1.5 !px-2 md:!px-1 !text-xs md:!text-[10px] lg:!text-xs !flex !items-center !justify-start md:!justify-center !gap-1.5 md:!gap-0.5 !h-auto !min-h-0 !border-0"
+                className="!rounded-lg data-[state=active]:bg-gray-100 !py-2 sm:!py-2.5 !px-2 sm:!px-4 !text-xs sm:!text-sm !flex !items-center !justify-start sm:!justify-center !gap-1.5 sm:!gap-2 !h-auto !min-h-0 !border-0 !font-medium"
               >
-                <Clock className="w-3.5 h-3.5 md:w-3 md:h-3 shrink-0" />
-                <span className="md:truncate">Past</span>
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="sm:truncate">Past</span>
               </TabsTrigger>
               <TabsTrigger
                 value="account"
-                className="!rounded-lg data-[state=active]:bg-blue-100 !py-2 md:!py-1.5 !px-2 md:!px-1 !text-xs md:!text-[10px] lg:!text-xs !flex !items-center !justify-start md:!justify-center !gap-1.5 md:!gap-0.5 !h-auto !min-h-0 !border-0"
+                className="!rounded-lg data-[state=active]:bg-blue-100 !py-2 sm:!py-2.5 !px-2 sm:!px-4 !text-xs sm:!text-sm !flex !items-center !justify-start sm:!justify-center !gap-1.5 sm:!gap-2 !h-auto !min-h-0 !border-0 !font-medium"
               >
-                <User className="w-3.5 h-3.5 md:w-3 md:h-3 shrink-0" />
-                <span className="md:truncate">Account</span>
+                <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="sm:truncate">Account</span>
               </TabsTrigger>
               <TabsTrigger
                 value="settings"
-                className="!rounded-lg data-[state=active]:bg-orange-100 !py-2 md:!py-1.5 !px-2 md:!px-1 !text-xs md:!text-[10px] lg:!text-xs !flex !items-center !justify-start md:!justify-center !gap-1.5 md:!gap-0.5 !h-auto !min-h-0 !border-0"
+                className="!rounded-lg data-[state=active]:bg-orange-100 !py-2 sm:!py-2.5 !px-2 sm:!px-4 !text-xs sm:!text-sm !flex !items-center !justify-start sm:!justify-center !gap-1.5 sm:!gap-2 !h-auto !min-h-0 !border-0 !font-medium"
               >
-                <Settings className="w-3.5 h-3.5 md:w-3 md:h-3 shrink-0" />
-                <span className="md:truncate">Settings</span>
+                <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="sm:truncate">Settings</span>
               </TabsTrigger>
             </TabsList>
 
-            <div className="flex-1 min-w-0 w-full md:w-auto">
+            <div className="flex-1 min-w-0 sm:flex-none sm:w-full">
           {/* Bookmarked Events */}
           <TabsContent value="bookmarked">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="mb-6">
-                <h2 className="text-xl sm:text-2xl mb-2">Bookmarked Events</h2>
-                <p className="text-sm sm:text-base text-gray-600">Events you've saved for later</p>
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-base sm:text-2xl mb-1 sm:mb-2">Bookmarked Events</h2>
+                <p className="text-xs sm:text-base text-gray-600">Events you've saved for later</p>
               </div>
 
               {bookmarkedEvents.length > 0 ? (
@@ -234,9 +234,9 @@ export function ProfilePage({
           {/* Upcoming RSVP'd Events */}
           <TabsContent value="upcoming">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                <div className="mb-6">
-                  <h2 className="text-xl sm:text-2xl mb-2">Upcoming Events</h2>
-                  <p className="text-sm sm:text-base text-gray-600">Events you've RSVP'd to</p>
+                <div className="mb-4 sm:mb-6">
+                  <h2 className="text-base sm:text-2xl mb-1 sm:mb-2">Upcoming Events</h2>
+                  <p className="text-xs sm:text-base text-gray-600">Events you've RSVP'd to</p>
                 </div>
 
                 {rsvpedEvents.length > 0 ? (
@@ -262,9 +262,9 @@ export function ProfilePage({
           {/* Past Events */}
           <TabsContent value="past">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="mb-6">
-                <h2 className="text-xl sm:text-2xl mb-2">Past Events</h2>
-                <p className="text-sm sm:text-base text-gray-600">Events you've attended</p>
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-base sm:text-2xl mb-1 sm:mb-2">Past Events</h2>
+                <p className="text-xs sm:text-base text-gray-600">Events you've attended</p>
               </div>
 
               {pastEvents.length > 0 ? (
