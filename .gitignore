@@ -11,7 +11,6 @@ yarn.lock
 !.vscode/extensions.json
 !.vscode/settings.json
 
-<<<<<<< HEAD
 # env files
 .env
 .env.local
@@ -28,16 +27,3 @@ public/*.glb
 public/*.glb
 !public/final-optimized.glb
 .env.local
-=======
-# Environment variables
-.env
-.env.local
-.env.production
-backend/.env
-backend/.env.local
-
-# Logs
-*.log
-npm-debug.log*
-backend/*.log
->>>>>>> feature/forum
