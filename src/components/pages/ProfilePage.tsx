@@ -156,11 +156,7 @@ export function ProfilePage({
           name={user.name}
           email={user.email}
           memberSince={user.memberSince}
-<<<<<<< HEAD
           onSignOut={handleSignOut}
-=======
-          
->>>>>>> feature/forum
         />
 
         {/* Tabs */}

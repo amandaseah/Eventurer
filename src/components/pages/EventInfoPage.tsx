@@ -2,6 +2,7 @@ import HowToGetThere from "../features/map/HowToGetThere";
 import TopForumPreview from "../features/forum/TopForumPreview";
 import EventActions from "../features/eventInfo/EventActions";
 import EventDetails from "../features/eventInfo/EventDetails";
+import { fetchEventbriteEvents} from "../../lib/eventbriteService";
 
 import { useEventForum } from "../../hooks/useEventForum";
 import { useState } from "react";
@@ -106,7 +107,7 @@ export function EventInfoPage({
             <div>
               <TopForumPreview
                 posts={posts.slice(0, 3)}
-                onViewAll={() => onNavigate("event-forum", { eventId })}
+                onViewAll={() => onNavigate("event-forum", { eventId: event.id })}
                 onPostClick={(postId) => onNavigate("event-forum", { eventId, postId })}
                 upvotePost={(postId) => upvotePost(postId, username)} 
                 username={username}
@@ -129,7 +130,7 @@ export function EventInfoPage({
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onNavigate("event-forum", { eventId })}
+              onClick={() => onNavigate("event-forum", { eventId:event.id })}
               className="w-full bg-white rounded-3xl p-6 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
             >
               <MessageSquare className="w-5 h-5 text-purple-600" />
