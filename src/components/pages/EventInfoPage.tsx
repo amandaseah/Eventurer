@@ -1,18 +1,18 @@
-import HowToGetThere from "../features/map/HowToGetThere";
-import TopForumPreview from "../features/forum/TopForumPreview";
-import EventActions from "../features/eventInfo/EventActions";
-import EventDetails from "../features/eventInfo/EventDetails";
-
-import { useEventForum } from "../../hooks/useEventForum";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../Header";
 import Image from "../common/Image";
 import { ArrowLeft, MessageSquare } from "lucide-react";
+import HowToGetThere from "../features/map/HowToGetThere";
+import TopForumPreview from "../features/forum/TopForumPreview";
+import EventActions from "../features/eventInfo/EventActions";
+import EventDetails from "../features/eventInfo/EventDetails";
+import { fetchEventbriteEvents } from "../../lib/eventbriteService";
+import { useEventForum } from "../../hooks/useEventForum";
 
 interface EventInfoPageProps {
-  eventId: number;
-  events: any[];
+  eventId: string | number;
+  events?: any[];
   onNavigate: (page: string, data?: any) => void;
   onGoBack: () => void;
   bookmarkedEventIds: number[];
@@ -31,35 +31,82 @@ export function EventInfoPage({
   onBookmarkChange,
   onRSVPChange,
 }: EventInfoPageProps) {
-  const event = events.find((e) => String(e.id) === String(eventId));
-  const [isBookmarked, setIsBookmarked] = useState(
-    bookmarkedEventIds.includes(eventId)
-  );
-  const [isRSVPed, setIsRSVPed] = useState(rsvpedEventIds.includes(eventId));
+  const [event, setEvent] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Local states
+  const [isBookmarked, setIsBookmarked] = useState(bookmarkedEventIds.includes(Number(eventId)));
+  const [isRSVPed, setIsRSVPed] = useState(rsvpedEventIds.includes(Number(eventId)));
   const [showRSVPDialog, setShowRSVPDialog] = useState(false);
-  const [saves, setSaves] = useState(event?.saves || 0);
+  const [saves, setSaves] = useState(0);
 
-  const { posts, addPost, upvotePost, username } = useEventForum(eventId); // fetch all posts
+  // Forum data
+  const { posts, addPost, upvotePost, username } = useEventForum(Number(eventId));
 
-  if (!event) return <div>Event not found</div>;
+  // Fetch event details
+  useEffect(() => {
+    async function loadEvent() {
+      try {
+        setLoading(true);
 
+        let eventData: any = null;
+
+        // If parent already passed in events, use them
+        if (events && events.length > 0) {
+          eventData = events.find((e) => String(e.id) === String(eventId));
+        }
+
+        // Otherwise, fetch from Eventbrite
+        if (!eventData) {
+          const allEvents = await fetchEventbriteEvents();
+          eventData = allEvents.find((e: any) => String(e.id) === String(eventId));
+        }
+
+        if (!eventData) {
+          setError("Event not found");
+          setEvent(null);
+        } else {
+          setEvent(eventData);
+          setSaves(eventData.saves || 0);
+        }
+      } catch (err) {
+        console.error("Failed to fetch event:", err);
+        setError("Failed to load event details");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadEvent();
+  }, [eventId]);
+
+  // Loading / Error states
+  if (loading) return <div className="p-8 text-center">Loading event details...</div>;
+  if (error || !event) return <div className="p-8 text-center text-red-500">{error}</div>;
+
+  // Handlers
   const handleBookmark = () => {
     const newBookmarked = !isBookmarked;
     setIsBookmarked(newBookmarked);
     setSaves(newBookmarked ? saves + 1 : saves - 1);
-    onBookmarkChange(eventId, newBookmarked);
+    onBookmarkChange(Number(eventId), newBookmarked);
   };
 
   const confirmRSVP = () => {
     const isFree = event.price === "Free" || event.price === "$0";
     const newRSVPStatus = !isRSVPed;
     setIsRSVPed(newRSVPStatus);
-    onRSVPChange(eventId, newRSVPStatus);
-    if (newRSVPStatus) {
-      alert(isFree ? "RSVP confirmed!" : "RSVP confirmed with payment info sent!");
-    } else {
-      alert(isFree ? "RSVP cancelled." : "RSVP cancelled, email sent.");
-    }
+    onRSVPChange(Number(eventId), newRSVPStatus);
+    alert(
+      newRSVPStatus
+        ? isFree
+          ? "RSVP confirmed!"
+          : "RSVP confirmed with payment info sent!"
+        : isFree
+        ? "RSVP cancelled."
+        : "RSVP cancelled, email sent."
+    );
   };
 
   return (
@@ -69,10 +116,8 @@ export function EventInfoPage({
       <div className="container mx-auto px-6 py-12 max-w-5xl">
         {/* Back Button */}
         <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          whileHover={{ x: -4 }}
           onClick={onGoBack}
+          whileHover={{ x: -4 }}
           className="fixed top-24 left-6 z-50 flex items-center gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -85,11 +130,7 @@ export function EventInfoPage({
           animate={{ opacity: 1, y: 0 }}
           className="relative overflow-hidden rounded-3xl mb-8 h-96"
         >
-          <Image
-            src={event.imageUrl}
-            alt={event.title}
-            className="w-full h-full object-cover"
-          />
+          <Image src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-8 left-8 text-white">
             <h1 className="text-4xl md:text-5xl mb-2">{event.title}</h1>
@@ -97,21 +138,18 @@ export function EventInfoPage({
           </div>
         </motion.div>
 
-        {/* Event Details + Top Forum Preview + Map */}
+        {/* Main content */}
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <EventDetails event={event} saves={saves} />
 
-            {/* Top 3 Forum Posts */}
-            <div>
-              <TopForumPreview
-                posts={posts.slice(0, 3)}
-                onViewAll={() => onNavigate("event-forum", { eventId })}
-                onPostClick={(postId) => onNavigate("event-forum", { eventId, postId })}
-                upvotePost={(postId) => upvotePost(postId, username)} 
-                username={username}
-              />
-            </div>
+            <TopForumPreview
+              posts={posts.slice(0, 3)}
+              onViewAll={() => onNavigate("event-forum", { eventId })}
+              onPostClick={(postId) => onNavigate("event-forum", { eventId, postId })}
+              upvotePost={(postId) => upvotePost(postId, username)}
+              username={username}
+            />
 
             <HowToGetThere event={event} />
           </div>
