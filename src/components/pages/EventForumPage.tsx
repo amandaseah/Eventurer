@@ -1,6 +1,5 @@
 import { motion } from 'motion/react';
 import { Header } from '../Header';
-import { events } from '../../lib/mockData';
 import { MessageSquare, ArrowLeft, Wifi, WifiOff, Loader2 } from 'lucide-react';
 import NewPostForm from "../features/forum/NewPostForm";
 import PostList from "../features/forum/PostList";
@@ -8,12 +7,13 @@ import { useEventForum } from "../../hooks/useEventForum";
 
 interface EventForumPageProps {
   eventId: number;
+  events: any[];
   onGoBack: () => void;
   onNavigate: (page: string, data?: any) => void;
   username: string;
 }
 
-export function EventForumPage({ eventId, onGoBack, onNavigate, username }: EventForumPageProps) {
+export function EventForumPage({ eventId, events, onGoBack, onNavigate, username }: EventForumPageProps) {
   const event = events.find(e => e.id.toString() === eventId.toString());
 
   const { posts, isConnected, isLoading, addPost, upvotePost, addReply } = useEventForum(eventId);

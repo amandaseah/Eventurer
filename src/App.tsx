@@ -218,6 +218,7 @@ function ShellApp() {
       {currentPage === "event-forum" && pageData.eventId && (
         <EventForumPage 
           eventId={pageData.eventId}
+          events={fetchedEvents}
           onGoBack={handleGoBack}
           onNavigate={handleNavigate}
           username={pageData?.username || "Guest"}
