@@ -7,12 +7,6 @@ import { useEventForum } from "../../hooks/useEventForum";
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../Header";
-<<<<<<< HEAD
-// import { events, forumPosts } from "../../lib/mockData";
-import { forumPosts } from '../../lib/mockData';
-=======
-import { events } from "../../lib/mockData";
->>>>>>> feature/forum
 import Image from "../common/Image";
 import { ArrowLeft, MessageSquare } from "lucide-react";
 
@@ -47,15 +41,7 @@ export function EventInfoPage({
 
   const { posts, addPost, upvotePost, username } = useEventForum(eventId); // fetch all posts
 
-<<<<<<< HEAD
-  // const eventForumPosts = forumPosts
-  //   .filter((p) => p.eventId === eventId)
-  //   .slice(0, 3);
-
-  const eventForumPosts: any[] = [];
-=======
   if (!event) return <div>Event not found</div>;
->>>>>>> feature/forum
 
   const handleBookmark = () => {
     const newBookmarked = !isBookmarked;
@@ -122,7 +108,7 @@ export function EventInfoPage({
                 posts={posts.slice(0, 3)}
                 onViewAll={() => onNavigate("event-forum", { eventId })}
                 onPostClick={(postId) => onNavigate("event-forum", { eventId, postId })}
-                upvotePost={upvotePost} 
+                upvotePost={(postId) => upvotePost(postId, username)} 
                 username={username}
               />
             </div>
