@@ -173,6 +173,10 @@ function ShellApp() {
           onNavigate={handleNavigate}
           events={fetchedEvents}
           loading={loadingEvents}
+          bookmarkedEventIds={bookmarkedEventIds}
+          rsvpedEventIds={rsvpedEventIds}
+          onBookmarkChange={handleBookmarkChange}
+          onRSVPChange={handleRSVPChange}
         />
       )}
       {currentPage === 'mood-results' && pageData.mood && (

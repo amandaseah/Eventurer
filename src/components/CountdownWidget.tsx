@@ -26,6 +26,7 @@ type EventSource = 'bookmarked' | 'rsvped' | 'general';
 
 interface CountdownEvent extends EventData {
   source: EventSource;
+  sources: EventSource[];
   countdownDays: number;
   eventDate: Date;
 }
@@ -98,6 +99,7 @@ export function CountdownWidget({
       acc.push({
         ...event,
         source,
+        sources: [source],
         eventDate,
         countdownDays,
       });
@@ -105,25 +107,32 @@ export function CountdownWidget({
     }, []);
   };
 
-  const dedupeAndSort = (events: CountdownEvent[]) => {
-    const seen = new Set<number>();
-    const unique: CountdownEvent[] = [];
-
-    for (const event of events) {
-      if (seen.has(event.id)) continue;
-      seen.add(event.id);
-      unique.push(event);
-    }
-
-    return unique.sort((a, b) => a.eventDate.getTime() - b.eventDate.getTime());
-  };
-
   // Only show events from bookmarked or rsvped lists. Do not fall back to general events.
+  // For events that are in both lists, we'll track both sources
   const visibleEvents = useMemo(() => {
-    const combined = dedupeAndSort([
-      ...normalizeEvents(bookmarkedEvents, 'bookmarked'),
-      ...normalizeEvents(rsvpedEvents, 'rsvped'),
-    ]);
+    const eventMap = new Map<number, CountdownEvent & { sources: EventSource[] }>();
+
+    // Process bookmarked events
+    normalizeEvents(bookmarkedEvents, 'bookmarked').forEach(event => {
+      if (!eventMap.has(event.id)) {
+        eventMap.set(event.id, { ...event, sources: ['bookmarked'] });
+      }
+    });
+
+    // Process RSVPed events and merge sources if already bookmarked
+    normalizeEvents(rsvpedEvents, 'rsvped').forEach(event => {
+      const existing = eventMap.get(event.id);
+      if (existing) {
+        existing.sources.push('rsvped');
+      } else {
+        eventMap.set(event.id, { ...event, sources: ['rsvped'] });
+      }
+    });
+
+    // Convert to array and sort by date
+    const combined = Array.from(eventMap.values()).sort(
+      (a, b) => a.eventDate.getTime() - b.eventDate.getTime()
+    );
 
     return combined.slice(0, MAX_DISPLAYED_EVENTS);
   }, [bookmarkedEvents, rsvpedEvents]);
@@ -166,7 +175,6 @@ export function CountdownWidget({
             <div className="overflow-y-auto px-5 py-4 pt-3">
               <div className="space-y-3">
                 {visibleEvents.map((event) => {
-                  const sourceLabel = sourceLabels[event.source];
                   return (
                     <motion.div
                       key={event.id}
@@ -187,12 +195,19 @@ export function CountdownWidget({
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800 line-clamp-1">{event.title}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            {sourceLabel && (
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            {event.sources.includes('bookmarked') && (
                               <span
-                                className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${sourceChipClasses[event.source]}`}
+                                className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${sourceChipClasses['bookmarked']}`}
                               >
-                                {sourceLabel}
+                                {sourceLabels['bookmarked']}
+                              </span>
+                            )}
+                            {event.sources.includes('rsvped') && (
+                              <span
+                                className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${sourceChipClasses['rsvped']}`}
+                              >
+                                {sourceLabels['rsvped']}
                               </span>
                             )}
                           </div>
@@ -200,7 +215,7 @@ export function CountdownWidget({
                         <motion.div
                           animate={{ scale: [1, 1.03, 1] }}
                           transition={{ duration: 2, repeat: Infinity }}
-                          className="text-right bg-white rounded-xl px-3 py-2 min-w-[72px] flex flex-col items-end justify-center flex-none"
+                          className="bg-white rounded-xl px-3 py-2 min-w-[72px] flex flex-col items-center justify-center flex-none"
                         >
                           <div className="text-2xl font-semibold text-purple-600 leading-none">
                             {event.countdownDays}
@@ -231,13 +246,22 @@ export function CountdownWidget({
               <span className="text-2xl font-semibold">{nextEvent.countdownDays}</span>
               <span className="text-sm uppercase tracking-wide">{pluraliseDays(nextEvent.countdownDays)}</span>
             </div>
-            {sourceLabels[nextEvent.source] && (
-              <span
-                className={`mt-1 text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses[nextEvent.source]}`}
-              >
-                {sourceLabels[nextEvent.source]}
-              </span>
-            )}
+            <div className="flex gap-1 mt-1 flex-wrap justify-center">
+              {nextEvent.sources.includes('bookmarked') && (
+                <span
+                  className={`text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses['bookmarked']}`}
+                >
+                  {sourceLabels['bookmarked']}
+                </span>
+              )}
+              {nextEvent.sources.includes('rsvped') && (
+                <span
+                  className={`text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses['rsvped']}`}
+                >
+                  {sourceLabels['rsvped']}
+                </span>
+              )}
+            </div>
             {additionalEventCount > 0 && (
               <div className="absolute -top-2 -right-2 bg-white text-purple-600 rounded-full px-2 py-[2px] text-xs font-medium shadow-lg border border-purple-100">
                 +{additionalEventCount}

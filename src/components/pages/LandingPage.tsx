@@ -12,9 +12,21 @@ interface LandingPageProps {
   onNavigate: (page: string, data?: any) => void;
   events: any[];
   loading?: boolean;
+  bookmarkedEventIds?: number[];
+  rsvpedEventIds?: number[];
+  onBookmarkChange?: (id: number, bookmarked: boolean) => void;
+  onRSVPChange?: (id: number, rsvped: boolean) => void;
 }
 
-export function LandingPage({ onNavigate, events = [], loading = false }: LandingPageProps) {
+export function LandingPage({ 
+  onNavigate, 
+  events = [], 
+  loading = false,
+  bookmarkedEventIds = [],
+  rsvpedEventIds = [],
+  onBookmarkChange,
+  onRSVPChange
+}: LandingPageProps) {
   const [quizStarted, setQuizStarted] = useState(false);
   const featuredEvents = (events ?? []).slice(0, 3); // guard against undefined
 
@@ -237,7 +249,14 @@ export function LandingPage({ onNavigate, events = [], loading = false }: Landin
                     transition: { duration: 0.2 }
                   }}
                 >
-                  <EventCard event={event} onEventClick={(id) => onNavigate('event-info', { eventId: id })} />
+                  <EventCard 
+                    event={event} 
+                    onEventClick={(id) => onNavigate('event-info', { eventId: id })}
+                    isBookmarkedInitially={bookmarkedEventIds.includes(event.id)}
+                    isRSVPedInitially={rsvpedEventIds.includes(event.id)}
+                    onBookmarkChange={onBookmarkChange}
+                    onRSVPChange={onRSVPChange}
+                  />
                 </motion.div>
               ))}
             </div>
