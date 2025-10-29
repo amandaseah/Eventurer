@@ -1,7 +1,6 @@
 import LoginForm from '../features/signup/LoginForm';
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Sparkles } from 'lucide-react';
 
 interface LoginPageProps {
   onNavigate: (page: string) => void;
@@ -40,9 +39,9 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
           <motion.div
             animate={{ rotate: [0, 360] }}
             transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            className="bg-gradient-to-br from-purple-400 via-pink-300 to-yellow-200 p-4 rounded-3xl mb-4"
+            className="mb-4"
           >
-            <Sparkles className="w-10 h-10 text-white" />
+            <img src="/favicon.png" alt="Eventurer" className="w-16 h-16 rounded-3xl" />
           </motion.div>
           <h1 className="text-3xl bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
             Eventurer

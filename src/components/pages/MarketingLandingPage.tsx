@@ -122,9 +122,7 @@ function Header({ onExplore }: { onExplore?: () => void }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
-            <Sparkles className="h-5 w-5 text-white" />
-          </div>
+          <img src="/favicon.png" alt="Eventurer" className="h-10 w-10 rounded-2xl" />
           <span className="text-xl tracking-tight text-gray-900 font-semibold">Eventurer</span>
         </motion.div>
 
@@ -456,9 +454,7 @@ function Footer() {
       <div className="grid gap-8 sm:gap-12 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2 lg:col-span-1">
           <div className="mb-4 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-purple-400 to-pink-400">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
+            <img src="/favicon.png" alt="Eventurer" className="h-8 w-8 rounded-xl" />
             <span className="text-gray-900 font-semibold">Eventurer</span>
           </div>
           <p className="text-sm leading-6 text-gray-600 max-w-sm">
