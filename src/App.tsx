@@ -47,7 +47,14 @@ interface PageData {
 function ShellApp() {
   const [currentPage, setCurrentPage] = useState<Page>('login');
   const [pageData, setPageData] = useState<PageData>({});
-  const [navigationHistory, setNavigationHistory] = useState<Page[]>(['login']);
+  interface HistoryEntry {
+    page: Page;
+    data?: PageData;
+  }
+
+  const [navigationHistory, setNavigationHistory] = useState<HistoryEntry[]>([
+    { page: 'login', data: {} },
+  ]);
   const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([1, 2, 3, 4]);
   const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([3, 4, 7]);
 
@@ -123,18 +130,19 @@ function ShellApp() {
 
 
   const handleNavigate: (page: string, data?: any) => void = (page, data) => {
-    setCurrentPage(page as Page);
-    setNavigationHistory(prev => [...prev, page as Page]);
-    if (data) setPageData(data as PageData);
+    const entry = { page: page as Page, data: data as PageData | undefined };
+    setCurrentPage(entry.page);
+    setNavigationHistory(prev => [...prev, entry]);
+    setPageData(entry.data ?? {});
   };
 
   const handleGoBack = () => {
     if (navigationHistory.length > 1) {
-      const newHistory = [...navigationHistory];
-      newHistory.pop(); // Remove current page
-      const previousPage = newHistory[newHistory.length - 1];
+      const newHistory = navigationHistory.slice(0, -1);
+      const previousEntry = newHistory[newHistory.length - 1];
       setNavigationHistory(newHistory);
-      setCurrentPage(previousPage);
+      setCurrentPage(previousEntry.page);
+      setPageData(previousEntry.data ?? {});
     } else {
       // Fallback to explore if no history
       handleNavigate('explore');
