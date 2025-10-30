@@ -86,7 +86,7 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
           transition={{ duration: 0.18 }}
           role="alert"
           aria-live="assertive"
-          className="flex items-start gap-3 p-3 rounded-lg border border-pink-200 bg-gradient-to-r from-white to-pink-50"
+          className="flex items-start gap-3 p-3 rounded-lg border border-pink-200 bg-pink-50"
         >
           <div className="flex-shrink-0 mt-0.5">
             <AlertTriangle className="w-5 h-5 text-pink-600" />
@@ -103,7 +103,7 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <Button type="submit" disabled={loading} className="w-full h-12 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-300 hover:shadow-xl transition-all">
+        <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl bg-purple-600 hover:bg-purple-700 hover:shadow-lg transition-all font-semibold">
           {loading ? 'Signing in...' : 'Login'}
         </Button>
       </motion.div>

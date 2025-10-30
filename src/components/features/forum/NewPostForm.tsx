@@ -131,7 +131,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         <Button
           onClick={handleSubmit}
           disabled={!text.trim() && !image}
-          className="rounded-full bg-gradient-to-r from-purple-400 to-pink-300 hover:shadow-lg text-sm sm:text-base py-2 sm:py-2.5 w-full sm:w-auto"
+          className="rounded-xl bg-purple-600 hover:bg-purple-700 hover:shadow-lg text-sm sm:text-base py-2 sm:py-2.5 w-full sm:w-auto font-semibold"
         >
           <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
           Post Comment

@@ -150,7 +150,7 @@ export default function PostItem({ post, username, depth = 0, onUpvote, onSubmit
               <Button 
                 onClick={handleReply} 
                 disabled={!replyText.trim() && !replyImage}
-                className="rounded-full bg-gradient-to-r from-purple-400 to-pink-300 hover:shadow-lg"
+                className="rounded-xl bg-purple-600 hover:bg-purple-700 hover:shadow-lg font-semibold"
                 size="sm"
               >
                 Post Reply

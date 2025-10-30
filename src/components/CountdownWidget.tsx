@@ -183,7 +183,7 @@ export function CountdownWidget({
                         onEventClick(event.id);
                         setIsExpanded(false);
                       }}
-                      className="p-3 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl cursor-pointer hover:shadow-md transition-all border border-purple-100"
+                      className="p-3 bg-white rounded-2xl cursor-pointer hover:shadow-md transition-all border border-gray-200"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
@@ -239,7 +239,7 @@ export function CountdownWidget({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsExpanded(true)}
-            className="relative bg-gradient-to-br from-purple-500 to-pink-400 text-white rounded-3xl px-4 py-3 shadow-2xl flex flex-col items-center gap-1 min-w-[128px]"
+            className="relative bg-purple-600 text-white rounded-2xl px-4 py-3 shadow-lg flex flex-col items-center gap-1 min-w-[128px]"
           >
             <Calendar className="w-4 h-4 opacity-90" />
             <div className="flex items-baseline gap-1 leading-none">

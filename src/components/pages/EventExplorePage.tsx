@@ -146,11 +146,11 @@ export function EventExplorePage({
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10 sm:mb-12"
         >
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent mb-3">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-3">
             Explore Events
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover amazing events tailored to your interests and mood
+            Filter by mood, price, date, or just browse everything
           </p>
         </motion.div>
 

@@ -60,10 +60,10 @@ export default function EventActions({
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className={`w-full py-4 rounded-2xl mb-4 transition-all flex items-center justify-center ${
+            className={`w-full py-4 rounded-xl mb-4 transition-all flex items-center justify-center font-semibold ${
               isRSVPed
-                ? "bg-green-500 text-white border-2 border-green-600"
-                : "bg-gradient-to-r from-purple-400 to-pink-300 text-white hover:shadow-xl"
+                ? "bg-green-500 text-white hover:bg-green-600 shadow-md"
+                : "bg-purple-600 text-white hover:bg-purple-700 hover:shadow-lg"
             }`}
           >
             {isRSVPed ? "✓ RSVP'd" : "RSVP to Event"}

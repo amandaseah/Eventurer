@@ -298,7 +298,6 @@ function TechSection() {
                 <div className="mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl">{tech === 'Motion' ? '✨' : tech === 'Tailwind CSS' ? '🎨' : tech === 'Shadcn/ui' ? '🎯' : tech === 'TypeScript' ? '📘' : '⚛️'}</div>
                 <div className="text-sm sm:text-base text-gray-900 font-medium">{tech}</div>
               </div>
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/0 to-pink-500/0 transition-all duration-300 group-hover:from-purple-500/5 group-hover:to-pink-500/5" />
             </div>
           </motion.div>
         ))}
@@ -311,55 +310,47 @@ function CTASection({ onExplore, onDemo }: MarketingLandingPageProps) {
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
       <motion.div
-        className="relative overflow-hidden rounded-[2rem] sm:rounded-[3rem] bg-gradient-to-br from-purple-600 via-pink-600 to-purple-700 p-1"
+        className="relative overflow-hidden rounded-2xl bg-purple-600 px-6 sm:px-8 lg:px-16 py-16 sm:py-20 text-center text-white shadow-xl"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
       >
-        <CTAAnimatedBackground />
-        <div className="relative overflow-hidden rounded-[1.8rem] sm:rounded-[2.8rem] bg-gradient-to-br from-purple-500 to-pink-500 px-6 sm:px-8 lg:px-16 py-16 sm:py-20 text-center text-white">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
-            <motion.div className="mb-6 sm:mb-8 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 sm:px-5 py-2 backdrop-blur-sm">
-              <Sparkles className="h-4 w-4" />
-              <span className="text-sm">Start Your Adventure Today</span>
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight px-4">
+            Ready to Find
+            <br />
+            Your Next Event?
+          </h2>
+
+          <p className="mx-auto mt-4 sm:mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-white/90 px-4">
+            Stop scrolling through events that don't match your mood. Start here.
+          </p>
+
+          <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                onClick={() => onExplore?.()}
+                className="flex items-center justify-center gap-2 rounded-xl bg-white px-8 sm:px-10 py-4 sm:py-6 text-base sm:text-lg font-semibold text-purple-600 shadow-lg hover:bg-gray-50 hover:shadow-xl"
+              >
+                <Calendar className="h-5 w-5" />
+                Browse Events
+                <ArrowRight className="h-5 w-5" />
+              </Button>
             </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                variant="outline"
+                onClick={() => onDemo?.()}
+                className="rounded-xl border-2 border-white bg-transparent px-8 sm:px-10 py-4 sm:py-6 text-base sm:text-lg font-semibold text-white hover:bg-white/10"
+              >
+                View Demo
+              </Button>
+            </motion.div>
+          </div>
 
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight px-4">
-              Ready to Discover
-              <br />
-              Your Next Adventure?
-            </h2>
-
-            <p className="mx-auto mt-4 sm:mt-6 max-w-3xl text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 px-4">
-              Join thousands of users finding amazing events tailored to their mood. Your perfect experience is just a click away.
-            </p>
-
-            <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  onClick={() => onExplore?.()}
-                  className="flex items-center justify-center gap-2 rounded-full bg-white px-8 sm:px-10 py-4 sm:py-7 text-base sm:text-lg text-purple-600 shadow-2xl hover:bg-gray-50"
-                >
-                  <Calendar className="h-5 w-5" />
-                  Start Exploring Now
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  variant="outline"
-                  onClick={() => onDemo?.()}
-                  className="rounded-full border-2 border-white bg-transparent px-8 sm:px-10 py-4 sm:py-7 text-base sm:text-lg text-white hover:bg-white/10"
-                >
-                  View Demo
-                </Button>
-              </motion.div>
-            </div>
-
-            <CTAStats />
-          </motion.div>
-        </div>
+          <CTAStats />
+        </motion.div>
       </motion.div>
     </section>
   );

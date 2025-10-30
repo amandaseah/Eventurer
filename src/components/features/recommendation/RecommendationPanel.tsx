@@ -51,7 +51,7 @@ export default function RecommendationPanel({
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-8"
       >
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-gray-900">
           {title}
         </h2>
         <p className="text-xs sm:text-sm text-gray-500">

@@ -37,7 +37,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               onClick={() => handleNavClick('landing')}
             >
               <img src="/favicon.png" alt="Eventurer" className="w-8 h-8 sm:w-10 sm:h-10 rounded-2xl" />
-              <span className="text-base sm:text-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+              <span className="text-base sm:text-xl font-semibold text-gray-900">
                 Eventurer
               </span>
             </motion.div>
@@ -68,7 +68,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleNavClick('profile')}
-                className="bg-gradient-to-r from-purple-400 to-pink-300 p-2 rounded-full hover:shadow-lg transition-shadow"
+                className="bg-purple-600 p-2 rounded-lg hover:bg-purple-700 hover:shadow-md transition-all"
               >
                 <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </motion.button>

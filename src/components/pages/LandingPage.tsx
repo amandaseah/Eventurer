@@ -32,30 +32,11 @@ export function LandingPage({
   const featuredEvents = (events ?? []).filter(e => !e.isPast).slice(0, 3); // filter out past events
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-gray-50">
       <Header currentPage="landing" onNavigate={onNavigate} />
 
-      {/* Simple clean background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-white to-pink-50 opacity-60"></div>
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-200 rounded-full blur-3xl opacity-20" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-pink-200 rounded-full blur-3xl opacity-20" />
-      </div>
-
-      {/* Hero + animated background */}
+      {/* Hero section */}
       <section className="relative overflow-hidden">
-        <motion.div
-          animate={{
-            background: [
-              'radial-gradient(circle at 20% 30%, rgba(224, 212, 255, 0.6) 0%, transparent 60%)',
-              'radial-gradient(circle at 80% 30%, rgba(195, 228, 255, 0.6) 0%, transparent 60%)',
-              'radial-gradient(circle at 50% 70%, rgba(255, 212, 195, 0.6) 0%, transparent 60%)',
-              'radial-gradient(circle at 20% 30%, rgba(224, 212, 255, 0.6) 0%, transparent 60%)',
-            ],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-          className="absolute inset-0"
-        />
 
         {!quizStarted && (
           <Hero onStart={() => setQuizStarted(true)} />
@@ -66,13 +47,9 @@ export function LandingPage({
         )}
       </section>
 
-      {/* Seamless transition to Featured Events */}
+      {/* Featured Events */}
       <div className="relative">
-        {/* Gradient bridge */}
-        <div className="h-16 bg-gradient-to-b from-transparent via-white/50 to-white" />
-        
-        {/* Featured Events with enhanced design */}
-        <section className="relative bg-gradient-to-b from-white via-purple-50/30 to-white py-20">
+        <section className="relative bg-white py-20">
           <div className="container mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -89,7 +66,7 @@ export function LandingPage({
                 className="inline-flex items-center gap-3 mb-6"
               >
                 <Star className="w-8 h-8 text-yellow-500" />
-                <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
+                <h2 className="text-5xl md:text-6xl font-bold text-gray-900">
                   Featured Events
                 </h2>
                 <Star className="w-8 h-8 text-yellow-500" />
@@ -102,7 +79,7 @@ export function LandingPage({
                 transition={{ delay: 0.4 }}
                 className="text-xl text-gray-600 max-w-2xl mx-auto"
               >
-                Discover amazing events curated just for you
+                Events picked based on your quiz results
               </motion.p>
 
               {/* Decorative elements */}
@@ -162,13 +139,13 @@ export function LandingPage({
               className="text-center mt-16"
             >
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => onNavigate('explore')}
-                className="px-8 py-4 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white rounded-full text-lg font-semibold hover:shadow-2xl transition-all duration-300 flex items-center gap-3 mx-auto"
+                className="px-8 py-4 bg-purple-600 text-white rounded-xl text-lg font-semibold hover:bg-purple-700 hover:shadow-lg transition-all flex items-center gap-3 mx-auto"
               >
                 <Zap className="w-5 h-5" />
-                Explore All Events
+                See All Events
               </motion.button>
             </motion.div>
           </div>

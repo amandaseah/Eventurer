@@ -103,7 +103,7 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => onComplete(selectedMood)}
-              className="px-8 py-4 bg-gradient-to-r from-purple-400 to-pink-300 text-white rounded-full text-lg hover:shadow-2xl transition-all"
+              className="px-8 py-4 bg-purple-600 text-white rounded-xl text-lg font-semibold hover:bg-purple-700 hover:shadow-lg transition-all"
             >
               See Matching Events
             </motion.button>

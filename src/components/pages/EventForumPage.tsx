@@ -36,7 +36,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       <Header onNavigate={onNavigate} />
 
       <div className="container mx-auto px-6 py-12 max-w-4xl">

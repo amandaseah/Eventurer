@@ -1,6 +1,6 @@
 export default function HomePreview() {
   return (
-    <div className="w-full h-full overflow-hidden bg-gradient-to-br from-pink-50 via-rose-50 to-white">
+    <div className="w-full h-full overflow-hidden bg-gray-50">
       <div className="flex h-full flex-col items-center justify-center gap-6 px-6 text-center">
         <div className="rounded-full border border-rose-200/70 bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-rose-400 shadow-sm">
           Eventurer

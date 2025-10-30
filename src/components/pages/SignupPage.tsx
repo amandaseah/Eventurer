@@ -9,23 +9,13 @@ interface SignupPageProps {
 
 export function SignupPage({ onNavigate }: SignupPageProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      <motion.div
-        animate={{
-          background: [
-            'radial-gradient(circle at 20% 50%, rgba(167, 139, 250, 0.15) 0%, transparent 50%)',
-            'radial-gradient(circle at 80% 50%, rgba(251, 191, 36, 0.15) 0%, transparent 50%)',
-          ],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-        className="absolute inset-0"
-      />
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
 
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-md mx-4 relative z-10"
+        className="bg-white rounded-2xl shadow-lg p-8 md:p-12 w-full max-w-md mx-4 relative"
       >
         {/* Back button to go to login */}
         <button
@@ -48,10 +38,10 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
           >
             <img src="/favicon.png" alt="Eventurer" className="w-16 h-16 rounded-3xl" />
           </motion.div>
-          <h1 className="text-3xl bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-gray-900">
             Create account
           </h1>
-          <p className="text-gray-500 mt-2">Join Eventurer and discover events that match your mood</p>
+          <p className="text-gray-500 mt-2">Start finding events that match your mood</p>
         </motion.div>
 
         <SignupForm onNavigate={onNavigate} />

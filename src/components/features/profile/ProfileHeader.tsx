@@ -23,7 +23,7 @@ export default function ProfileHeader({
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-purple-400 via-pink-300 to-orange-200 flex items-center justify-center text-white text-2xl sm:text-3xl flex-shrink-0"
+            className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-purple-600 flex items-center justify-center text-white text-2xl sm:text-3xl font-semibold flex-shrink-0 shadow-md"
           >
             {initials}
           </motion.div>

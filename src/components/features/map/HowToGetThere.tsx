@@ -997,7 +997,7 @@ export default function HowToGetThere({ event }: { event: any }) {
           transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-50 via-violet-100/45 to-white text-slate-900 shadow-2xl p-6 border-2 border-purple-200 ring-2 ring-purple-200/50"
+          className="relative overflow-hidden rounded-2xl bg-white text-slate-900 shadow-lg p-6 border border-gray-200"
         >
           <span aria-hidden className="htgt-route-card-gradient" />
           <span aria-hidden className="htgt-card-dim" />
@@ -1069,7 +1069,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                 {Array.from({ length: 2 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="h-16 rounded-2xl bg-gradient-to-r from-purple-100/70 to-purple-50/50 animate-pulse"
+                    className="h-16 rounded-xl bg-gray-200 animate-pulse"
                   />
                 ))}
               </motion.div>
@@ -1125,7 +1125,6 @@ export default function HowToGetThere({ event }: { event: any }) {
                           isActive ? 'opacity-100 bg-purple-500' : 'opacity-0 group-hover:opacity-60 bg-purple-400'
                         }`}
                       />
-                      <span className={`pointer-events-none absolute inset-x-0 -top-8 h-12 bg-gradient-to-br from-purple-100/60 via-purple-50/0 to-transparent transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-90'}`} />
                       <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-purple-900">
                         <span className="flex-1">{station.name}</span>
                         <div className="flex flex-col items-end gap-1">
@@ -1239,7 +1238,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                 {Array.from({ length: 3 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="h-16 rounded-2xl bg-gradient-to-r from-pink-100/70 to-pink-50/40 animate-pulse"
+                    className="h-16 rounded-xl bg-gray-200 animate-pulse"
                   />
                 ))}
               </motion.div>
@@ -1296,7 +1295,6 @@ export default function HowToGetThere({ event }: { event: any }) {
                           isActive ? 'opacity-100 bg-pink-500' : 'opacity-0 group-hover:opacity-60 bg-pink-400'
                         }`}
                       />
-                      <span className={`pointer-events-none absolute inset-x-0 -top-8 h-12 bg-gradient-to-br from-pink-100/60 via-pink-50/0 to-transparent transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-90'}`} />
                       <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-pink-900">
                         <span className="flex-1">{stop.name}</span>
                         <div className="flex flex-col items-end gap-1">
