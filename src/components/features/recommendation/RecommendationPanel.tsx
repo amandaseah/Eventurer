@@ -20,7 +20,7 @@ export default function RecommendationPanel({
   events,
   mood,
   limit = 4,
-  title = "Recommended Events (based on your mood)",
+  title = "Recommended Events",
   onSelect,
   bookmarkedEventIds,
   rsvpedEventIds,

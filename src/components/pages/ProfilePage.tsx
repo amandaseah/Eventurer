@@ -183,7 +183,7 @@ export function ProfilePage({
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-2 sm:grid-cols-5 w-full mb-6 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto gap-1 sm:!gap-1">
+            <TabsList className="grid grid-cols-5 w-full mb-6 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto gap-1 sm:!gap-1">
               <TabsTrigger
                 value="bookmarked"
                 className="!rounded-lg data-[state=active]:bg-purple-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
@@ -218,7 +218,7 @@ export function ProfilePage({
               </TabsTrigger>
               <TabsTrigger
                 value="settings"
-                className="!rounded-lg data-[state=active]:bg-orange-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium col-span-2 sm:col-span-1"
+                className="!rounded-lg data-[state=active]:bg-orange-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
                 style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
               >
                 <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
