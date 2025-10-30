@@ -108,13 +108,13 @@ export function MoodResultsPage({
     <div className="min-h-screen bg-gray-50">
       <Header currentPage="mood-results" onNavigate={onNavigate} />
 
-      {/* Back Button - Fixed */}
+      {/* Back Button - Sticky */}
       <motion.button
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         whileHover={{ x: -4 }}
         onClick={() => onNavigate('landing')}
-        className="fixed top-24 left-6 z-50 flex items-center gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md"
+        className="sticky top-4 z-50 flex items-center gap-2 text-pink-500 hover:text-pink-600 bg-white/90 backdrop-blur-sm rounded-full shadow-md w-fit px-4 py-2"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to Quiz</span>
@@ -150,14 +150,14 @@ export function MoodResultsPage({
           className="bg-white rounded-3xl p-8 shadow-lg mb-12 border border-gray-100"
         >
           <div className="flex items-center gap-3 mb-8">
-            <SlidersHorizontal className="w-6 h-6 text-purple-500" />
+            <SlidersHorizontal className="w-6 h-6 text-pink-500" />
             <h3 className="text-xl font-semibold text-gray-900">Filter & Sort Events</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">Category</label>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="rounded-2xl h-12 border-gray-200 focus:border-purple-500 focus:ring-purple-500">
+                <SelectTrigger className="rounded-2xl h-12 border-gray-200 focus:border-pink-600 focus:ring-pink-600">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -172,7 +172,7 @@ export function MoodResultsPage({
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">Price</label>
               <Select value={priceFilter} onValueChange={setPriceFilter}>
-                <SelectTrigger className="rounded-2xl h-12 border-gray-200 focus:border-purple-500 focus:ring-purple-500">
+                <SelectTrigger className="rounded-2xl h-12 border-gray-200 focus:border-pink-600 focus:ring-pink-600">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -188,7 +188,7 @@ export function MoodResultsPage({
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full h-12 rounded-2xl justify-start text-left font-normal border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+                    className="w-full h-12 rounded-2xl justify-start text-left font-normal border-gray-200 focus:border-pink-600 focus:ring-pink-600"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateFilter ? formatDateObjectToDDMMYYYY(dateFilter) : <span>Pick a date</span>}
@@ -218,7 +218,7 @@ export function MoodResultsPage({
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">Sort By</label>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="rounded-2xl h-12 border-gray-200 focus:border-purple-500 focus:ring-purple-500">
+                <SelectTrigger className="rounded-2xl h-12 border-gray-200 focus:border-pink-600 focus:ring-pink-600">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

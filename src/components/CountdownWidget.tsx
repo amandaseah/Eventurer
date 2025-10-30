@@ -42,8 +42,8 @@ const sourceLabels: Record<EventSource, string> = {
 };
 
 const sourceChipClasses: Record<EventSource, string> = {
-  bookmarked: 'bg-pink-100 text-pink-600 border border-pink-200',
-  rsvped: 'bg-purple-100 text-purple-600 border border-purple-200',
+  bookmarked: 'bg-pink-100 text-pink-500 border border-pink-200',
+  rsvped: 'bg-pink-200 text-pink-500 border border-pink-200',
   general: 'bg-gray-100 text-gray-600 border border-gray-200',
 };
 
@@ -224,7 +224,7 @@ export function CountdownWidget({
                           transition={{ duration: 2, repeat: Infinity }}
                           className="bg-white rounded-xl px-3 py-2 min-w-[72px] flex flex-col items-center justify-center flex-none"
                         >
-                          <div className="text-2xl font-semibold text-purple-600 leading-none">
+                          <div className="text-2xl font-semibold text-pink-500 leading-none">
                             {event.countdownDays}
                           </div>
                           <div className="text-xs text-gray-500 leading-none mt-1">
@@ -246,7 +246,7 @@ export function CountdownWidget({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsExpanded(true)}
-            className="relative bg-purple-600 text-white rounded-2xl px-4 py-3 shadow-lg flex flex-col items-center gap-1 min-w-[128px]"
+            className="relative bg-pink-400 text-white rounded-2xl px-4 py-3 shadow-lg flex flex-col items-center gap-1 min-w-[128px]"
           >
             <Calendar className="w-4 h-4 opacity-90" />
             <div className="flex items-baseline gap-1 leading-none">
@@ -270,7 +270,7 @@ export function CountdownWidget({
               )}
             </div>
             {additionalEventCount > 0 && (
-              <div className="absolute -top-2 -right-2 bg-white text-purple-600 rounded-full px-2 py-[2px] text-xs font-medium shadow-lg border border-purple-100">
+              <div className="absolute -top-2 -right-2 bg-white text-pink-500 rounded-full px-2 py-[2px] text-xs font-medium shadow-lg border border-pink-200">
                 +{additionalEventCount}
               </div>
             )}

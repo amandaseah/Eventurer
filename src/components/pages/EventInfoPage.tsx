@@ -122,11 +122,11 @@ export function EventInfoPage({
       <Header onNavigate={onNavigate} />
 
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl event-info-page">
-        {/* Back Button */}
+        {/* Back Button - Sticky */}
         <motion.button
           onClick={onGoBack}
           whileHover={{ x: -4 }}
-          className="mb-4 flex items-center gap-1.5 sm:gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-2.5 sm:px-4 py-2 rounded-full shadow-md text-xs sm:text-base"
+          className="sticky top-4 z-50 mb-4 flex items-center gap-1.5 sm:gap-2 text-pink-500 hover:text-pink-600 bg-white/90 backdrop-blur-sm px-2.5 sm:px-4 py-2 rounded-full shadow-md text-xs sm:text-base w-fit"
         >
           <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           <span>Back</span>
@@ -178,7 +178,7 @@ export function EventInfoPage({
               onClick={() => onNavigate("event-forum", { eventId })}
               className="w-full bg-white rounded-3xl p-6 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
             >
-              <MessageSquare className="w-5 h-5 text-purple-600" />
+              <MessageSquare className="w-5 h-5 text-pink-500" />
               <span>Join Discussion</span>
             </motion.button>
           </div>

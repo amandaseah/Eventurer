@@ -68,12 +68,12 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
                   whileHover={{ scale: 1.02, x: 4 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleAnswer(option.mood)}
-                  className="p-4 text-left rounded-2xl border-2 border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all group"
+                  className="p-4 text-left rounded-2xl border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 transition-all group"
                 >
-                  <span className="text-gray-700 group-hover:text-purple-700">
+                  <span className="text-gray-700 group-hover:text-pink-600">
                     {option.text}
                   </span>
-                  <ChevronRight className="inline-block ml-2 w-4 h-4 text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="inline-block ml-2 w-4 h-4 text-gray-400 group-hover:text-pink-500 group-hover:translate-x-1 transition-transform" />
                 </motion.button>
               ))}
             </div>
@@ -103,7 +103,7 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => onComplete(selectedMood)}
-              className="px-8 py-4 bg-purple-600 text-white rounded-xl text-lg font-semibold hover:bg-purple-700 hover:shadow-lg transition-all"
+              className="px-8 py-4 bg-pink-400 text-white rounded-xl text-lg font-semibold hover:bg-pink-500 hover:shadow-lg transition-all"
             >
               See Matching Events
             </motion.button>

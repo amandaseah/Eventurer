@@ -97,7 +97,7 @@ export function EventCard({
       case 'chill': return 'border-blue-400 bg-blue-50/30';
       case 'active': return 'border-green-400 bg-green-50/30';
       case 'social': return 'border-pink-400 bg-pink-50/30';
-      case 'educational': return 'border-purple-400 bg-purple-50/30';
+      case 'educational': return 'border-pink-500 bg-pink-50/30';
       default: return 'border-gray-300 bg-gray-50/30';
     }
   };
@@ -107,7 +107,7 @@ export function EventCard({
       case 'chill': return 'bg-blue-500';
       case 'active': return 'bg-green-500';
       case 'social': return 'bg-pink-500';
-      case 'educational': return 'bg-purple-500';
+      case 'educational': return 'bg-pink-500';
       default: return 'bg-gray-500';
     }
   };
@@ -170,7 +170,7 @@ export function EventCard({
               handleBookmark();
             }}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-full backdrop-blur-md transition-all shadow-md ${
-              isBookmarked ? 'bg-purple-600 text-white' : 'bg-white/95 text-gray-700 hover:bg-white'
+              isBookmarked ? 'bg-pink-400 text-white' : 'bg-white/95 text-gray-700 hover:bg-white'
             }`}
           >
             <Bookmark className="w-3.5 h-3.5" fill={isBookmarked ? 'currentColor' : 'none'} />
@@ -181,7 +181,7 @@ export function EventCard({
         {/* Price badge */}
         <div className="absolute bottom-3 left-3">
           <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md">
-            <span className="text-sm font-bold text-purple-600">{event.price}</span>
+            <span className="text-sm font-bold text-pink-500">{event.price}</span>
           </div>
         </div>
       </div>
@@ -192,11 +192,11 @@ export function EventCard({
 
         <div className="space-y-2 mb-4">
           <div className={`flex items-center gap-2 text-sm text-gray-600 ${centerText ? 'justify-center' : ''}`}>
-            <Calendar className="w-4 h-4 text-purple-500" />
+            <Calendar className="w-4 h-4 text-pink-500" />
             <span>{formatDateToDDMMYYYY(event.date)} at {event.time}</span>
           </div>
           <div className={`flex items-center gap-2 text-sm text-gray-600 ${centerText ? 'justify-center' : ''}`}>
-            <MapPin className="w-4 h-4 text-purple-500" />
+            <MapPin className="w-4 h-4 text-pink-500" />
             <span className="line-clamp-1">{event.location}</span>
           </div>
           {isClosingSoon() && !event.isPast && (
@@ -209,8 +209,8 @@ export function EventCard({
 
         {/* Show user comment for past events or RSVP button for upcoming events */}
         {event.isPast && event.userComment ? (
-          <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
-            <p className="text-xs text-purple-700 mb-1">Your comment:</p>
+          <div className="bg-pink-50 border border-pink-200 rounded-xl p-3">
+            <p className="text-xs text-pink-600 mb-1">Your comment:</p>
             <p className="text-sm text-gray-700 italic">&quot;{event.userComment}&quot;</p>
           </div>
         ) : !event.isPast ? (
@@ -225,7 +225,7 @@ export function EventCard({
                 className={`w-full py-3 rounded-xl transition-all flex items-center justify-center font-semibold ${
                   isRSVPed
                     ? 'bg-green-500 text-white hover:bg-green-600 shadow-md'
-                    : 'bg-purple-600 text-white hover:bg-purple-700 shadow-md hover:shadow-lg'
+                    : 'bg-pink-400 text-white hover:bg-pink-500 shadow-md hover:shadow-lg'
                 }`}
               >
                 <span className="flex items-center justify-center gap-2">

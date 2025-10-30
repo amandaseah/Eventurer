@@ -63,7 +63,7 @@ const moods = [
   },
   {
     name: 'Educational',
-    color: 'bg-purple-100 text-purple-600',
+    color: 'bg-pink-200 text-pink-500',
     icon: <GraduationCap className="h-4 w-4" />,
   },
 ];
@@ -130,7 +130,7 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
             <div className="mb-2">Events That Actually</div>
             <div className="my-3">
               <motion.span
-                className="inline-block text-purple-600"
+                className="inline-block text-pink-400"
                 animate={{ scale: [1, 1.02, 1] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               >
@@ -158,7 +158,7 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
         >
           <Button
             onClick={() => onExplore?.()}
-            className="group flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:bg-purple-700 hover:shadow-xl hover:-translate-y-0.5"
+            className="group flex items-center justify-center gap-2 rounded-xl bg-pink-400 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:bg-pink-500 hover:shadow-xl hover:-translate-y-0.5"
           >
             <Calendar className="h-5 w-5" />
             Browse Events
@@ -234,8 +234,8 @@ function FeaturesSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: index * 0.15 }}
           >
-            <Card className="h-full overflow-hidden rounded-2xl border-2 border-gray-200 bg-white p-8 shadow-sm transition hover:border-purple-300 hover:shadow-md">
-              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-600 text-white">
+            <Card className="h-full overflow-hidden rounded-2xl border-2 border-gray-200 bg-white p-8 shadow-sm transition hover:border-pink-300 hover:shadow-md">
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-pink-400 text-white">
                 {feature.icon}
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
@@ -267,7 +267,7 @@ function TechSection() {
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl tracking-tight text-gray-900 px-4">
             Built with{' '}
-            <span className="text-purple-600">
+            <span className="text-pink-400">
               Modern Tech
             </span>
           </h2>
@@ -293,7 +293,7 @@ function TechSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
           >
-            <div className="relative rounded-3xl border border-purple-100 bg-white/70 p-4 sm:p-6 lg:p-8 transition-all duration-300 hover:-translate-y-2 hover:border-purple-300 hover:shadow-xl backdrop-blur-sm">
+            <div className="relative rounded-3xl border border-pink-200 bg-white/70 p-4 sm:p-6 lg:p-8 transition-all duration-300 hover:-translate-y-2 hover:border-pink-300 hover:shadow-xl backdrop-blur-sm">
               <div className="text-center">
                 <div className="mb-3 sm:mb-4 flex justify-center">
                   <img
@@ -322,7 +322,7 @@ function CTASection({ onExplore, onDemo }: MarketingLandingPageProps) {
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
       <motion.div
-        className="relative overflow-hidden rounded-2xl bg-purple-600 px-6 sm:px-8 lg:px-16 py-16 sm:py-20 text-center text-white shadow-xl"
+        className="relative overflow-hidden rounded-2xl bg-pink-400 px-6 sm:px-8 lg:px-16 py-16 sm:py-20 text-center text-white shadow-xl"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -343,7 +343,7 @@ function CTASection({ onExplore, onDemo }: MarketingLandingPageProps) {
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 onClick={() => onExplore?.()}
-                className="flex items-center justify-center gap-2 rounded-xl bg-white px-8 sm:px-10 py-4 sm:py-6 text-base sm:text-lg font-semibold text-purple-600 shadow-lg hover:bg-gray-50 hover:shadow-xl"
+                className="flex items-center justify-center gap-2 rounded-xl bg-white px-8 sm:px-10 py-4 sm:py-6 text-base sm:text-lg font-semibold text-pink-400 shadow-lg hover:bg-gray-50 hover:shadow-xl"
               >
                 <Calendar className="h-5 w-5" />
                 Browse Events

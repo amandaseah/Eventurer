@@ -53,7 +53,7 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
         </div>
       </motion.div>
@@ -74,7 +74,7 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
         </div>
       </motion.div>
@@ -92,8 +92,8 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
             <AlertTriangle className="w-5 h-5 text-pink-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-pink-700">Sign in failed</p>
-            <p className="text-sm text-pink-600">{error}</p>
+            <p className="text-sm font-medium text-pink-500">Sign in failed</p>
+            <p className="text-sm text-pink-500">{error}</p>
           </div>
         </motion.div>
       )}
@@ -103,7 +103,7 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl bg-purple-600 hover:bg-purple-700 hover:shadow-lg transition-all font-semibold">
+        <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl bg-pink-400 hover:bg-pink-500 hover:shadow-lg transition-all font-semibold">
           {loading ? 'Signing in...' : 'Login'}
         </Button>
       </motion.div>
@@ -113,7 +113,7 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
         <button
           type="button"
           onClick={() => onNavigate('signup')}
-          className="text-purple-600 hover:underline font-medium"
+          className="text-pink-500 hover:underline font-medium"
         >
           Sign up here!
         </button>

@@ -58,7 +58,7 @@ export default function EventDetails({
         {/* Location */}
         <div className="flex items-start gap-4">
           <div className="bg-pink-100 p-3 rounded-2xl">
-            <MapPin className="w-6 h-6 text-pink-600" />
+            <MapPin className="w-6 h-6 text-pink-500" />
           </div>
           <div>
             <p className="text-sm text-gray-600">Location</p>

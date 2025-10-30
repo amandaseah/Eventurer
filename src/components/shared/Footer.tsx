@@ -32,7 +32,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-1.5 text-xs text-gray-500">
               <span>Made with</span>
-              <Heart className="w-3.5 h-3.5 fill-purple-500 text-purple-500" />
+              <Heart className="w-3.5 h-3.5 fill-pink-500 text-pink-500" />
               <span>in Singapore</span>
             </div>
           </div>
@@ -48,7 +48,7 @@ export default function Footer() {
                   <li key={link}>
                     <a
                       href="#"
-                      className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
+                      className="text-sm text-gray-600 hover:text-pink-500 transition-colors"
                     >
                       {link}
                     </a>
@@ -71,7 +71,7 @@ export default function Footer() {
               <a
                 key={name}
                 href="#"
-                className="p-2 rounded-lg bg-white border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all"
+                className="p-2 rounded-lg bg-white border border-gray-200 hover:border-pink-300 hover:bg-pink-50 transition-all"
               >
                 <Icon className="w-4 h-4 text-gray-600" />
               </a>

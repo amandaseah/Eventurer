@@ -59,13 +59,13 @@ export default function Hero({ onStart }: { onStart: () => void }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-purple-600 block"
+              className="text-pink-400 block"
             >
               Vibe {displayedText}
               <motion.span
                 animate={{ opacity: [1, 0, 1] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
-                className="inline-block w-0.5 sm:w-1 h-10 sm:h-12 md:h-16 lg:h-20 bg-purple-600 ml-1"
+                className="inline-block w-0.5 sm:w-1 h-10 sm:h-12 md:h-16 lg:h-20 bg-pink-400 ml-1"
                 style={{ verticalAlign: 'middle' }}
               />
             </motion.span>
@@ -88,7 +88,7 @@ export default function Hero({ onStart }: { onStart: () => void }) {
             whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(147, 51, 234, 0.3)" }}
             whileTap={{ scale: 0.98 }}
             onClick={onStart}
-            className="px-10 py-5 bg-purple-600 text-white rounded-xl text-lg font-semibold hover:bg-purple-700 shadow-lg transition-all duration-200 flex items-center gap-3 mx-auto"
+            className="px-10 py-5 bg-pink-400 text-white rounded-xl text-lg font-semibold hover:bg-pink-500 shadow-lg transition-all duration-200 flex items-center gap-3 mx-auto"
           >
             <Zap className="w-5 h-5" />
             <span>Take the Quiz</span>

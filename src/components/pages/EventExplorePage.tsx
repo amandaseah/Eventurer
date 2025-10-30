@@ -128,13 +128,13 @@ export function EventExplorePage({
       <Header currentPage="explore" onNavigate={onNavigate} />
 
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Back Button */}
+        {/* Back Button - Sticky */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           whileHover={{ x: -4 }}
           onClick={() => onNavigate('landing')}
-          className="flex items-center gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-md text-sm sm:text-base mb-6 sm:mb-8"
+          className="sticky top-4 z-50 flex items-center gap-2 text-pink-500 hover:text-pink-600 bg-white/90 backdrop-blur-sm rounded-full shadow-md w-fit px-3 sm:px-4 py-2 text-sm sm:text-base mb-6 sm:mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Home</span>

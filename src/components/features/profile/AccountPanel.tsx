@@ -78,7 +78,7 @@ export default function AccountPanel({
                 onChangeName(`${firstName} ${lastName}`.trim());
                 onSave({ firstName: firstName || undefined, lastName: lastName || undefined, email });
               }}
-              className="px-6 py-3 bg-purple-500 text-white rounded-2xl hover:bg-purple-600 transition-all"
+              className="px-6 py-3 bg-pink-500 text-white rounded-2xl hover:bg-pink-600 transition-all"
             >
               Save Changes
             </Button>

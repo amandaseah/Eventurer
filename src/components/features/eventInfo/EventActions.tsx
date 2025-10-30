@@ -63,7 +63,7 @@ export default function EventActions({
             className={`w-full py-4 rounded-xl mb-4 transition-all flex items-center justify-center font-semibold ${
               isRSVPed
                 ? "bg-green-500 text-white hover:bg-green-600 shadow-md"
-                : "bg-purple-600 text-white hover:bg-purple-700 hover:shadow-lg"
+                : "bg-pink-400 text-white hover:bg-pink-500 hover:shadow-lg"
             }`}
           >
             {isRSVPed ? "✓ RSVP'd" : "RSVP to Event"}
@@ -94,8 +94,8 @@ export default function EventActions({
         onClick={onToggleBookmark}
         className={`w-full py-4 rounded-2xl transition-all flex items-center justify-center gap-2 ${
           isBookmarked
-            ? "bg-pink-100 text-pink-700 border-2 border-pink-300"
-            : "border-2 border-gray-200 text-gray-700 hover:border-purple-300 hover:bg-purple-50"
+            ? "bg-pink-100 text-pink-500 border-2 border-pink-200"
+            : "border-2 border-gray-200 text-gray-700 hover:border-pink-300 hover:bg-pink-50"
         }`}
       >
         <Bookmark className="w-5 h-5" />

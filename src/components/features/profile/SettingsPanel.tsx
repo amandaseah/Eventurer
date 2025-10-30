@@ -38,7 +38,7 @@ export default function SettingsPanel() {
             <input
               type="checkbox"
               defaultChecked
-              className="settings-checkbox rounded border-2 border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer"
+              className="settings-checkbox rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 focus:ring-offset-0 cursor-pointer"
             />
             <span className="text-sm sm:text-base">Event reminders</span>
           </label>
@@ -53,14 +53,14 @@ export default function SettingsPanel() {
               <input
                 type="checkbox"
                 defaultChecked
-                className="settings-checkbox rounded border-2 border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer"
+                className="settings-checkbox rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 focus:ring-offset-0 cursor-pointer"
               />
               <span className="text-sm sm:text-base">Chill & Relax 🌿</span>
             </label>
             <label className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors">
               <input
                 type="checkbox"
-                className="settings-checkbox rounded border-2 border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer"
+                className="settings-checkbox rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 focus:ring-offset-0 cursor-pointer"
               />
               <span className="text-sm sm:text-base">Active ⚡</span>
             </label>
@@ -68,14 +68,14 @@ export default function SettingsPanel() {
               <input
                 type="checkbox"
                 defaultChecked
-                className="settings-checkbox rounded border-2 border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer"
+                className="settings-checkbox rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 focus:ring-offset-0 cursor-pointer"
               />
               <span className="text-sm sm:text-base">Social 🎉</span>
             </label>
             <label className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors">
               <input
                 type="checkbox"
-                className="settings-checkbox rounded border-2 border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer"
+                className="settings-checkbox rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 focus:ring-offset-0 cursor-pointer"
               />
               <span className="text-sm sm:text-base">Educational 📚</span>
             </label>
@@ -89,7 +89,7 @@ export default function SettingsPanel() {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-4 sm:px-6 py-2 sm:py-2.5 bg-purple-100 text-purple-700 rounded-xl sm:rounded-2xl hover:bg-purple-200 transition-all text-sm sm:text-base font-medium"
+            className="px-4 sm:px-6 py-2 sm:py-2.5 bg-pink-200 text-pink-600 rounded-xl sm:rounded-2xl hover:bg-pink-300 transition-all text-sm sm:text-base font-medium"
           >
             Manage Privacy Settings
           </motion.button>

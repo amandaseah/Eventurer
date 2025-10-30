@@ -161,13 +161,13 @@ export function ProfilePage({
       <Header currentPage="profile" onNavigate={onNavigate} />
 
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        {/* Back Button - Fixed */}
+        {/* Back Button - Sticky */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           whileHover={{ x: -4 }}
           onClick={onGoBack}
-          className="fixed top-20 sm:top-24 left-4 sm:left-6 z-50 flex items-center gap-1.5 sm:gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-2.5 sm:px-4 py-2 rounded-full shadow-md text-xs sm:text-base"
+          className="sticky top-4 z-50 flex items-center gap-1.5 sm:gap-2 text-pink-500 hover:text-pink-600 bg-white/90 backdrop-blur-sm rounded-full shadow-md w-fit px-2.5 sm:px-4 py-2 text-xs sm:text-base"
         >
           <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           <span>Back</span>
@@ -186,7 +186,7 @@ export function ProfilePage({
             <TabsList className="grid grid-cols-5 w-full mb-6 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto gap-1 sm:!gap-1">
               <TabsTrigger
                 value="bookmarked"
-                className="!rounded-lg data-[state=active]:bg-purple-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
+                className="!rounded-lg data-[state=active]:bg-pink-200 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
                 style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
               >
                 <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -329,7 +329,7 @@ export function ProfilePage({
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setIsEditingAccount(true)}
-                  className="px-6 py-3 bg-purple-100 text-purple-700 rounded-2xl hover:bg-purple-200 transition-all"
+                  className="px-6 py-3 bg-pink-200 text-pink-600 rounded-2xl hover:bg-pink-300 transition-all"
                 >
                   Edit Profile
                 </motion.button>

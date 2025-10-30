@@ -75,7 +75,7 @@ export default function TopForumPreview({
         </h2>
         <Button
           variant="outline"
-          className="text-purple-600 border-purple-300 hover:bg-purple-50"
+          className="text-pink-500 border-pink-300 hover:bg-pink-50"
           onClick={onViewAll}
         >
           View All
@@ -109,7 +109,7 @@ export default function TopForumPreview({
             >
               {/* Top row: Username + Timestamp */}
               <div className="flex justify-between items-center mb-2">
-                <p className="text-sm font-semibold text-purple-700">
+                <p className="text-sm font-semibold text-pink-600">
                   @{post.username}
                 </p>
                 <p className="text-xs text-gray-400">
@@ -139,7 +139,7 @@ export default function TopForumPreview({
                 {upvotePost && username && (
                   <button
                     className={`flex items-center gap-2 text-sm ${
-                      hasUpvoted ? "text-purple-700" : "text-gray-500 hover:text-purple-600"
+                      hasUpvoted ? "text-pink-600" : "text-gray-500 hover:text-pink-500"
                     }`}
                     onClick={(e) => {
                       e.stopPropagation(); // Prevent opening the post
@@ -160,7 +160,7 @@ export default function TopForumPreview({
 
               {/* Hover glow border */}
               <motion.div
-                className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-purple-300"
+                className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-pink-300"
                 transition={{ duration: 0.2 }}
               />
             </motion.div>

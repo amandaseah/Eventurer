@@ -86,7 +86,7 @@ export function LandingPage({
               <motion.div
                 animate={{ rotate: [0, 360] }}
                 transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                className="absolute -top-4 -right-4 w-16 h-16 text-purple-200"
+                className="absolute -top-4 -right-4 w-16 h-16 text-pink-300"
               >
                 <Sparkles className="w-full h-full" />
               </motion.div>
@@ -142,7 +142,7 @@ export function LandingPage({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onNavigate('explore')}
-                className="px-8 py-4 bg-purple-600 text-white rounded-xl text-lg font-semibold hover:bg-purple-700 hover:shadow-lg transition-all flex items-center gap-3 mx-auto"
+                className="px-8 py-4 bg-pink-400 text-white rounded-xl text-lg font-semibold hover:bg-pink-500 hover:shadow-lg transition-all flex items-center gap-3 mx-auto"
               >
                 <Zap className="w-5 h-5" />
                 See All Events

@@ -52,8 +52,8 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                   onClick={() => handleNavClick(item.id)}
                   className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-4 py-2 rounded-full transition-all text-xs lg:text-base ${
                     currentPage === item.id
-                      ? 'bg-purple-100 text-purple-700'
-                      : 'text-gray-600 hover:text-purple-600'
+                      ? 'bg-pink-200 text-pink-600'
+                      : 'text-gray-600 hover:text-pink-500'
                   }`}
                 >
                   <item.icon className="w-4 h-4" />
@@ -68,7 +68,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleNavClick('profile')}
-                className="bg-purple-600 p-2 rounded-lg hover:bg-purple-700 hover:shadow-md transition-all"
+                className="bg-pink-400 p-2 rounded-lg hover:bg-pink-500 hover:shadow-md transition-all"
               >
                 <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </motion.button>
@@ -78,7 +78,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 text-gray-600 hover:text-purple-600"
+                className="md:hidden p-2 text-gray-600 hover:text-pink-500"
               >
                 {isMobileMenuOpen ? (
                   <X className="w-6 h-6" />
@@ -120,7 +120,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                     onClick={() => handleNavClick(item.id)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${
                       currentPage === item.id
-                        ? 'bg-purple-100 text-purple-700'
+                        ? 'bg-pink-200 text-pink-600'
                         : 'text-gray-600 hover:bg-gray-50'
                     }`}
                   >
