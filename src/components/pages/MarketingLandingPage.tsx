@@ -295,7 +295,19 @@ function TechSection() {
           >
             <div className="relative rounded-3xl border border-purple-100 bg-white/70 p-4 sm:p-6 lg:p-8 transition-all duration-300 hover:-translate-y-2 hover:border-purple-300 hover:shadow-xl backdrop-blur-sm">
               <div className="text-center">
-                <div className="mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl">{tech === 'Motion' ? '✨' : tech === 'Tailwind CSS' ? '🎨' : tech === 'Shadcn/ui' ? '🎯' : tech === 'TypeScript' ? '📘' : '⚛️'}</div>
+                <div className="mb-3 sm:mb-4 flex justify-center">
+                  <img
+                    src={
+                      tech === 'React' ? 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg' :
+                      tech === 'TypeScript' ? 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg' :
+                      tech === 'Tailwind CSS' ? 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg' :
+                      tech === 'Motion' ? 'https://cdn.worldvectorlogo.com/logos/framer-motion.svg' :
+                      'https://ui.shadcn.com/apple-touch-icon.png'
+                    }
+                    alt={tech}
+                    className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain"
+                  />
+                </div>
                 <div className="text-sm sm:text-base text-gray-900 font-medium">{tech}</div>
               </div>
             </div>

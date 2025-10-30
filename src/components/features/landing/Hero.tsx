@@ -46,7 +46,7 @@ export default function Hero({ onStart }: { onStart: () => void }) {
           className="text-center max-w-4xl mx-auto"
         >
           {/* Main heading with typing animation */}
-          <h1 className="text-5xl md:text-6xl lg:text-7xl mb-8 font-bold text-gray-900">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-8 font-bold text-gray-900">
             <motion.span
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -65,7 +65,8 @@ export default function Hero({ onStart }: { onStart: () => void }) {
               <motion.span
                 animate={{ opacity: [1, 0, 1] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
-                className="inline-block w-1 h-16 md:h-20 lg:h-24 bg-purple-600 ml-1"
+                className="inline-block w-0.5 sm:w-1 h-10 sm:h-12 md:h-16 lg:h-20 bg-purple-600 ml-1"
+                style={{ verticalAlign: 'middle' }}
               />
             </motion.span>
           </h1>

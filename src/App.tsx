@@ -165,12 +165,11 @@ function ShellApp() {
     }
   };
 
-  // Only show the countdown widget when not on login or signup,
-  // and when the user has bookmarked or RSVPed events.
+  // Show the countdown widget on all pages except login and signup
+  // Will display bookmarked/RSVP events, or fallback to upcoming events
   const showCountdownWidget =
     currentPage !== 'login' &&
-    currentPage !== 'signup' &&
-    (bookmarkedEvents.length > 0 || rsvpedEvents.length > 0);
+    currentPage !== 'signup';
 
   return (
     <div className="size-full bg-white">
