@@ -29,7 +29,7 @@ export function LandingPage({
   onRSVPChange
 }: LandingPageProps) {
   const [quizStarted, setQuizStarted] = useState(false);
-  const featuredEvents = (events ?? []).slice(0, 3); // guard against undefined
+  const featuredEvents = (events ?? []).filter(e => !e.isPast).slice(0, 3); // filter out past events
 
   return (
     <div className="min-h-screen relative overflow-hidden">

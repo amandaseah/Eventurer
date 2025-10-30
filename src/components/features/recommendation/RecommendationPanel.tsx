@@ -29,7 +29,8 @@ export default function RecommendationPanel({
 }: Props) {
   // pick recommended events
   const recommended = useMemo(() => {
-    const pool = events.filter(e => !e.isPast);
+    // Filter out past events explicitly
+    const pool = events.filter(e => e.isPast !== true);
     const byMood = mood ? pool.filter(e => e.mood === mood) : pool;
     return byMood.slice(0, limit);
   }, [events, mood, limit]);

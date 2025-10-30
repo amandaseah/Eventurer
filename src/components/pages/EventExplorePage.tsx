@@ -157,7 +157,7 @@ export function EventExplorePage({
         <div className="w-full space-y-6">
           {/* Carousel Section */}
           <RecommendationPanel
-            events={events}
+            events={events.filter(e => !e.isPast)}
             onSelect={(id) => onNavigate("event-info", { eventId: id })}
             bookmarkedEventIds={bookmarkedEventIds}
             rsvpedEventIds={rsvpedEventIds}
