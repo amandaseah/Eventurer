@@ -111,9 +111,16 @@ export function EventInfoPage({
 
   return (
     <div className="min-h-screen">
+      <style>{`
+        @media (max-width: 639px) {
+          .event-info-page {
+            font-size: 14px;
+          }
+        }
+      `}</style>
       <Header onNavigate={onNavigate} />
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl event-info-page">
         {/* Back Button */}
         <motion.button
           onClick={onGoBack}

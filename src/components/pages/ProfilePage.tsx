@@ -136,6 +136,27 @@ export function ProfilePage({
 
   return (
     <div className="min-h-screen">
+      <style>{`
+        [data-slot="tabs-trigger"] {
+          padding: 0.5rem !important;
+          height: 40px !important;
+          min-height: 40px !important;
+          max-height: 40px !important;
+        }
+        @media (min-width: 640px) {
+          [data-slot="tabs-trigger"] {
+            padding: 0.625rem 1rem !important;
+            height: 40px !important;
+            min-height: 40px !important;
+            max-height: 40px !important;
+          }
+        }
+        @media (max-width: 639px) {
+          html {
+            font-size: 14px;
+          }
+        }
+      `}</style>
       <Header currentPage="profile" onNavigate={onNavigate} />
 
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -161,46 +182,50 @@ export function ProfilePage({
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex flex-row sm:flex-col gap-3 sm:gap-0">
-            <TabsList className="!flex !flex-col sm:!grid w-auto sm:w-full sm:grid-cols-5 mb-4 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto !gap-0.5 sm:!gap-1 shrink-0">
+            <TabsList className="grid grid-cols-2 sm:grid-cols-5 w-full mb-6 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto gap-1 sm:!gap-1">
               <TabsTrigger
                 value="bookmarked"
-                className="!rounded-lg data-[state=active]:bg-purple-100 !py-2 sm:!py-2.5 !px-2 sm:!px-4 !text-xs sm:!text-sm !flex !items-center !justify-start sm:!justify-center !gap-1.5 sm:!gap-2 !h-auto !min-h-0 !border-0 !font-medium"
+                className="!rounded-lg data-[state=active]:bg-purple-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
+                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
               >
                 <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                <span className="sm:truncate">Bookmarked</span>
+                <span className="truncate">Bookmarked</span>
               </TabsTrigger>
               <TabsTrigger
                 value="upcoming"
-                className="!rounded-lg data-[state=active]:bg-green-100 !py-2 sm:!py-2.5 !px-2 sm:!px-4 !text-xs sm:!text-sm !flex !items-center !justify-start sm:!justify-center !gap-1.5 sm:!gap-2 !h-auto !min-h-0 !border-0 !font-medium"
+                className="!rounded-lg data-[state=active]:bg-green-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
+                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
               >
                 <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                <span className="sm:truncate">Upcoming</span>
+                <span className="truncate">Upcoming</span>
               </TabsTrigger>
               <TabsTrigger
                 value="past"
-                className="!rounded-lg data-[state=active]:bg-gray-100 !py-2 sm:!py-2.5 !px-2 sm:!px-4 !text-xs sm:!text-sm !flex !items-center !justify-start sm:!justify-center !gap-1.5 sm:!gap-2 !h-auto !min-h-0 !border-0 !font-medium"
+                className="!rounded-lg data-[state=active]:bg-gray-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
+                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
               >
                 <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                <span className="sm:truncate">Past</span>
+                <span className="truncate">Past</span>
               </TabsTrigger>
               <TabsTrigger
                 value="account"
-                className="!rounded-lg data-[state=active]:bg-blue-100 !py-2 sm:!py-2.5 !px-2 sm:!px-4 !text-xs sm:!text-sm !flex !items-center !justify-start sm:!justify-center !gap-1.5 sm:!gap-2 !h-auto !min-h-0 !border-0 !font-medium"
+                className="!rounded-lg data-[state=active]:bg-blue-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
+                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
               >
                 <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                <span className="sm:truncate">Account</span>
+                <span className="truncate">Account</span>
               </TabsTrigger>
               <TabsTrigger
                 value="settings"
-                className="!rounded-lg data-[state=active]:bg-orange-100 !py-2 sm:!py-2.5 !px-2 sm:!px-4 !text-xs sm:!text-sm !flex !items-center !justify-start sm:!justify-center !gap-1.5 sm:!gap-2 !h-auto !min-h-0 !border-0 !font-medium"
+                className="!rounded-lg data-[state=active]:bg-orange-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium col-span-2 sm:col-span-1"
+                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
               >
                 <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                <span className="sm:truncate">Settings</span>
+                <span className="truncate">Settings</span>
               </TabsTrigger>
             </TabsList>
 
-            <div className="flex-1 min-w-0 sm:flex-none sm:w-full">
+
           {/* Bookmarked Events */}
           <TabsContent value="bookmarked">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -223,9 +248,9 @@ export function ProfilePage({
                   onRSVPChange={onRSVPChange}
                 />
               ) : (
-                <div className="bg-white rounded-3xl p-12 text-center">
-                  <Bookmark className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-xl text-gray-500">No bookmarked events yet</p>
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center">
+                  <Bookmark className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                  <p className="text-sm sm:text-xl text-gray-500">No bookmarked events yet</p>
                 </div>
               )}
             </motion.div>
@@ -251,9 +276,9 @@ export function ProfilePage({
                     onRSVPChange={onRSVPChange}
                   />
                 ) : (
-                  <div className="bg-white rounded-3xl p-12 text-center">
-                    <CheckCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                    <p className="text-xl text-gray-500">No upcoming events</p>
+                  <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center">
+                    <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                    <p className="text-sm sm:text-xl text-gray-500">No upcoming events</p>
                   </div>
                 )}
               </motion.div>
@@ -277,9 +302,9 @@ export function ProfilePage({
                   onRSVPChange={onRSVPChange}
                 />
               ) : (
-                <div className="bg-white rounded-3xl p-12 text-center">
-                  <Clock className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-xl text-gray-500">No past events</p>
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center">
+                  <Clock className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                  <p className="text-sm sm:text-xl text-gray-500">No past events</p>
                 </div>
               )}
             </motion.div>
@@ -315,8 +340,6 @@ export function ProfilePage({
           <TabsContent value="settings">
             <SettingsPanel />
           </TabsContent>
-            </div>
-          </div>
         </Tabs>
       </div>
     </div>
