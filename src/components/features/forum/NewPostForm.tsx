@@ -7,17 +7,74 @@ interface NewPostFormProps {
   onAddPost: (comment: string, image?: string) => void;
 }
 
+// Utility function to resize image while maintaining aspect ratio
+const resizeImage = (file: File, maxWidth: number, maxHeight: number): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions while maintaining aspect ratio
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxWidth || height > maxHeight) {
+          const aspectRatio = width / height;
+          
+          if (width > height) {
+            width = maxWidth;
+            height = width / aspectRatio;
+          } else {
+            height = maxHeight;
+            width = height * aspectRatio;
+          }
+        }
+        
+        // Create canvas and draw resized image
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+        }
+        
+        // Convert to base64 with good quality
+        resolve(canvas.toDataURL('image/jpeg', 0.9));
+      };
+      
+      img.onerror = reject;
+      img.src = e.target?.result as string;
+    };
+    
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 export default function NewPostForm({ onAddPost }: NewPostFormProps) {
   const [text, setText] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    const reader = new FileReader();
-    reader.onloadend = () => setImage(reader.result as string);
-    reader.readAsDataURL(f);
+    
+    try {
+      // Resize image to max 800x800px while maintaining aspect ratio
+      const resizedImage = await resizeImage(f, 800, 800);
+      setImage(resizedImage);
+    } catch (error) {
+      console.error('Error resizing image:', error);
+      // Fallback to original behavior if resize fails
+      const reader = new FileReader();
+      reader.onloadend = () => setImage(reader.result as string);
+      reader.readAsDataURL(f);
+    }
   };
 
   const handleSubmit = () => {
@@ -44,7 +101,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
           <img
             src={image}
             alt="Upload preview"
-            className="w-full max-h-48 sm:max-h-64 object-cover rounded-xl sm:rounded-2xl"
+            className="w-full max-h-48 sm:max-h-64 object-contain rounded-xl sm:rounded-2xl bg-gray-50"
           />
           <button
             onClick={() => setImage(null)}
@@ -55,7 +112,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      <div className="flex justify-end items-center flex-wrap gap-3 mt-3">
         <input
           ref={fileRef}
           type="file"
@@ -66,7 +123,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         <Button
           onClick={() => fileRef.current?.click()}
           variant="outline"
-          className="rounded-full text-sm sm:text-base py-2 sm:py-2.5 w-full sm:w-auto"
+          className="rounded-full text-sm sm:text-base py-2 sm:py-2.5 sm:w-auto"
         >
           <ImageIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
           Add Image
