@@ -31,7 +31,7 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
   const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
 
   return (
-    <div className="container mx-auto px-6 relative z-10">
+    <div className="container mx-auto px-6 py-12 relative z-10">
       <AnimatePresence mode="wait">
         {quizStarted && !quizComplete && (
           <motion.div
@@ -39,7 +39,7 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="max-w-2xl mx-auto mt-12 bg-white rounded-3xl p-8 shadow-xl"
+            className="max-w-2xl mx-auto bg-white rounded-3xl p-8 shadow-xl"
           >
             <div className="mb-6">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
@@ -85,7 +85,7 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
             key="quiz-result"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="max-w-2xl mx-auto mt-12 bg-white rounded-3xl p-8 shadow-xl text-center"
+            className="max-w-2xl mx-auto bg-white rounded-3xl p-8 shadow-xl text-center"
           >
             <motion.div
               initial={{ scale: 0 }}

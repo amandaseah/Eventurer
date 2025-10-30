@@ -1,7 +1,41 @@
 import { motion } from 'motion/react';
 import { Sparkles, Zap, ArrowRight, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function Hero({ onStart }: { onStart: () => void }) {
+  const [displayedText, setDisplayedText] = useState('');
+  const fullText = "Right Now?";
+
+  useEffect(() => {
+    let currentIndex = 0;
+    let isDeleting = false;
+
+    const typingInterval = setInterval(() => {
+      if (!isDeleting) {
+        // Typing forward
+        if (currentIndex <= fullText.length) {
+          setDisplayedText(fullText.slice(0, currentIndex));
+          currentIndex++;
+        } else {
+          // Pause at the end before deleting
+          setTimeout(() => {
+            isDeleting = true;
+          }, 2000);
+        }
+      } else {
+        // Deleting backward
+        if (currentIndex > 0) {
+          currentIndex--;
+          setDisplayedText(fullText.slice(0, currentIndex));
+        } else {
+          // Reset and start typing again
+          isDeleting = false;
+        }
+      }
+    }, isDeleting ? 50 : 100); // faster deletion, slower typing
+
+    return () => clearInterval(typingInterval);
+  }, []);
   return (
     <section className="relative min-h-screen flex items-center">
       <div className="container mx-auto px-6 py-24 md:py-40 relative z-10">
@@ -11,19 +45,30 @@ export default function Hero({ onStart }: { onStart: () => void }) {
           transition={{ duration: 0.8 }}
           className="text-center max-w-4xl mx-auto"
         >
-          {/* Main heading */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-5xl md:text-6xl lg:text-7xl mb-8 font-bold text-gray-900"
-          >
-            What's Your Vibe
-            <br />
-            <span className="text-purple-600">
-              Right Now?
-            </span>
-          </motion.h1>
+          {/* Main heading with typing animation */}
+          <h1 className="text-5xl md:text-6xl lg:text-7xl mb-8 font-bold text-gray-900">
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="block"
+            >
+              What's Your
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="text-purple-600 block"
+            >
+              Vibe {displayedText}
+              <motion.span
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{ duration: 0.8, repeat: Infinity }}
+                className="inline-block w-1 h-16 md:h-20 lg:h-24 bg-purple-600 ml-1"
+              />
+            </motion.span>
+          </h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
