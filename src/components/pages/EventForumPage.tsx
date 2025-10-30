@@ -4,6 +4,7 @@ import { MessageSquare, ArrowLeft, Wifi, WifiOff, Loader2 } from 'lucide-react';
 import NewPostForm from "../features/forum/NewPostForm";
 import PostList from "../features/forum/PostList";
 import { useEventForum } from "../../hooks/useEventForum";
+import Footer from "../shared/Footer";
 
 interface EventForumPageProps {
   eventId: number;
@@ -117,6 +118,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
           </p>
         </motion.div>
       </div>
+      <Footer />
     </div>
   );
 }

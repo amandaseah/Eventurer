@@ -9,6 +9,7 @@ import EventActions from "../features/eventInfo/EventActions";
 import EventDetails from "../features/eventInfo/EventDetails";
 import { fetchEventbriteEvents } from "../../lib/eventbriteService";
 import { useEventForum } from "../../hooks/useEventForum";
+import Footer from "../shared/Footer";
 
 interface EventInfoPageProps {
   eventId: string | number;
@@ -183,6 +184,7 @@ export function EventInfoPage({
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

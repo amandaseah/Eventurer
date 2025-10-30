@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
+import Footer from '../shared/Footer';
 
 interface MarketingLandingPageProps {
   onExplore?: () => void;
@@ -86,12 +87,6 @@ const moods = [
 ];
 
 const techStack = ['React', 'TypeScript', 'Tailwind CSS', 'Motion', 'Shadcn/ui'];
-
-const footerLinks = {
-  Product: ['Features', 'Pricing', 'Events', 'Community'],
-  Company: ['About Us', 'Careers', 'Blog', 'Press'],
-  Support: ['Help Center', 'Contact Us', 'Privacy Policy', 'Terms of Service'],
-};
 
 export function MarketingLandingPage({ onExplore, onDemo }: MarketingLandingPageProps) {
   return (
@@ -445,50 +440,6 @@ function CTAStats() {
         </motion.div>
       ))}
     </motion.div>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="w-full max-w-7xl mx-auto border-t border-purple-100 bg-white/40 px-4 sm:px-6 lg:px-8 py-12 sm:py-16 backdrop-blur-sm">
-      <div className="grid gap-8 sm:gap-12 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="sm:col-span-2 lg:col-span-1">
-          <div className="mb-4 flex items-center gap-2">
-            <img src="/favicon.png" alt="Eventurer" className="h-8 w-8 rounded-xl" />
-            <span className="text-gray-900 font-semibold">Eventurer</span>
-          </div>
-          <p className="text-sm leading-6 text-gray-600 max-w-sm">
-            Discover events that match your mood and create unforgettable experiences.
-          </p>
-        </div>
-
-        {Object.entries(footerLinks).map(([section, links]) => (
-          <div key={section}>
-            <h3 className="mb-4 font-semibold text-gray-900">{section}</h3>
-            <ul className="space-y-3 text-sm text-gray-600">
-              {links.map((link) => (
-                <li key={link}>
-                  <a href="#" className="transition hover:text-purple-600">
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-8 sm:mt-10 flex flex-col items-center justify-between gap-4 border-t border-purple-100 pt-6 sm:pt-8 text-sm text-gray-600 sm:flex-row">
-        <p>© {new Date().getFullYear()} Eventurer. All rights reserved.</p>
-        <div className="flex items-center gap-4 sm:gap-6">
-          {['Twitter', 'Instagram', 'Facebook', 'LinkedIn'].map((social) => (
-            <a key={social} href="#" className="transition hover:text-purple-600">
-              {social}
-            </a>
-          ))}
-        </div>
-      </div>
-    </footer>
   );
 }
 

@@ -5,6 +5,7 @@ import { updateProfile, onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import SettingsPanel from "../features/profile/SettingsPanel";
 import EventsGrid from "../features/profile/EventsGrid";
+import Footer from "../shared/Footer";
 
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
@@ -342,6 +343,7 @@ export function ProfilePage({
           </TabsContent>
         </Tabs>
       </div>
+      <Footer />
     </div>
   );
 }

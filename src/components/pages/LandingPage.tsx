@@ -7,6 +7,7 @@ import { EventCard } from '../features/event/EventCard';
 
 import Hero from '../features/landing/Hero';
 import MoodQuiz from '../features/landing/MoodQuiz';
+import Footer from '../shared/Footer';
 
 interface LandingPageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -282,6 +283,7 @@ export function LandingPage({
           </div>
         </section>
       </div>
+      <Footer />
     </div>
   );
 }

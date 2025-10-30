@@ -1,5 +1,6 @@
 import RecommendationPanel from "../features/recommendation/RecommendationPanel";
 import FiltersPanel from "../features/explore/FiltersPanel";
+import Footer from "../shared/Footer";
 // import { sanityCheckMe, fetchEventbriteEventsForMe } from '../../lib/eventbriteService';
 
 
@@ -209,6 +210,7 @@ export function EventExplorePage({
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
