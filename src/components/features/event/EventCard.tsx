@@ -91,13 +91,35 @@ export function EventCard({
     return diffDays > 0 && diffDays <= 3;
   };
 
+  // Get mood-based accent color
+  const getMoodColor = () => {
+    switch(event.mood) {
+      case 'chill': return 'border-blue-400 bg-blue-50/30';
+      case 'active': return 'border-green-400 bg-green-50/30';
+      case 'social': return 'border-pink-400 bg-pink-50/30';
+      case 'educational': return 'border-purple-400 bg-purple-50/30';
+      default: return 'border-gray-300 bg-gray-50/30';
+    }
+  };
+
+  const getMoodAccent = () => {
+    switch(event.mood) {
+      case 'chill': return 'bg-blue-500';
+      case 'active': return 'bg-green-500';
+      case 'social': return 'bg-pink-500';
+      case 'educational': return 'bg-purple-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
   return (
     <motion.div
-      whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(167, 139, 250, 0.15)' }}
+      whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)' }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-3xl overflow-hidden shadow-md cursor-pointer group relative"
+      className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl cursor-pointer group relative transition-all border border-gray-100"
     >
+
       {/* RSVP Popup */}
       <AnimatePresence>
         {showRSVPPopup && (
@@ -105,7 +127,7 @@ export function EventCard({
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: -20 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-2xl p-6 border-2 border-green-300"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-xl shadow-2xl p-6 border-2 border-green-400"
           >
             <div className="text-center">
               <motion.div
@@ -116,7 +138,7 @@ export function EventCard({
               >
                 🎉
               </motion.div>
-              <p className="text-xl text-green-700">You're going!</p>
+              <p className="text-xl text-green-700 font-semibold">You're going!</p>
             </div>
           </motion.div>
         )}
@@ -126,7 +148,7 @@ export function EventCard({
         <Image
           src={event.imageUrl}
           alt={event.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
         {/* Past Event Overlay */}
@@ -138,6 +160,7 @@ export function EventCard({
           </div>
         )}
 
+        {/* Bookmark button */}
         <div className="absolute top-3 right-3">
           <motion.button
             whileHover={{ scale: 1.1 }}
@@ -146,43 +169,47 @@ export function EventCard({
               e.stopPropagation();
               handleBookmark();
             }}
-            className={`flex items-center gap-2 px-3 py-2 rounded-full backdrop-blur-sm transition-all ${
-              isBookmarked ? 'bg-pink-400 text-white' : 'bg-white/80 text-gray-700'
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-full backdrop-blur-md transition-all shadow-md ${
+              isBookmarked ? 'bg-purple-600 text-white' : 'bg-white/95 text-gray-700 hover:bg-white'
             }`}
           >
-            <Bookmark className="w-4 h-4" fill={isBookmarked ? 'currentColor' : 'none'} />
-            <span className="text-xs font-medium">{saves}</span>
+            <Bookmark className="w-3.5 h-3.5" fill={isBookmarked ? 'currentColor' : 'none'} />
+            <span className="text-xs font-semibold">{saves}</span>
           </motion.button>
         </div>
-        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-          <span className="text-xs text-purple-600">{event.price}</span>
+
+        {/* Price badge */}
+        <div className="absolute bottom-3 left-3">
+          <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md">
+            <span className="text-sm font-bold text-purple-600">{event.price}</span>
+          </div>
         </div>
       </div>
 
       <div className={`p-5 ${centerText ? 'text-center' : ''}`} onClick={() => onEventClick(event.id)}>
-        <h3 className="mb-2 line-clamp-1">{event.title}</h3>
+        <h3 className="mb-2 line-clamp-1 font-semibold text-lg text-gray-900">{event.title}</h3>
         <p className="text-sm text-gray-600 mb-4 line-clamp-2">{event.description}</p>
 
         <div className="space-y-2 mb-4">
           <div className={`flex items-center gap-2 text-sm text-gray-600 ${centerText ? 'justify-center' : ''}`}>
-            <Calendar className="w-4 h-4 text-purple-400" />
+            <Calendar className="w-4 h-4 text-purple-500" />
             <span>{formatDateToDDMMYYYY(event.date)} at {event.time}</span>
           </div>
           <div className={`flex items-center gap-2 text-sm text-gray-600 ${centerText ? 'justify-center' : ''}`}>
-            <MapPin className="w-4 h-4 text-pink-400" />
+            <MapPin className="w-4 h-4 text-purple-500" />
             <span className="line-clamp-1">{event.location}</span>
           </div>
           {isClosingSoon() && !event.isPast && (
-            <div className="flex items-center gap-2 text-sm text-orange-600">
-              <Clock className="w-4 h-4" />
-              <span className="font-medium">Closing soon!</span>
+            <div className={`flex items-center gap-2 text-sm ${centerText ? 'justify-center' : ''}`}>
+              <Clock className="w-4 h-4 text-orange-500" />
+              <span className="font-medium text-orange-600">Closing soon!</span>
             </div>
           )}
         </div>
 
         {/* Show user comment for past events or RSVP button for upcoming events */}
         {event.isPast && event.userComment ? (
-          <div className="bg-purple-50 border border-purple-200 rounded-2xl p-3">
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
             <p className="text-xs text-purple-700 mb-1">Your comment:</p>
             <p className="text-sm text-gray-700 italic">&quot;{event.userComment}&quot;</p>
           </div>
@@ -195,13 +222,13 @@ export function EventCard({
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
-                className={`w-full py-2.5 rounded-full transition-all flex items-center justify-center ${
+                className={`w-full py-3 rounded-xl transition-all flex items-center justify-center font-semibold ${
                   isRSVPed
-                    ? 'bg-green-500 text-white border-2 border-green-600'
-                    : 'bg-gradient-to-r from-purple-400 to-pink-300 text-white hover:shadow-lg'
+                    ? 'bg-green-500 text-white hover:bg-green-600 shadow-md'
+                    : 'bg-purple-600 text-white hover:bg-purple-700 shadow-md hover:shadow-lg'
                 }`}
               >
-                <span className="flex items-center justify-center gap-1">
+                <span className="flex items-center justify-center gap-2">
                   {isRSVPed ? '✓ RSVP\'d' : 'RSVP'}
                 </span>
               </motion.button>
