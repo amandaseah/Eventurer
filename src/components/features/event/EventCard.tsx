@@ -225,7 +225,7 @@ export function EventCard({
                 className={`w-full py-3 rounded-xl transition-all flex items-center justify-center font-semibold ${
                   isRSVPed
                     ? 'bg-green-500 text-white hover:bg-green-600 shadow-md'
-                    : 'bg-pink-400 text-white hover:bg-pink-500 shadow-md hover:shadow-lg'
+                    : 'bg-pink-200 text-pink-600 border border-pink-300 hover:bg-pink-300 shadow-sm hover:shadow-md'
                 }`}
               >
                 <span className="flex items-center justify-center gap-2">
@@ -252,7 +252,10 @@ export function EventCard({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={confirmRSVP}>
+                <AlertDialogAction
+                  onClick={confirmRSVP}
+                  className="bg-pink-200 text-pink-600 hover:bg-pink-300 focus:ring-pink-200 focus:ring-offset-2"
+                >
                   {isRSVPed ? 'Cancel RSVP' : 'Confirm RSVP'}
                 </AlertDialogAction>
               </AlertDialogFooter>

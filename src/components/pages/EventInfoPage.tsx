@@ -10,6 +10,7 @@ import EventDetails from "../features/eventInfo/EventDetails";
 import { fetchEventbriteEvents } from "../../lib/eventbriteService";
 import { useEventForum } from "../../hooks/useEventForum";
 import Footer from "../shared/Footer";
+import { toast } from "sonner";
 
 interface EventInfoPageProps {
   eventId: string | number;
@@ -39,7 +40,6 @@ export function EventInfoPage({
   // Local states
   const [isBookmarked, setIsBookmarked] = useState(bookmarkedEventIds.includes(Number(eventId)));
   const [isRSVPed, setIsRSVPed] = useState(rsvpedEventIds.includes(Number(eventId)));
-  const [showRSVPDialog, setShowRSVPDialog] = useState(false);
   const [saves, setSaves] = useState(0);
 
   // Forum data
@@ -99,15 +99,19 @@ export function EventInfoPage({
     const newRSVPStatus = !isRSVPed;
     setIsRSVPed(newRSVPStatus);
     onRSVPChange(Number(eventId), newRSVPStatus);
-    alert(
-      newRSVPStatus
-        ? isFree
-          ? "RSVP confirmed!"
-          : "RSVP confirmed with payment info sent!"
-        : isFree
-        ? "RSVP cancelled."
-        : "RSVP cancelled, email sent."
-    );
+    if (newRSVPStatus) {
+      if (isFree) {
+        toast.success("RSVP confirmed! See you at the event.");
+      } else {
+        toast.success("RSVP confirmed! A confirmation email with payment details is on the way.");
+      }
+    } else {
+      if (isFree) {
+        toast.success("RSVP cancelled.");
+      } else {
+        toast.success("RSVP cancelled. We've sent a confirmation email.");
+      }
+    }
   };
 
   return (
@@ -126,11 +130,11 @@ export function EventInfoPage({
         <motion.button
           onClick={onGoBack}
           whileHover={{ x: -4 }}
-          className="sticky top-4 z-50 mb-4 flex items-center gap-1.5 sm:gap-2 text-pink-500 hover:text-pink-600 bg-white/90 backdrop-blur-sm px-2.5 sm:px-4 py-2 rounded-full shadow-md text-xs sm:text-base w-fit"
-        >
-          <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          <span>Back</span>
-        </motion.button>
+        className="sticky top-[84px] sm:top-[96px] z-40 mb-4 flex items-center gap-2 text-pink-500 hover:text-pink-600 bg-white/90 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-md text-sm sm:text-base w-fit"
+      >
+        <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        <span>Back</span>
+      </motion.button>
 
         {/* Event Banner */}
         <motion.div

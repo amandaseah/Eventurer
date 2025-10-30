@@ -43,7 +43,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <button
             onClick={onGoBack}
-            className="sticky top-4 z-50 flex items-center gap-2 text-pink-500 hover:text-pink-600 mb-4 transition-colors bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md w-fit"
+            className="sticky top-[84px] sm:top-[96px] z-40 flex items-center gap-2 text-pink-500 hover:text-pink-600 mb-4 transition-colors bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Event</span>

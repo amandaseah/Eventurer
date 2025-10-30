@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { LoginPage } from './components/pages/LoginPage';
 import { SignupPage } from './components/pages/SignupPage';
 import { LandingPage } from './components/pages/LandingPage';
@@ -10,12 +10,11 @@ import { EventForumPage } from './components/pages/EventForumPage';
 import { ProfilePage } from './components/pages/ProfilePage';
 import { CountdownWidget } from './components/CountdownWidget';
 import { Toaster } from './components/ui/sonner';
-import { events } from './lib/mockData';
 import { loadGoogleMapsScript } from './lib/loadGoogleMaps';
 import { fetchEventbriteEvents, fetchEventbriteEventsForMe, sanityCheckMe } from './lib/eventbriteService';
 import { categorizeEvent } from './lib/eventCategoriser';
 
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom'
 import ThreeLanding from './components/features/landing3D/ThreeLanding'
 import HomePreview from './components/pages/HomePreview'
 
@@ -44,17 +43,11 @@ interface PageData {
   eventId?: number;
 }
 
-function ShellApp() {
-  const [currentPage, setCurrentPage] = useState<Page>('login');
-  const [pageData, setPageData] = useState<PageData>({});
-  interface HistoryEntry {
-    page: Page;
-    data?: PageData;
-  }
+type NavigateData = PageData & { postId?: number };
 
-  const [navigationHistory, setNavigationHistory] = useState<HistoryEntry[]>([
-    { page: 'login', data: {} },
-  ]);
+function ShellApp() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([1, 2, 3, 4]);
   const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([3, 4, 7]);
 
@@ -129,25 +122,50 @@ function ShellApp() {
   }
 
 
-  const handleNavigate: (page: string, data?: any) => void = (page, data) => {
-    const entry = { page: page as Page, data: data as PageData | undefined };
-    setCurrentPage(entry.page);
-    setNavigationHistory(prev => [...prev, entry]);
-    setPageData(entry.data ?? {});
-  };
-
-  const handleGoBack = () => {
-    if (navigationHistory.length > 1) {
-      const newHistory = navigationHistory.slice(0, -1);
-      const previousEntry = newHistory[newHistory.length - 1];
-      setNavigationHistory(newHistory);
-      setCurrentPage(previousEntry.page);
-      setPageData(previousEntry.data ?? {});
-    } else {
-      // Fallback to explore if no history
-      handleNavigate('explore');
+  const mapPageToPath = useCallback((page: Page, data?: NavigateData) => {
+    switch (page) {
+      case 'login':
+        return '/app/login'
+      case 'signup':
+        return '/app/signup'
+      case 'landing':
+        return '/app/landing'
+      case 'explore':
+        return '/app/explore'
+      case 'profile':
+        return '/app/profile'
+      case 'mood-results':
+        if (data?.mood) {
+          return `/app/mood-results/${encodeURIComponent(data.mood)}`
+        }
+        return '/app/mood-results'
+      case 'event-info':
+        if (typeof data?.eventId !== 'undefined') {
+          return `/app/events/${data.eventId}`
+        }
+        return '/app/explore'
+      case 'event-forum':
+        if (typeof data?.eventId !== 'undefined') {
+          const base = `/app/events/${data.eventId}/forum`
+          if (typeof data?.postId !== 'undefined') {
+            return `${base}?post=${data.postId}`
+          }
+          return base
+        }
+        return '/app/explore'
+      default:
+        return '/app/landing'
     }
-  };
+  }, [])
+
+  const handleNavigate = useCallback(
+    (page: string, data?: NavigateData) => {
+      const target = mapPageToPath(page as Page, data)
+      if (!target) return
+      navigate(target)
+    },
+    [mapPageToPath, navigate],
+  )
 
   const handleBookmarkChange = (eventId: number, isBookmarked: boolean) => {
     if (isBookmarked) {
@@ -165,86 +183,105 @@ function ShellApp() {
     }
   };
 
-  // Show the countdown widget on all pages except login and signup
-  // Will display bookmarked/RSVP events, or fallback to upcoming events
-  const showCountdownWidget =
-    currentPage !== 'login' &&
-    currentPage !== 'signup';
+  const isAuthRoute = /\/app\/(login|signup)\/?$/i.test(location.pathname)
+  const isAppRoot = location.pathname === '/app'
+  const showCountdownWidget = !isAuthRoute && !isAppRoot
 
   return (
     <div className="size-full bg-white">
-      {currentPage === 'login' && <LoginPage onNavigate={handleNavigate} />}
-      {currentPage === 'signup' && <SignupPage onNavigate={handleNavigate} />}
-      {currentPage === 'landing' && (
-        <LandingPage
-          onNavigate={handleNavigate}
-          events={fetchedEvents}
-          loading={loadingEvents}
-          bookmarkedEventIds={bookmarkedEventIds}
-          rsvpedEventIds={rsvpedEventIds}
-          onBookmarkChange={handleBookmarkChange}
-          onRSVPChange={handleRSVPChange}
+      <Routes>
+        <Route index element={<Navigate to="login" replace />} />
+        <Route path="login" element={<LoginPage onNavigate={handleNavigate} />} />
+        <Route path="signup" element={<SignupPage onNavigate={handleNavigate} />} />
+        <Route
+          path="landing"
+          element={
+            <LandingPage
+              onNavigate={handleNavigate}
+              events={fetchedEvents}
+              loading={loadingEvents}
+              bookmarkedEventIds={bookmarkedEventIds}
+              rsvpedEventIds={rsvpedEventIds}
+              onBookmarkChange={handleBookmarkChange}
+              onRSVPChange={handleRSVPChange}
+            />
+          }
         />
-      )}
-      {currentPage === 'mood-results' && pageData.mood && (
-        <MoodResultsPage 
-        mood={pageData.mood}
-        events={fetchedEvents}
-        onNavigate={handleNavigate}
-        bookmarkedEventIds={bookmarkedEventIds}
-        rsvpedEventIds={rsvpedEventIds}
-        onBookmarkChange={handleBookmarkChange}
-        onRSVPChange={handleRSVPChange}
-         />
-      )}
+        <Route
+          path="mood-results"
+          element={<Navigate to="../landing" replace />}
+        />
+        <Route
+          path="mood-results/:mood"
+          element={
+            <MoodResultsRoute
+              events={fetchedEvents}
+              onNavigate={handleNavigate}
+              bookmarkedEventIds={bookmarkedEventIds}
+              rsvpedEventIds={rsvpedEventIds}
+              onBookmarkChange={handleBookmarkChange}
+              onRSVPChange={handleRSVPChange}
+            />
+          }
+        />
+        <Route
+          path="explore"
+          element={
+            <EventExplorePage
+              events={fetchedEvents}
+              loading={loadingEvents}
+              onNavigate={handleNavigate}
+              bookmarkedEventIds={bookmarkedEventIds}
+              rsvpedEventIds={rsvpedEventIds}
+              onBookmarkChange={handleBookmarkChange}
+              onRSVPChange={handleRSVPChange}
+            />
+          }
+        />
+        <Route
+          path="events"
+          element={<Navigate to="../explore" replace />}
+        />
+        <Route
+          path="events/:eventId"
+          element={
+            <EventInfoRoute
+              events={fetchedEvents}
+              onNavigate={handleNavigate}
+              bookmarkedEventIds={bookmarkedEventIds}
+              rsvpedEventIds={rsvpedEventIds}
+              onBookmarkChange={handleBookmarkChange}
+              onRSVPChange={handleRSVPChange}
+            />
+          }
+        />
+        <Route
+          path="events/:eventId/forum"
+          element={
+            <EventForumRoute
+              events={fetchedEvents}
+              onNavigate={handleNavigate}
+              username="Guest"
+            />
+          }
+        />
+        <Route
+          path="profile"
+          element={
+            <ProfilePage
+              events={fetchedEvents}
+              onNavigate={handleNavigate}
+              onGoBack={() => navigate(-1)}
+              bookmarkedEventIds={bookmarkedEventIds}
+              rsvpedEventIds={rsvpedEventIds}
+              onBookmarkChange={handleBookmarkChange}
+              onRSVPChange={handleRSVPChange}
+            />
+          }
+        />
+        <Route path="*" element={<Navigate to="landing" replace />} />
+      </Routes>
 
-      {currentPage === 'explore' && (
-      <EventExplorePage 
-        events={fetchedEvents}
-        onNavigate={handleNavigate}
-        bookmarkedEventIds={bookmarkedEventIds}
-        rsvpedEventIds={rsvpedEventIds}
-        onBookmarkChange={handleBookmarkChange}
-        onRSVPChange={handleRSVPChange}
-        />
-      )}
-
-      {currentPage === 'event-info' && pageData.eventId && (
-        <EventInfoPage 
-          eventId={pageData.eventId} 
-          events={fetchedEvents}
-          onNavigate={handleNavigate}
-          onGoBack={handleGoBack}
-          bookmarkedEventIds={bookmarkedEventIds}
-          rsvpedEventIds={rsvpedEventIds}
-          onBookmarkChange={handleBookmarkChange}
-          onRSVPChange={handleRSVPChange}
-        />
-      )}
-
-      {currentPage === "event-forum" && pageData.eventId && (
-        <EventForumPage 
-          eventId={pageData.eventId}
-          events={fetchedEvents}
-          onGoBack={handleGoBack}
-          onNavigate={handleNavigate}
-          username={pageData?.username || "Guest"}
-        />
-      )}
-
-      
-      {currentPage === 'profile' && (
-        <ProfilePage 
-          events={fetchedEvents}
-          onNavigate={handleNavigate}
-          onGoBack={handleGoBack}
-          bookmarkedEventIds={bookmarkedEventIds}
-          rsvpedEventIds={rsvpedEventIds}
-          onBookmarkChange={handleBookmarkChange}
-          onRSVPChange={handleRSVPChange}
-        />
-      )}
-      
       {showCountdownWidget && (
         <CountdownWidget
           bookmarkedEvents={bookmarkedEvents}
@@ -259,6 +296,109 @@ function ShellApp() {
   );
 }
 
+function MoodResultsRoute({
+  events,
+  onNavigate,
+  bookmarkedEventIds,
+  rsvpedEventIds,
+  onBookmarkChange,
+  onRSVPChange,
+}: {
+  events: any[]
+  onNavigate: (page: string, data?: NavigateData) => void
+  bookmarkedEventIds: number[]
+  rsvpedEventIds: number[]
+  onBookmarkChange: (eventId: number, isBookmarked: boolean) => void
+  onRSVPChange: (eventId: number, isRSVPed: boolean) => void
+}) {
+  const { mood } = useParams<{ mood?: string }>()
+  if (!mood) {
+    return <Navigate to="../landing" replace />
+  }
+
+  const decodedMood = decodeURIComponent(mood)
+
+  return (
+    <MoodResultsPage
+      mood={decodedMood}
+      events={events}
+      onNavigate={onNavigate}
+      bookmarkedEventIds={bookmarkedEventIds}
+      rsvpedEventIds={rsvpedEventIds}
+      onBookmarkChange={onBookmarkChange}
+      onRSVPChange={onRSVPChange}
+    />
+  )
+}
+
+function EventInfoRoute({
+  events,
+  onNavigate,
+  bookmarkedEventIds,
+  rsvpedEventIds,
+  onBookmarkChange,
+  onRSVPChange,
+}: {
+  events: any[]
+  onNavigate: (page: string, data?: NavigateData) => void
+  bookmarkedEventIds: number[]
+  rsvpedEventIds: number[]
+  onBookmarkChange: (eventId: number, isBookmarked: boolean) => void
+  onRSVPChange: (eventId: number, isRSVPed: boolean) => void
+}) {
+  const { eventId } = useParams<{ eventId?: string }>()
+  const navigate = useNavigate()
+
+  if (!eventId) {
+    return <Navigate to="../explore" replace />
+  }
+
+  return (
+    <EventInfoPage
+      eventId={eventId}
+      events={events}
+      onNavigate={onNavigate}
+      onGoBack={() => navigate(-1)}
+      bookmarkedEventIds={bookmarkedEventIds}
+      rsvpedEventIds={rsvpedEventIds}
+      onBookmarkChange={onBookmarkChange}
+      onRSVPChange={onRSVPChange}
+    />
+  )
+}
+
+function EventForumRoute({
+  events,
+  onNavigate,
+  username,
+}: {
+  events: any[]
+  onNavigate: (page: string, data?: NavigateData) => void
+  username: string
+}) {
+  const { eventId } = useParams<{ eventId?: string }>()
+  const navigate = useNavigate()
+
+  if (!eventId) {
+    return <Navigate to="../explore" replace />
+  }
+
+  const numericId = Number(eventId)
+  if (Number.isNaN(numericId)) {
+    return <Navigate to="../explore" replace />
+  }
+
+  return (
+    <EventForumPage
+      eventId={numericId}
+      events={events}
+      onGoBack={() => navigate(-1)}
+      onNavigate={onNavigate}
+      username={username}
+    />
+  )
+}
+
 // ---- Router wrapper ----
 export default function App() {
   return (
@@ -271,7 +411,7 @@ export default function App() {
         {/* The page shown inside the monitor iframe */}
         <Route path="/home" element={<HomePreview />} />
         {/* Your existing app (state-based navigation) lives under /app */}
-        <Route path="/app" element={<ShellApp />} />
+        <Route path="/app/*" element={<ShellApp />} />
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

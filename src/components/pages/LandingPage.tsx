@@ -30,6 +30,7 @@ export function LandingPage({
 }: LandingPageProps) {
   const [quizStarted, setQuizStarted] = useState(false);
   const featuredEvents = (events ?? []).filter(e => !e.isPast).slice(0, 3); // filter out past events
+  const skeletonCards = Array.from({ length: 3 });
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gray-50">
@@ -79,7 +80,6 @@ export function LandingPage({
                 transition={{ delay: 0.4 }}
                 className="text-xl text-gray-600 max-w-2xl mx-auto"
               >
-                Events picked based on your quiz results
               </motion.p>
 
               {/* Decorative elements */}
@@ -100,35 +100,43 @@ export function LandingPage({
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredEvents.map((event, idx) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ 
-                    delay: idx * 0.2,
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 12
-                  }}
-                  whileHover={{ 
-                    y: -10,
-                    scale: 1.02,
-                    transition: { duration: 0.2 }
-                  }}
-                >
-                  <EventCard 
-                    event={event} 
-                    onEventClick={(id) => onNavigate('event-info', { eventId: id })}
-                    isBookmarkedInitially={bookmarkedEventIds.includes(event.id)}
-                    isRSVPedInitially={rsvpedEventIds.includes(event.id)}
-                    onBookmarkChange={onBookmarkChange}
-                    onRSVPChange={onRSVPChange}
-                  />
-                </motion.div>
-              ))}
+              {loading
+                ? skeletonCards.map((_, idx) => <FeaturedEventSkeleton key={idx} />)
+                : featuredEvents.map((event, idx) => (
+                    <motion.div
+                      key={event.id}
+                      initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ 
+                        delay: idx * 0.2,
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 12
+                      }}
+                      whileHover={{ 
+                        y: -10,
+                        scale: 1.02,
+                        transition: { duration: 0.2 }
+                      }}
+                    >
+                      <EventCard 
+                        event={event} 
+                        onEventClick={(id) => onNavigate('event-info', { eventId: id })}
+                        isBookmarkedInitially={bookmarkedEventIds.includes(event.id)}
+                        isRSVPedInitially={rsvpedEventIds.includes(event.id)}
+                        onBookmarkChange={onBookmarkChange}
+                        onRSVPChange={onRSVPChange}
+                      />
+                    </motion.div>
+                  ))}
             </div>
+
+            {!loading && featuredEvents.length === 0 && (
+              <div className="mt-10 text-center text-gray-500">
+                No upcoming events found yet. Check back soon!
+              </div>
+            )}
 
             {/* Call to action */}
             <motion.div
@@ -154,4 +162,22 @@ export function LandingPage({
       <Footer />
     </div>
   );
+}
+
+function FeaturedEventSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl shadow-md border border-gray-100 animate-pulse">
+      <div className="h-44 bg-gray-200 rounded-t-2xl" />
+      <div className="p-6 space-y-4">
+        <div className="h-5 bg-gray-200 rounded w-3/4" />
+        <div className="h-4 bg-gray-200 rounded w-full" />
+        <div className="h-4 bg-gray-200 rounded w-5/6" />
+        <div className="flex gap-3">
+          <div className="h-4 bg-gray-200 rounded w-1/3" />
+          <div className="h-4 bg-gray-200 rounded w-1/4" />
+        </div>
+        <div className="h-10 bg-gray-200 rounded-xl" />
+      </div>
+    </div>
+  )
 }

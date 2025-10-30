@@ -493,6 +493,8 @@ function GlobalLoader({ opacity }: { opacity: number }) {
   )
 }
 
+const IMMERSIVE_STATE_KEY = 'eventurer-immersive-mode'
+
 export default function ThreeLanding() {
   const navigate = useNavigate()
   const controlsRef = useRef<OrbitControlsImpl | null>(null)
@@ -509,6 +511,10 @@ export default function ThreeLanding() {
   const [canvasDpr, setCanvasDpr] = useState<[number, number]>([1, 1.6])
   const [showLoader, setShowLoader] = useState(true)
   const [loaderOpacity, setLoaderOpacity] = useState(1)
+  const [startInInteractive] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.sessionStorage.getItem(IMMERSIVE_STATE_KEY) === 'monitor'
+  })
   useCursor(isHovering)
 
   const isZoomed = currentZoomState === 'ZOOMED'
@@ -566,12 +572,17 @@ export default function ThreeLanding() {
 
     const camera = controls.object as THREE.PerspectiveCamera
     fitCameraToObject(camera, model, controls, 1.15)
-    camera.position.set(...FOCUS.wide.position)
-    controls.target.set(...FOCUS.wide.target)
+    const nextFocus = startInInteractive ? FOCUS.monitor : FOCUS.wide
+    camera.position.set(...nextFocus.position)
+    controls.target.set(...nextFocus.target)
     controls.update()
-    zoomStateRef.current = 'WIDE'
-    setCurrentZoomState('WIDE')
-  }, [modelReady])
+    const nextZoomState: ZoomState = startInInteractive ? 'ZOOMED' : 'WIDE'
+    zoomStateRef.current = nextZoomState
+    setCurrentZoomState(nextZoomState)
+    if (startInInteractive) {
+      setOverlayOpen(false)
+    }
+  }, [modelReady, startInInteractive])
 
   const clearDwell = useCallback(() => {
     if (dwellTimerRef.current !== null) {
@@ -597,6 +608,13 @@ export default function ThreeLanding() {
         }
         if (endState === 'WIDE') {
           setOverlayOpen(false)
+        }
+        if (typeof window !== 'undefined') {
+          if (endState === 'ZOOMED') {
+            window.sessionStorage.setItem(IMMERSIVE_STATE_KEY, 'monitor')
+          } else if (endState === 'WIDE') {
+            window.sessionStorage.removeItem(IMMERSIVE_STATE_KEY)
+          }
         }
         postComplete?.()
       })
@@ -649,6 +667,17 @@ export default function ThreeLanding() {
       runTransition('wide', 'ZOOMING_OUT', 'WIDE')
     }
   }, [overlayOpen, runTransition])
+
+  useEffect(() => {
+    if (!startInInteractive || !modelReady) return
+    const controls = controlsRef.current
+    if (!controls) return
+    const camera = controls.object as THREE.PerspectiveCamera
+    camera.position.set(...FOCUS.monitor.position)
+    controls.target.set(...FOCUS.monitor.target)
+    controls.update()
+    setOverlayOpen(false)
+  }, [modelReady, startInInteractive])
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
