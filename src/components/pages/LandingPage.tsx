@@ -33,7 +33,7 @@ export function LandingPage({
   const skeletonCards = Array.from({ length: 3 });
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gray-50">
+    <div className="min-h-screen relative bg-gray-50">
       <Header currentPage="landing" onNavigate={onNavigate} />
 
       {/* Hero section */}
@@ -50,20 +50,20 @@ export function LandingPage({
 
       {/* Featured Events */}
       <div className="relative">
-        <section className="relative bg-white py-20">
+        <section className="relative bg-gradient-to-b from-white/50 to-gray-50/80 backdrop-blur-sm py-20">
           <div className="container mx-auto px-6">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 60 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
               className="text-center mb-16"
             >
               <motion.div
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ delay: 0.2, duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
                 className="inline-flex items-center gap-3 mb-6"
               >
                 <Star className="w-8 h-8 text-yellow-500" />
@@ -74,10 +74,10 @@ export function LandingPage({
               </motion.div>
               
               <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ delay: 0.4, duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
                 className="text-xl text-gray-600 max-w-2xl mx-auto"
               >
               </motion.p>
@@ -105,19 +105,17 @@ export function LandingPage({
                 : featuredEvents.map((event, idx) => (
                     <motion.div
                       key={event.id}
-                      initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ 
-                        delay: idx * 0.2,
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 12
+                      initial={{ opacity: 0, y: 50 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.2 }}
+                      transition={{
+                        delay: idx * 0.15,
+                        duration: 0.7,
+                        ease: [0.25, 0.1, 0.25, 1]
                       }}
-                      whileHover={{ 
-                        y: -10,
-                        scale: 1.02,
-                        transition: { duration: 0.2 }
+                      whileHover={{
+                        y: -8,
+                        transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }
                       }}
                     >
                       <EventCard 
@@ -140,17 +138,20 @@ export function LandingPage({
 
             {/* Call to action */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.8 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
               className="text-center mt-16"
             >
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onNavigate('explore')}
-                className="px-8 py-4 bg-pink-400 text-white rounded-xl text-lg font-semibold hover:bg-pink-500 hover:shadow-lg transition-all flex items-center gap-3 mx-auto"
+                className="px-8 py-4 bg-pink-400/90 backdrop-blur-md text-white rounded-xl text-lg font-semibold hover:bg-pink-500/90 hover:shadow-lg transition-all flex items-center gap-3 mx-auto border border-white/30"
+                style={{
+                  boxShadow: '0 8px 24px 0 rgba(236, 72, 153, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)',
+                }}
               >
                 <Zap className="w-5 h-5" />
                 See All Events

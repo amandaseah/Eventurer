@@ -162,9 +162,12 @@ export function CountdownWidget({
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-white rounded-3xl shadow-2xl w-80 max-h-[28rem] overflow-hidden flex flex-col"
+            className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl w-80 max-h-[28rem] overflow-hidden flex flex-col border border-white/50"
+            style={{
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.5)',
+            }}
           >
-            <div className="flex items-center justify-between px-5 py-4 sticky top-0 bg-white z-10 border-b border-gray-100">
+            <div className="flex items-center justify-between px-5 py-4 sticky top-0 bg-white/60 backdrop-blur-md z-10 border-b border-white/30">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
                 <Calendar className="w-4 h-4 text-purple-600" />
                 Event countdowns
@@ -190,7 +193,7 @@ export function CountdownWidget({
                         onEventClick(event.id);
                         setIsExpanded(false);
                       }}
-                      className="p-3 bg-white rounded-2xl cursor-pointer hover:shadow-md transition-all border border-gray-200"
+                      className="p-3 bg-white/50 backdrop-blur-sm rounded-2xl cursor-pointer hover:shadow-md hover:bg-white/70 transition-all border border-white/40"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
@@ -222,7 +225,7 @@ export function CountdownWidget({
                         <motion.div
                           animate={{ scale: [1, 1.03, 1] }}
                           transition={{ duration: 2, repeat: Infinity }}
-                          className="bg-white rounded-xl px-3 py-2 min-w-[72px] flex flex-col items-center justify-center flex-none"
+                          className="bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2 min-w-[72px] flex flex-col items-center justify-center flex-none"
                         >
                           <div className="text-2xl font-semibold text-pink-500 leading-none">
                             {event.countdownDays}
@@ -246,7 +249,10 @@ export function CountdownWidget({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsExpanded(true)}
-            className="relative bg-pink-400 text-white rounded-2xl px-4 py-3 shadow-lg flex flex-col items-center gap-1 min-w-[128px]"
+            className="relative bg-pink-400/80 backdrop-blur-md text-white rounded-2xl px-4 py-3 shadow-lg flex flex-col items-center gap-1 min-w-[128px] border border-white/30"
+            style={{
+              boxShadow: '0 8px 32px 0 rgba(236, 72, 153, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)',
+            }}
           >
             <Calendar className="w-4 h-4 opacity-90" />
             <div className="flex items-baseline gap-1 leading-none">

@@ -27,7 +27,10 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 100 }}
-        className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100 shadow-sm"
+        className="sticky top-0 z-50 bg-white/60 backdrop-blur-xl border-b border-white/40 shadow-sm"
+        style={{
+          boxShadow: '0 4px 24px 0 rgba(31, 38, 135, 0.1), inset 0 -1px 0 0 rgba(255, 255, 255, 0.5)',
+        }}
       >
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
@@ -110,7 +113,10 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-[73px] right-0 bottom-0 w-64 bg-white shadow-2xl z-40 md:hidden"
+              className="fixed top-[73px] right-0 bottom-0 w-64 bg-white/70 backdrop-blur-xl shadow-2xl z-40 md:hidden border-l border-white/50"
+              style={{
+                boxShadow: '-4px 0 24px 0 rgba(31, 38, 135, 0.15), inset 1px 0 0 0 rgba(255, 255, 255, 0.5)',
+              }}
             >
               <nav className="flex flex-col p-6 gap-2">
                 {navItems.map((item) => (

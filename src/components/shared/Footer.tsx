@@ -31,9 +31,9 @@ export default function Footer() {
               Events sorted by how you actually feel. No scrolling through stuff that doesn't fit your vibe.
             </p>
             <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <span>Made with</span>
+              <span>Made by G6's Group 8</span>
               <Heart className="w-3.5 h-3.5 fill-pink-500 text-pink-500" />
-              <span>in Singapore</span>
+              
             </div>
           </div>
 
