@@ -17,6 +17,7 @@ import { Calendar } from '../ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Button } from '../ui/button';
 import { formatDateObjectToDDMMYYYY } from '../../lib/dateUtils';
+import { Star } from 'lucide-react';
 
 
 
@@ -136,9 +137,13 @@ export function EventExplorePage({
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10 sm:mb-12"
         >
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-3">
-            Explore Events
-          </h1>
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Star className="w-8 h-8 text-yellow-500" />
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900">
+              Explore Events
+            </h1>
+            <Star className="w-8 h-8 text-yellow-500" />
+          </div>
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
             Filter by mood, price, date, or just browse everything
           </p>
@@ -170,11 +175,15 @@ export function EventExplorePage({
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6"
+              className="mb-6 flex flex-col items-center gap-3 text-center"
             >
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">
-                All Events
-              </h2>
+              <div className="flex items-center justify-center gap-3">
+                <Star className="w-6 h-6 text-yellow-500" />
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                  All Events
+                </h2>
+                <Star className="w-6 h-6 text-yellow-500" />
+              </div>
               <p className="text-xs sm:text-sm text-gray-500">
                 Browse all available events
               </p>
