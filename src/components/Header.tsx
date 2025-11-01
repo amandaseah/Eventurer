@@ -1,9 +1,10 @@
-import { Home, Search, Calendar, User, Menu, X, Settings, LogOut } from 'lucide-react';
+import { Home, Search, Calendar, User, Menu, X, Settings, LogOut, HelpCircle, Shield, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { auth } from '../lib/firebase';
+import { auth, db } from '../lib/firebase';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 interface HeaderProps {
   currentPage?: string;
@@ -12,6 +13,41 @@ interface HeaderProps {
 
 export function Header({ currentPage, onNavigate }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userName, setUserName] = useState<string>('');
+
+  // Load user data
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setUserName('');
+        return;
+      }
+
+      // Try to get name from auth first
+      if (user.displayName) {
+        // Extract first name only
+        const firstName = user.displayName.split(' ')[0];
+        setUserName(firstName);
+      } else {
+        // Try to get from Firestore
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            // Use firstName only
+            setUserName(data.firstName || 'User');
+          } else {
+            setUserName('User');
+          }
+        } catch (err) {
+          console.warn('Failed to load user name', err);
+          setUserName('User');
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const navItems = [
     { name: 'Home', id: 'landing', icon: Home },
@@ -75,9 +111,17 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="relative bg-pink-400 p-2 rounded-lg hover:bg-pink-500 hover:shadow-md transition-all overflow-hidden"
+                    className="flex items-center gap-2 bg-pink-400 px-3 py-2 rounded-lg hover:bg-pink-500 hover:shadow-md transition-all"
                   >
                     <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                    {userName ? (
+                      <span className="text-white font-medium text-sm max-w-[100px] truncate">
+                        {userName}
+                      </span>
+                    ) : (
+                      <span className="text-white/50 font-medium text-xs">Loading...</span>
+                    )}
+                    <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </motion.button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 border border-pink-100 bg-white/95 shadow-xl">
@@ -94,6 +138,21 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                   >
                     <Settings className="w-4 h-4" />
                     <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-pink-100" />
+                  <DropdownMenuItem
+                    onClick={() => handleNavClick('faq')}
+                    className="text-gray-600 focus:bg-pink-50 focus:text-pink-600"
+                  >
+                    <HelpCircle className="w-4 h-4" />
+                    <span>FAQ</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleNavClick('safety')}
+                    className="text-gray-600 focus:bg-pink-50 focus:text-pink-600"
+                  >
+                    <Shield className="w-4 h-4" />
+                    <span>Safety Guidelines</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-pink-100" />
                   <DropdownMenuItem
@@ -171,6 +230,26 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                     <span className="font-medium">{item.name}</span>
                   </motion.button>
                 ))}
+
+                <div className="h-px bg-gray-200 my-2" />
+
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleNavClick('faq')}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left text-gray-600 hover:bg-gray-50"
+                >
+                  <HelpCircle className="w-5 h-5" />
+                  <span className="font-medium">FAQ</span>
+                </motion.button>
+
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleNavClick('safety')}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left text-gray-600 hover:bg-gray-50"
+                >
+                  <Shield className="w-5 h-5" />
+                  <span className="font-medium">Safety Guidelines</span>
+                </motion.button>
               </nav>
             </motion.div>
           </>

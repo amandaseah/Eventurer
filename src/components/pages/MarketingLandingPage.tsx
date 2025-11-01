@@ -28,7 +28,6 @@ const TECH_ICONS: Record<string, string> = {
 
 interface MarketingLandingPageProps {
   onExplore?: () => void;
-  onDemo?: () => void;
 }
 
 const features = [
@@ -77,7 +76,7 @@ const moods = [
 
 const techStack = ['React', 'TypeScript', 'Tailwind CSS', 'Motion', 'Shadcn/ui'];
 
-export function MarketingLandingPage({ onExplore, onDemo }: MarketingLandingPageProps) {
+export function MarketingLandingPage({ onExplore }: MarketingLandingPageProps) {
   return (
     <div className="min-h-screen relative isolate bg-white">
       <AnimatedBackground />
@@ -88,9 +87,9 @@ export function MarketingLandingPage({ onExplore, onDemo }: MarketingLandingPage
           <HeroSection onExplore={onExplore} />
           <FeaturesSection />
           <TechSection />
-          <CTASection onExplore={onExplore} onDemo={onDemo} />
+          <CTASection onExplore={onExplore} />
         </main>
-        <Footer />
+        <Footer onNavigate={() => onExplore?.()} />
       </div>
     </div>
   );
@@ -319,7 +318,7 @@ function TechSection() {
   );
 }
 
-function CTASection({ onExplore, onDemo }: MarketingLandingPageProps) {
+function CTASection({ onExplore }: MarketingLandingPageProps) {
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
       <motion.div
@@ -340,7 +339,7 @@ function CTASection({ onExplore, onDemo }: MarketingLandingPageProps) {
             Stop scrolling through events that don't match your mood. Start here.
           </p>
 
-          <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="mt-8 sm:mt-10 flex items-center justify-center">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 onClick={() => onExplore?.()}
@@ -349,15 +348,6 @@ function CTASection({ onExplore, onDemo }: MarketingLandingPageProps) {
                 <Calendar className="h-5 w-5" />
                 Browse Events
                 <ArrowRight className="h-5 w-5" />
-              </Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                variant="outline"
-                onClick={() => onDemo?.()}
-                className="rounded-xl border-2 border-white bg-transparent px-8 sm:px-10 py-4 sm:py-6 text-base sm:text-lg font-semibold text-white hover:bg-white/10"
-              >
-                View Demo
               </Button>
             </motion.div>
           </div>

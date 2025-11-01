@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import Footer from '../shared/Footer';
-import { User, Trash2, Bell, Lock, Settings as SettingsIcon, KeyRound, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
+import { User, Trash2, Bell, Lock, Settings as SettingsIcon, KeyRound, LogOut, ChevronLeft, ChevronRight, HelpCircle, Shield } from 'lucide-react';
 import { BackButton } from '../shared/BackButton';
 import { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../../lib/firebase';
@@ -213,11 +213,12 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
   };
 
   const navItems = [
-    { id: 'account', label: 'Account Info', icon: User },
-    { id: 'password', label: 'Password', icon: KeyRound },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'privacy', label: 'Privacy', icon: Lock },
-    { id: 'preferences', label: 'Preferences', icon: SettingsIcon },
+    { id: 'account', label: 'Account Info', icon: User, type: 'scroll' as const },
+    { id: 'password', label: 'Password', icon: KeyRound, type: 'scroll' as const },
+    { id: 'notifications', label: 'Notifications', icon: Bell, type: 'scroll' as const },
+    { id: 'privacy', label: 'Privacy', icon: Lock, type: 'scroll' as const },
+    { id: 'preferences', label: 'Preferences', icon: SettingsIcon, type: 'scroll' as const },
+    { id: 'help', label: 'Help & Safety', icon: HelpCircle, type: 'scroll' as const },
   ];
 
   return (
@@ -563,11 +564,51 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               </div>
             </motion.section>
 
+            {/* Help & Safety Section */}
+            <motion.section
+              id="help"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md border border-blue-100"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <HelpCircle className="w-5 h-5 text-blue-600" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Help & Safety</h2>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-gray-700">
+                  Need help or want to learn about staying safe? Check out our resources.
+                </p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => onNavigate('faq')}
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 border border-blue-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 transition-all font-semibold"
+                  >
+                    <HelpCircle className="w-5 h-5 text-blue-600" />
+                    <span>FAQ</span>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => onNavigate('safety')}
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 border border-blue-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 transition-all font-semibold"
+                  >
+                    <Shield className="w-5 h-5 text-blue-600" />
+                    <span>Safety Guidelines</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.section>
+
             {/* Sign Out Section */}
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.7 }}
               className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md"
             >
               <div className="flex items-center gap-3 mb-6">

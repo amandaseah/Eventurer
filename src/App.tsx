@@ -9,6 +9,8 @@ import { EventInfoPage } from './components/pages/EventInfoPage';
 import { EventForumPage } from './components/pages/EventForumPage';
 import { ProfilePage } from './components/pages/ProfilePage';
 import { SettingsPage } from './components/pages/SettingsPage';
+import { FAQPage } from './components/pages/FAQPage';
+import { SafetyGuidelinesPage } from './components/pages/SafetyGuidelinesPage';
 import { CountdownWidget } from './components/CountdownWidget';
 import { Toaster } from './components/ui/sonner';
 import { loadGoogleMapsScript } from './lib/loadGoogleMaps';
@@ -41,7 +43,9 @@ type Page =
   | 'event-info'
   | 'event-forum'
   | 'profile'
-  | 'settings';
+  | 'settings'
+  | 'faq'
+  | 'safety';
 
 interface PageData {
   mood?: string;
@@ -180,6 +184,10 @@ function ShellApp() {
         return '/app/profile'
       case 'settings':
         return '/app/settings'
+      case 'faq':
+        return '/app/faq'
+      case 'safety':
+        return '/app/safety'
       case 'mood-results':
         if (data?.mood) {
           return `/app/mood-results/${encodeURIComponent(data.mood)}`
@@ -331,6 +339,24 @@ function ShellApp() {
           path="settings"
           element={
             <SettingsPage
+              onNavigate={handleNavigate}
+              onGoBack={() => navigate(-1)}
+            />
+          }
+        />
+        <Route
+          path="faq"
+          element={
+            <FAQPage
+              onNavigate={handleNavigate}
+              onGoBack={() => navigate(-1)}
+            />
+          }
+        />
+        <Route
+          path="safety"
+          element={
+            <SafetyGuidelinesPage
               onNavigate={handleNavigate}
               onGoBack={() => navigate(-1)}
             />
