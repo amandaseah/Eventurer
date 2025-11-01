@@ -158,8 +158,24 @@ export function EventCard({
           </div>
         )}
 
-        {/* Bookmark button */}
-        <div className="absolute top-3 right-3">
+        {/* Top badges row */}
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+          {/* Closing Soon badge - left side */}
+          {isClosingSoon() && !event.isPast && (
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-red-500/95 backdrop-blur-md shadow-lg"
+            >
+              <Clock className="w-3 h-3 text-white" />
+              <span className="text-xs font-bold text-white">Closing Soon</span>
+            </motion.div>
+          )}
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Bookmark button - right side */}
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -197,12 +213,6 @@ export function EventCard({
             <MapPin className="w-4 h-4 text-pink-500" />
             <span className="line-clamp-1">{event.location}</span>
           </div>
-          {isClosingSoon() && !event.isPast && (
-            <div className={`flex items-center gap-2 text-sm ${centerText ? 'justify-center' : ''}`}>
-              <Clock className="w-4 h-4 text-orange-500" />
-              <span className="font-medium text-orange-600">Closing soon!</span>
-            </div>
-          )}
         </div>
 
         {/* Show user comment for past events or RSVP button for upcoming events */}

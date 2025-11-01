@@ -10,7 +10,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Bookmark, CheckCircle, ArrowLeft, History } from 'lucide-react';
+import { Bookmark, CheckCircle, History } from 'lucide-react';
+import { BackButton } from '../shared/BackButton';
 
 interface ProfilePageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -131,16 +132,7 @@ export function ProfilePage({
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 py-10 sm:py-16 max-w-5xl">
         {/* Back Button - Sticky */}
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          whileHover={{ x: -4 }}
-          onClick={onGoBack}
-          className="sticky top-[84px] sm:top-[96px] z-40 flex items-center gap-1.5 sm:gap-2 text-pink-500 hover:text-pink-600 bg-white/90 backdrop-blur-sm rounded-full shadow-md w-fit px-2.5 sm:px-4 py-2 text-xs sm:text-base"
-        >
-          <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          <span>Back</span>
-        </motion.button>
+        <BackButton onClick={onGoBack} />
 
         <div className="grid gap-6 sm:gap-8">
           {/* Profile Header */}

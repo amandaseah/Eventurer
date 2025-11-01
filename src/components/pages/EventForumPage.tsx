@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Header } from '../Header';
-import { MessageSquare, ArrowLeft, Wifi, WifiOff, Loader2 } from 'lucide-react';
+import { MessageSquare, Wifi, WifiOff, Loader2 } from 'lucide-react';
+import { BackButton } from '../shared/BackButton';
 import NewPostForm from "../features/forum/NewPostForm";
 import PostList from "../features/forum/PostList";
 import { useEventForum } from "../../hooks/useEventForum";
@@ -42,15 +43,10 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
       <Header onNavigate={onNavigate} />
 
       <div className="container mx-auto px-6 py-12 max-w-4xl">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <button
-            onClick={onGoBack}
-            className="sticky top-[84px] sm:top-[96px] z-40 flex items-center gap-2 text-pink-500 hover:text-pink-600 mb-4 transition-colors bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md w-fit"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Event</span>
-          </button>
+        {/* Back Button - Sticky */}
+        <BackButton onClick={onGoBack} label="Back to Event" />
 
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-2">{event.title}</h1>

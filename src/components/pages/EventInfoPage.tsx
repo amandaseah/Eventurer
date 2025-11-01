@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../Header";
 import Image from "../common/Image";
-import { ArrowLeft, MessageSquare } from "lucide-react";
+import { MessageSquare } from "lucide-react";
+import { BackButton } from "../shared/BackButton";
 import HowToGetThere from "../features/map/HowToGetThere";
 import TopForumPreview from "../features/forum/TopForumPreview";
 import EventActions from "../features/eventInfo/EventActions";
@@ -132,14 +133,7 @@ export function EventInfoPage({
 
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl event-info-page">
         {/* Back Button - Sticky */}
-        <motion.button
-          onClick={onGoBack}
-          whileHover={{ x: -4 }}
-        className="sticky top-[84px] sm:top-[96px] z-40 mb-4 flex items-center gap-2 text-pink-500 hover:text-pink-600 bg-white/90 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-md text-sm sm:text-base w-fit"
-      >
-        <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        <span>Back</span>
-      </motion.button>
+        <BackButton onClick={onGoBack} />
 
         {/* Event Banner */}
         <motion.div

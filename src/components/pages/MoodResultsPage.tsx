@@ -4,7 +4,8 @@ import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
 // import { moods } from '../../lib/mockData';
 import { categorizeEvent } from '../../lib/eventCategoriser';
-import { SlidersHorizontal, ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
+import { SlidersHorizontal, Calendar as CalendarIcon } from 'lucide-react';
+import { BackButton } from '../shared/BackButton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Calendar } from '../ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
@@ -108,19 +109,9 @@ export function MoodResultsPage({
     <div className="min-h-screen bg-gray-50">
       <Header currentPage="mood-results" onNavigate={onNavigate} />
 
-      {/* Back Button - Sticky */}
-      <motion.button
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        whileHover={{ x: -4 }}
-        onClick={() => onNavigate('landing')}
-        className="sticky top-[84px] sm:top-[96px] z-40 flex items-center gap-2 text-pink-500 hover:text-pink-600 bg-white/90 backdrop-blur-sm rounded-full shadow-md w-fit px-4 py-2"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Back to Quiz</span>
-      </motion.button>
-
       <div className="container mx-auto px-6 py-8 max-w-7xl">
+        {/* Back Button - Sticky */}
+        <BackButton onClick={() => onNavigate('landing')} label="Back to Quiz" />
         {/* Mood Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
