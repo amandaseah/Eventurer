@@ -1,6 +1,9 @@
-import { Home, Search, Calendar, User, Menu, X } from 'lucide-react';
+import { Home, Search, Calendar, User, Menu, X, Settings, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { auth } from '../lib/firebase';
+import { signOut } from 'firebase/auth';
 
 interface HeaderProps {
   currentPage?: string;
@@ -67,14 +70,42 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
 
             {/* Mobile & Desktop Right Side */}
             <div className="flex items-center gap-3">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleNavClick('profile')}
-                className="bg-pink-400 p-2 rounded-lg hover:bg-pink-500 hover:shadow-md transition-all"
-              >
-                <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </motion.button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-pink-400 p-2 rounded-lg hover:bg-pink-500 hover:shadow-md transition-all"
+                  >
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </motion.button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => handleNavClick('profile')}>
+                    <User className="w-4 h-4" />
+                    <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleNavClick('settings')}>
+                    <Settings className="w-4 h-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={async () => {
+                      try {
+                        await signOut(auth);
+                        handleNavClick('login');
+                      } catch (e) {
+                        console.warn('Sign out failed', e);
+                      }
+                    }}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               {/* Mobile Menu Button */}
               <motion.button

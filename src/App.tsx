@@ -8,6 +8,7 @@ import { EventExplorePage } from './components/pages/EventExplorePage';
 import { EventInfoPage } from './components/pages/EventInfoPage';
 import { EventForumPage } from './components/pages/EventForumPage';
 import { ProfilePage } from './components/pages/ProfilePage';
+import { SettingsPage } from './components/pages/SettingsPage';
 import { CountdownWidget } from './components/CountdownWidget';
 import { Toaster } from './components/ui/sonner';
 import { loadGoogleMapsScript } from './lib/loadGoogleMaps';
@@ -36,7 +37,8 @@ type Page =
   | 'explore'
   | 'event-info'
   | 'event-forum'
-  | 'profile';
+  | 'profile'
+  | 'settings';
 
 interface PageData {
   mood?: string;
@@ -134,6 +136,8 @@ function ShellApp() {
         return '/app/explore'
       case 'profile':
         return '/app/profile'
+      case 'settings':
+        return '/app/settings'
       case 'mood-results':
         if (data?.mood) {
           return `/app/mood-results/${encodeURIComponent(data.mood)}`
@@ -276,6 +280,15 @@ function ShellApp() {
               rsvpedEventIds={rsvpedEventIds}
               onBookmarkChange={handleBookmarkChange}
               onRSVPChange={handleRSVPChange}
+            />
+          }
+        />
+        <Route
+          path="settings"
+          element={
+            <SettingsPage
+              onNavigate={handleNavigate}
+              onGoBack={() => navigate(-1)}
             />
           }
         />

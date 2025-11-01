@@ -1,9 +1,8 @@
 import ProfileHeader from "../features/profile/ProfileHeader";
-import AccountPanel from "../features/profile/AccountPanel";
+import ProfileStats from "../features/profile/ProfileStats";
 import { auth, db } from '../../lib/firebase';
-import { updateProfile, onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import SettingsPanel from "../features/profile/SettingsPanel";
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import EventsGrid from "../features/profile/EventsGrid";
 import Footer from "../shared/Footer";
 
@@ -12,7 +11,7 @@ import { motion } from 'motion/react';
 import { Header } from '../Header';
 // import { events } from '../../lib/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { User, Bookmark, CheckCircle, Clock, Settings, ArrowLeft } from 'lucide-react';
+import { Bookmark, CheckCircle, Clock, ArrowLeft } from 'lucide-react';
 
 interface ProfilePageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -25,18 +24,17 @@ interface ProfilePageProps {
   currentUser?: any;
 }
 
-export function ProfilePage({ 
-  onNavigate, 
+export function ProfilePage({
+  onNavigate,
   onGoBack,
   events,
-  bookmarkedEventIds, 
-  rsvpedEventIds, 
+  bookmarkedEventIds,
+  rsvpedEventIds,
   onBookmarkChange,
   onRSVPChange,
   currentUser,
 }: ProfilePageProps & { events: any[] }) {
   const [activeTab, setActiveTab] = useState('bookmarked');
-  const [isEditingAccount, setIsEditingAccount] = useState(false);
 
   // Local user display state (prefers ints from auth/db but editable locally)
   const [userName, setUserName] = useState<string>(currentUser?.displayName || `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() || 'Alex Chen');
@@ -58,48 +56,6 @@ export function ProfilePage({
   const rsvpedEvents = events.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
   const pastEvents = events.filter(e => e.isPast && rsvpedEventIds.includes(e.id));
 
-  const handleSaveProfile = () => {
-    setIsEditingAccount(false);
-    // If we have an authenticated user, persist changes to Firebase
-    // Otherwise this remains a local-only change
-  };
-
-  const handleSaveProfileWithData = async (changes?: { firstName?: string; lastName?: string; email?: string }) => {
-    setIsEditingAccount(false);
-    // Update local preview
-    if (changes?.firstName || changes?.lastName) {
-      setUserName(`${changes?.firstName || ''} ${changes?.lastName || ''}`.trim());
-    }
-    if (changes?.email) setUserEmail(changes.email);
-
-    // Persist to Firebase if logged in
-    try {
-      const u = auth.currentUser;
-      if (!u) return;
-
-      const displayName = `${changes?.firstName || u.displayName || ''} ${changes?.lastName || ''}`.trim() || u.displayName || undefined;
-      if (displayName) await updateProfile(u, { displayName });
-
-      await setDoc(doc(db, 'users', u.uid), {
-        firstName: changes?.firstName ?? null,
-        lastName: changes?.lastName ?? null,
-        displayName: displayName ?? null,
-        email: changes?.email ?? u.email ?? null,
-      }, { merge: true });
-    } catch (err) {
-      console.warn('Failed to persist profile changes', err);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-    } catch (e) {
-      console.warn('Sign out failed', e);
-    }
-    // navigate to login page
-    onNavigate('login');
-  };
 
   // Listen for auth state changes so the page updates after signup/login
   useEffect(() => {
@@ -178,12 +134,18 @@ export function ProfilePage({
           name={user.name}
           email={user.email}
           memberSince={user.memberSince}
-          onSignOut={handleSignOut}
+        />
+
+        {/* Profile Stats */}
+        <ProfileStats
+          bookmarkedCount={bookmarkedEvents.length}
+          upcomingCount={rsvpedEvents.length}
+          attendedCount={pastEvents.length}
         />
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-5 w-full mb-6 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto gap-1 sm:!gap-1">
+            <TabsList className="grid grid-cols-3 w-full mb-6 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto gap-1 sm:!gap-1">
               <TabsTrigger
                 value="bookmarked"
                 className="!rounded-lg data-[state=active]:bg-pink-200 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
@@ -207,22 +169,6 @@ export function ProfilePage({
               >
                 <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                 <span className="truncate">Past</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="account"
-                className="!rounded-lg data-[state=active]:bg-blue-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
-                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
-              >
-                <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                <span className="truncate">Account</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="settings"
-                className="!rounded-lg data-[state=active]:bg-orange-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
-                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
-              >
-                <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                <span className="truncate">Settings</span>
               </TabsTrigger>
             </TabsList>
 
@@ -309,37 +255,6 @@ export function ProfilePage({
                 </div>
               )}
             </motion.div>
-          </TabsContent>
-
-          {/* Account Information */}
-          <TabsContent value="account">
-            <AccountPanel
-              isEditing={isEditingAccount}
-              name={userName}
-              email={userEmail}
-              memberSince={user.memberSince}
-              onChangeName={setUserName}
-              onChangeEmail={setUserEmail}
-              onSave={handleSaveProfileWithData}
-              onCancel={() => setIsEditingAccount(false)}
-            />
-            {!isEditingAccount && (
-              <div className="mt-4">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setIsEditingAccount(true)}
-                  className="px-6 py-3 bg-pink-200 text-pink-600 rounded-2xl hover:bg-pink-300 transition-all"
-                >
-                  Edit Profile
-                </motion.button>
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Settings */}
-          <TabsContent value="settings">
-            <SettingsPanel />
           </TabsContent>
         </Tabs>
       </div>
