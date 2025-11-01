@@ -14,6 +14,9 @@ import { Toaster } from './components/ui/sonner';
 import { loadGoogleMapsScript } from './lib/loadGoogleMaps';
 import { fetchEventbriteEvents, fetchEventbriteEventsForMe, sanityCheckMe } from './lib/eventbriteService';
 import { categorizeEvent } from './lib/eventCategoriser';
+import { auth, db } from './lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom'
 import ThreeLanding from './components/features/landing3D/ThreeLanding'
@@ -50,8 +53,47 @@ type NavigateData = PageData & { postId?: number };
 function ShellApp() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([1, 2, 3, 4]);
-  const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([3, 4, 7]);
+  const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([]);
+  const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([]);
+
+  // Load user's bookmarks and RSVPs from Firebase
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setBookmarkedEventIds(userData.bookmarkedEventIds || []);
+            setRsvpedEventIds(userData.rsvpedEventIds || []);
+          }
+        } catch (err) {
+          console.warn('Failed to load user event data', err);
+        }
+      } else {
+        // User signed out, clear data
+        setBookmarkedEventIds([]);
+        setRsvpedEventIds([]);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Save user event data to Firebase
+  const saveUserEventData = async (bookmarks: number[], rsvps: number[]) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        bookmarkedEventIds: bookmarks,
+        rsvpedEventIds: rsvps,
+      }, { merge: true });
+    } catch (err) {
+      console.error('Failed to save user event data', err);
+    }
+  };
 
   useEffect(() => {
     // Preload Google Maps so the first visit to event details feels instant.
@@ -171,20 +213,22 @@ function ShellApp() {
     [mapPageToPath, navigate],
   )
 
-  const handleBookmarkChange = (eventId: number, isBookmarked: boolean) => {
-    if (isBookmarked) {
-      setBookmarkedEventIds([...bookmarkedEventIds, eventId]);
-    } else {
-      setBookmarkedEventIds(bookmarkedEventIds.filter(id => id !== eventId));
-    }
+  const handleBookmarkChange = async (eventId: number, isBookmarked: boolean) => {
+    const newBookmarks = isBookmarked
+      ? [...bookmarkedEventIds, eventId]
+      : bookmarkedEventIds.filter(id => id !== eventId);
+    
+    setBookmarkedEventIds(newBookmarks);
+    await saveUserEventData(newBookmarks, rsvpedEventIds);
   };
 
-  const handleRSVPChange = (eventId: number, isRSVPed: boolean) => {
-    if (isRSVPed) {
-      setRsvpedEventIds([...rsvpedEventIds, eventId]);
-    } else {
-      setRsvpedEventIds(rsvpedEventIds.filter(id => id !== eventId));
-    }
+  const handleRSVPChange = async (eventId: number, isRSVPed: boolean) => {
+    const newRSVPs = isRSVPed
+      ? [...rsvpedEventIds, eventId]
+      : rsvpedEventIds.filter(id => id !== eventId);
+    
+    setRsvpedEventIds(newRSVPs);
+    await saveUserEventData(bookmarkedEventIds, newRSVPs);
   };
 
   const isAuthRoute = /\/app\/(login|signup)\/?$/i.test(location.pathname)

@@ -1,9 +1,9 @@
 import { Home, Search, Calendar, User, Menu, X, Settings, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { auth } from '../lib/firebase';
-import { signOut } from 'firebase/auth';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
 
 interface HeaderProps {
   currentPage?: string;
@@ -75,7 +75,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="bg-pink-400 p-2 rounded-lg hover:bg-pink-500 hover:shadow-md transition-all"
+                    className="relative bg-pink-400 p-2 rounded-lg hover:bg-pink-500 hover:shadow-md transition-all overflow-hidden"
                   >
                     <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </motion.button>

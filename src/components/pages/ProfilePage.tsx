@@ -1,7 +1,7 @@
 import ProfileHeader from "../features/profile/ProfileHeader";
 import ProfileStats from "../features/profile/ProfileStats";
 import { auth, db } from '../../lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import EventsGrid from "../features/profile/EventsGrid";
 import Footer from "../shared/Footer";
@@ -9,9 +9,8 @@ import Footer from "../shared/Footer";
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
-// import { events } from '../../lib/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Bookmark, CheckCircle, Clock, ArrowLeft } from 'lucide-react';
+import { Bookmark, CheckCircle, ArrowLeft } from 'lucide-react';
 
 interface ProfilePageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -54,7 +53,16 @@ export function ProfilePage({
   // Filter events based on bookmarked and RSVP'd IDs
   const bookmarkedEvents = events.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
   const rsvpedEvents = events.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
-  const pastEvents = events.filter(e => e.isPast && rsvpedEventIds.includes(e.id));
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.warn('Sign out failed', e);
+    }
+    // navigate to login page
+    onNavigate('login');
+  };
 
 
   // Listen for auth state changes so the page updates after signup/login
@@ -82,6 +90,14 @@ export function ProfilePage({
     });
     return () => unsub();
   }, []);
+
+  // Sync when parent-provided currentUser prop changes (e.g., after login)
+  useEffect(() => {
+    if (!currentUser) return;
+    if (currentUser.displayName) setUserName(currentUser.displayName);
+    else if (currentUser.firstName || currentUser.lastName) setUserName(`${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim());
+    if (currentUser.email) setUserEmail(currentUser.email);
+  }, [currentUser]);
 
   // Sync when parent-provided currentUser prop changes (e.g., after login)
   useEffect(() => {
@@ -134,21 +150,21 @@ export function ProfilePage({
           name={user.name}
           email={user.email}
           memberSince={user.memberSince}
+          onSignOut={handleSignOut}
         />
 
         {/* Profile Stats */}
         <ProfileStats
           bookmarkedCount={bookmarkedEvents.length}
           upcomingCount={rsvpedEvents.length}
-          attendedCount={pastEvents.length}
         />
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-3 w-full mb-6 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto gap-1 sm:!gap-1">
+            <TabsList className="grid grid-cols-2 w-full mb-6 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto gap-1 sm:!gap-1">
               <TabsTrigger
                 value="bookmarked"
-                className="!rounded-lg data-[state=active]:bg-pink-200 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
+                className="!rounded-lg data-[state=active]:bg-purple-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
                 style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
               >
                 <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -161,14 +177,6 @@ export function ProfilePage({
               >
                 <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                 <span className="truncate">Upcoming</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="past"
-                className="!rounded-lg data-[state=active]:bg-gray-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
-                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
-              >
-                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                <span className="truncate">Past</span>
               </TabsTrigger>
             </TabsList>
 
@@ -227,32 +235,6 @@ export function ProfilePage({
                     <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
                     <p className="text-sm sm:text-xl text-gray-500">No upcoming events</p>
                   </div>
-                )}
-              </motion.div>
-            </TabsContent>
-
-          {/* Past Events */}
-          <TabsContent value="past">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="mb-4 sm:mb-6">
-                <h2 className="text-base sm:text-2xl mb-1 sm:mb-2">Past Events</h2>
-                <p className="text-xs sm:text-base text-gray-600">Events you've attended</p>
-              </div>
-
-              {pastEvents.length > 0 ? (
-                <EventsGrid
-                  events={pastEvents}
-                  onEventClick={(id) => onNavigate("event-info", { eventId: id })}
-                  bookmarkedEventIds={bookmarkedEventIds}
-                  rsvpedEventIds={rsvpedEventIds}
-                  onBookmarkChange={onBookmarkChange}
-                  onRSVPChange={onRSVPChange}
-                />
-              ) : (
-                <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center">
-                  <Clock className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
-                  <p className="text-sm sm:text-xl text-gray-500">No past events</p>
-                </div>
               )}
             </motion.div>
           </TabsContent>

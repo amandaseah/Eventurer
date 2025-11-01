@@ -107,7 +107,7 @@ export function CountdownWidget({
     }, []);
   };
 
-  // Show events from bookmarked or rsvped lists, fallback to general events if none exist
+  // Show events from bookmarked or rsvped lists only
   // For events that are in both lists, we'll track both sources
   const visibleEvents = useMemo(() => {
     const eventMap = new Map<number, CountdownEvent & { sources: EventSource[] }>();
@@ -129,12 +129,8 @@ export function CountdownWidget({
       }
     });
 
-    // If no bookmarked or RSVP'd events, use fallback events
-    if (eventMap.size === 0) {
-      normalizeEvents(fallbackEvents, 'general').forEach(event => {
-        eventMap.set(event.id, { ...event, sources: ['general'] });
-      });
-    }
+    // Only show events if there are bookmarked or RSVP'd events
+    // Do not show fallback events if no user-specific events exist
 
     // Convert to array and sort by date
     const combined = Array.from(eventMap.values()).sort(
@@ -204,7 +200,7 @@ export function CountdownWidget({
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-800 line-clamp-1">{event.title}</p>
+                          <p className="text-sm font-medium text-gray-800 line-clamp-2 leading-tight">{event.title}</p>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             {event.sources.includes('bookmarked') && (
                               <span

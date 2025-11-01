@@ -1,99 +1,155 @@
 import { motion } from "motion/react";
+import { useState, useEffect } from "react";
+import { auth, db } from "../../../lib/firebase";
+import { updateProfile, onAuthStateChanged } from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { toast } from "sonner";
+import { User, Trash2 } from "lucide-react";
 
 export default function SettingsPanel() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+
+  // Load user data
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+
+      setEmail(user.email || '');
+
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setFirstName(data.firstName || '');
+          setLastName(data.lastName || '');
+        }
+      } catch (err) {
+        console.warn('Failed to load user data', err);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleSaveAccountSettings = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        toast.error('Please sign in to save account settings');
+        return;
+      }
+
+      const displayName = `${firstName} ${lastName}`.trim();
+      if (displayName) {
+        await updateProfile(user, { displayName });
+      }
+
+      await setDoc(doc(db, 'users', user.uid), {
+        firstName,
+        lastName,
+        displayName,
+        email: user.email,
+      }, { merge: true });
+
+      toast.success('Account settings saved successfully');
+    } catch (err: any) {
+      console.error('Failed to save account settings', err);
+      toast.error('Failed to save account settings');
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      toast.error('Account deletion is not yet implemented');
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-md"
+      className="space-y-6"
     >
-      <style>{`
-        .settings-checkbox {
-          width: 1rem !important;
-          height: 1rem !important;
-          min-width: 1rem !important;
-          min-height: 1rem !important;
-          max-width: 1rem !important;
-          max-height: 1rem !important;
-          flex-shrink: 0 !important;
-        }
-        @media (min-width: 640px) {
-          .settings-checkbox {
-            width: 1.25rem !important;
-            height: 1.25rem !important;
-            min-width: 1.25rem !important;
-            min-height: 1.25rem !important;
-            max-width: 1.25rem !important;
-            max-height: 1.25rem !important;
-          }
-        }
-      `}</style>
-      <h2 className="text-lg sm:text-2xl font-semibold mb-4 sm:mb-6">Settings & Preferences</h2>
-      <div className="space-y-4 sm:space-y-6">
-        {/* Email Notifications */}
-        <div className="p-3 sm:p-4 bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100">
-          <h3 className="text-base sm:text-lg font-medium mb-1 sm:mb-2">Email Notifications</h3>
-          <p className="text-xs sm:text-sm text-gray-600 mb-3">Receive updates about events and recommendations</p>
-          <label className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors">
-            <input
-              type="checkbox"
-              defaultChecked
-              className="settings-checkbox rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 focus:ring-offset-0 cursor-pointer"
-            />
-            <span className="text-sm sm:text-base">Event reminders</span>
-          </label>
+      {/* Account Information */}
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-md">
+        <div className="flex items-center gap-3 mb-6">
+          <User className="w-5 h-5 text-pink-500" />
+          <h2 className="text-lg sm:text-2xl font-semibold">Account Information</h2>
         </div>
 
-        {/* Mood Preferences */}
-        <div className="p-3 sm:p-4 bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100">
-          <h3 className="text-base sm:text-lg font-medium mb-1 sm:mb-2">Mood Preferences</h3>
-          <p className="text-xs sm:text-sm text-gray-600 mb-3">Your favorite event types</p>
-          <div className="space-y-1 sm:space-y-2">
-            <label className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                First Name
+              </label>
               <input
-                type="checkbox"
-                defaultChecked
-                className="settings-checkbox rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 focus:ring-offset-0 cursor-pointer"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="John"
               />
-              <span className="text-sm sm:text-base">Chill & Relax 🌿</span>
-            </label>
-            <label className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors">
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Last Name
+              </label>
               <input
-                type="checkbox"
-                className="settings-checkbox rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 focus:ring-offset-0 cursor-pointer"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="Doe"
               />
-              <span className="text-sm sm:text-base">Active ⚡</span>
-            </label>
-            <label className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors">
-              <input
-                type="checkbox"
-                defaultChecked
-                className="settings-checkbox rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 focus:ring-offset-0 cursor-pointer"
-              />
-              <span className="text-sm sm:text-base">Social 🎉</span>
-            </label>
-            <label className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors">
-              <input
-                type="checkbox"
-                className="settings-checkbox rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 focus:ring-offset-0 cursor-pointer"
-              />
-              <span className="text-sm sm:text-base">Educational 📚</span>
-            </label>
+            </div>
           </div>
-        </div>
 
-        {/* Privacy */}
-        <div className="p-3 sm:p-4 bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100">
-          <h3 className="text-base sm:text-lg font-medium mb-1 sm:mb-2">Privacy</h3>
-          <p className="text-xs sm:text-sm text-gray-600 mb-3">Control your data and visibility</p>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={email}
+              disabled
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed"
+            />
+            <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+          </div>
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-4 sm:px-6 py-2 sm:py-2.5 bg-pink-200 text-pink-600 rounded-xl sm:rounded-2xl hover:bg-pink-300 transition-all text-sm sm:text-base font-medium"
+            onClick={handleSaveAccountSettings}
+            className="px-6 py-3 bg-pink-500 text-white rounded-2xl hover:bg-pink-600 transition-all font-semibold"
           >
-            Manage Privacy Settings
+            Save Changes
           </motion.button>
         </div>
+      </div>
+
+      {/* Delete Account */}
+      <div className="bg-red-50 border-2 border-red-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8">
+        <div className="flex items-center gap-3 mb-4">
+          <Trash2 className="w-5 h-5 text-red-500" />
+          <h2 className="text-lg sm:text-2xl font-semibold text-red-700">Delete Account</h2>
+        </div>
+        
+        <p className="text-gray-700 mb-4">
+          Once you delete your account, there is no going back. Please be certain.
+        </p>
+        
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleDeleteAccount}
+          className="px-6 py-3 bg-red-500 text-white rounded-2xl hover:bg-red-600 transition-all font-semibold"
+        >
+          Delete Account
+        </motion.button>
       </div>
     </motion.div>
   );

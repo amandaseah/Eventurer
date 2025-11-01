@@ -1,16 +1,14 @@
 import { motion } from 'motion/react';
-import { Bookmark, Calendar, CheckCircle } from 'lucide-react';
+import { Bookmark, CheckCircle } from 'lucide-react';
 
 interface ProfileStatsProps {
   bookmarkedCount: number;
   upcomingCount: number;
-  attendedCount: number;
 }
 
 export default function ProfileStats({
   bookmarkedCount,
   upcomingCount,
-  attendedCount
 }: ProfileStatsProps) {
   const stats = [
     {
@@ -33,21 +31,10 @@ export default function ProfileStats({
       iconColor: 'text-green-500',
       textColor: 'text-green-600',
     },
-    {
-      label: 'Attended',
-      value: attendedCount,
-      icon: Calendar,
-      color: 'gray',
-      bgColor: 'bg-gray-50',
-      borderColor: 'border-gray-200',
-      iconColor: 'text-gray-500',
-      textColor: 'text-gray-600',
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 sm:mb-8">
-      {stats.map((stat, index) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 sm:mb-8">{stats.map((stat, index) => (
         <motion.div
           key={stat.label}
           initial={{ opacity: 0, y: 20 }}
