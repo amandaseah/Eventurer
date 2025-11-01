@@ -80,6 +80,6 @@
             "sort-package-json": "^3.4.0",
             "tailwindcss": "^4.1.16",
             "typescript": "^5.9.3",
-            "vite": "6.3.5"
+            "vite": "^6.4.1"
       }
 }

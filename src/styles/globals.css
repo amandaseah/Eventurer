@@ -51,6 +51,65 @@
   --pastel-yellow: #fff4c3;
 }
 
+/* Custom layout utilities for better screen utilization */
+@layer utilities {
+  .dynamic-container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .dynamic-container {
+      max-width: 100%;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .dynamic-container {
+      max-width: 95%;
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .dynamic-container {
+      max-width: 90%;
+      padding-left: 4rem;
+      padding-right: 4rem;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .dynamic-container {
+      max-width: 85%;
+      padding-left: 5rem;
+      padding-right: 5rem;
+    }
+  }
+  
+  @media (min-width: 1536px) {
+    .dynamic-container {
+      max-width: 80%;
+      padding-left: 6rem;
+      padding-right: 6rem;
+    }
+  }
+  
+  @media (min-width: 1920px) {
+    .dynamic-container {
+      max-width: 75%;
+      padding-left: 8rem;
+      padding-right: 8rem;
+    }
+  }
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

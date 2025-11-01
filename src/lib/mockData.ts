@@ -1,5 +1,5 @@
 export const moods = [
-  { id: 'chill', name: 'Chill & Relax', emoji: '🌿', color: '#c3ffd4' },
+  { id: 'chill', name: 'Chill & Relax', emoji: '🌿', color: '#2d5016' },
   { id: 'active', name: 'Active', emoji: '⚡', color: '#ffd4c3' },
   { id: 'social', name: 'Social', emoji: '🎉', color: '#ffc3e4' },
   { id: 'educational', name: 'Educational', emoji: '📚', color: '#c3e4ff' },

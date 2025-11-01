@@ -1,48 +1,172 @@
-// src/features/forum/TopForumPreview.tsx
-import { motion } from "motion/react";
+import { ThumbsUp, MessageCircle } from "lucide-react";
 import { Button } from "../../ui/button";
-import { ThumbsUp } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { motion } from "motion/react";
 
-type Post = { id: number; username: string; timestamp: string; comment: string; upvotes: number };
+interface Reply {
+  id: string;
+  text: string;
+  createdAt: number;
+  username: string;
+  upvotes: number;
+  upvotedBy: string[];
+  replies: Reply[];
+}
+
+interface Post {
+  id: string;
+  text: string;
+  createdAt: number;
+  username: string;
+  upvotes: number;
+  upvotedBy?: string[];
+  replies?: Reply[];
+  image?: string;
+}
+
+interface TopForumPreviewProps {
+  posts: Post[];
+  onViewAll: () => void;
+  onPostClick?: (postId: string) => void;
+  upvotePost?: (postId: string) => void;
+  username?: string;
+}
+
+// Helper function to count all nested replies
+const countAllReplies = (replies: Reply[]): number => {
+  return replies.reduce((total, reply) => {
+    return total + 1 + countAllReplies(reply.replies || []);
+  }, 0);
+};
 
 export default function TopForumPreview({
   posts,
   onViewAll,
-}: {
-  posts: Post[];
-  onViewAll: () => void;
-}) {
-  if (!posts?.length) return null;
+  onPostClick,
+  upvotePost,
+  username,
+}: TopForumPreviewProps) {
+  if (!posts || posts.length === 0) {
+    return (
+      <div className="mt-12 mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold">Top Forum Posts</h2>
+          <Button variant="outline" onClick={onViewAll}>
+            View All
+          </Button>
+        </div>
+        <p className="text-gray-500 italic">
+          No posts yet — be the first to share something!
+        </p>
+      </div>
+    );
+  }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 }}
-      className="bg-white rounded-3xl p-8 shadow-md mb-8"
+      className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 mt-12 mb-8"
     >
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl">Top Forum Posts</h2>
-        <Button variant="outline" onClick={onViewAll} className="rounded-full">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold text-gray-900">
+          Top Forum Posts
+        </h2>
+        <Button
+          variant="outline"
+          className="text-pink-500 border-pink-300 hover:bg-pink-50"
+          onClick={onViewAll}
+        >
           View All
         </Button>
       </div>
 
-      <div className="space-y-4">
-        {/* ⬇ paste the .map(post => ...) you cut, but remove motion wrappers if duplicated */}
-        {posts.slice(0, 3).map((post) => (
-          <motion.div key={post.id} whileHover={{ x: 4 }} className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-            <div className="flex items-start justify-between mb-2">
-              <p className="font-medium text-sm">{post.username}</p>
-              <span className="text-xs text-gray-500">{post.timestamp}</span>
-            </div>
-            <p className="text-gray-700 mb-3">{post.comment}</p>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <ThumbsUp className="w-4 h-4" />
-              <span>{post.upvotes} upvotes</span>
-            </div>
-          </motion.div>
-        ))}
+      {/* Posts */}
+      <div className="space-y-5">
+        {posts.map((post, index) => {
+          const hasUpvoted = post.upvotedBy?.includes(username || "") || false;
+          const replyCount = countAllReplies(post.replies || []);
+
+          return (
+            <motion.div
+              key={post.id}
+              whileHover={{
+                scale: 1.02,
+                backgroundColor: "rgba(243, 232, 255, 0.6)",
+                boxShadow: "0px 8px 20px rgba(168, 85, 247, 0.15)",
+              }}
+              whileTap={{ scale: 0.97 }}
+              transition={{
+                type: "spring",
+                stiffness: 250,
+                damping: 20,
+              }}
+              onClick={() => onPostClick?.(post.id)}
+              className={`group relative cursor-pointer p-5 rounded-2xl transition-all ${
+                index !== 0 ? "border-t border-gray-100 pt-6" : ""
+              }`}
+            >
+              {/* Top row: Username + Timestamp */}
+              <div className="flex justify-between items-center mb-2">
+                <p className="text-sm font-semibold text-pink-600">
+                  @{post.username}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {formatDistanceToNow(new Date(post.createdAt), {
+                    addSuffix: true,
+                  })}
+                </p>
+              </div>
+
+              {/* Post content */}
+              <p className="text-gray-800 leading-relaxed mb-3 line-clamp-3">
+                {post.text}
+              </p>
+
+              {/* Display image if present */}
+              {post.image && (
+                <div className="mb-3 flex justify-center">
+                  <img 
+                    src={post.image} 
+                    alt="Post attachment" 
+                    className="rounded-xl h-96 w-96 object-cover border border-gray-200 shadow-sm"
+                  />
+                </div>
+              )}
+
+              {/* Upvotes and Reply Count */}
+              <div className="flex items-center gap-4">
+                {upvotePost && username && (
+                  <button
+                    className={`flex items-center gap-2 text-sm ${
+                      hasUpvoted ? "text-pink-600" : "text-gray-500 hover:text-pink-500"
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent opening the post
+                      upvotePost(post.id);
+                    }}
+                  >
+                    <ThumbsUp className="w-4 h-4" />
+                    <span>{post.upvotes}</span>
+                  </button>
+                )}
+                
+                {/* Reply count */}
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <MessageCircle className="w-4 h-4" />
+                  <span>{replyCount}</span>
+                </div>
+              </div>
+
+              {/* Hover glow border */}
+              <motion.div
+                className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-pink-300"
+                transition={{ duration: 0.2 }}
+              />
+            </motion.div>
+          );
+        })}
       </div>
     </motion.div>
   );

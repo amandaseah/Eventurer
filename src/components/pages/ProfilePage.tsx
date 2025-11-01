@@ -1,17 +1,16 @@
 import ProfileHeader from "../features/profile/ProfileHeader";
-import AccountPanel from "../features/profile/AccountPanel";
+import ProfileStats from "../features/profile/ProfileStats";
 import { auth, db } from '../../lib/firebase';
-import { updateProfile, onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import SettingsPanel from "../features/profile/SettingsPanel";
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import EventsGrid from "../features/profile/EventsGrid";
+import Footer from "../shared/Footer";
 
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
-// import { events } from '../../lib/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { User, Bookmark, CheckCircle, Clock, Settings, ArrowLeft } from 'lucide-react';
+import { Bookmark, CheckCircle, ArrowLeft } from 'lucide-react';
 
 interface ProfilePageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -24,18 +23,17 @@ interface ProfilePageProps {
   currentUser?: any;
 }
 
-export function ProfilePage({ 
-  onNavigate, 
+export function ProfilePage({
+  onNavigate,
   onGoBack,
   events,
-  bookmarkedEventIds, 
-  rsvpedEventIds, 
+  bookmarkedEventIds,
+  rsvpedEventIds,
   onBookmarkChange,
   onRSVPChange,
   currentUser,
 }: ProfilePageProps & { events: any[] }) {
   const [activeTab, setActiveTab] = useState('bookmarked');
-  const [isEditingAccount, setIsEditingAccount] = useState(false);
 
   // Local user display state (prefers ints from auth/db but editable locally)
   const [userName, setUserName] = useState<string>(currentUser?.displayName || `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() || 'Alex Chen');
@@ -55,40 +53,6 @@ export function ProfilePage({
   // Filter events based on bookmarked and RSVP'd IDs
   const bookmarkedEvents = events.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
   const rsvpedEvents = events.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
-  const pastEvents = events.filter(e => e.isPast && rsvpedEventIds.includes(e.id));
-
-  const handleSaveProfile = () => {
-    setIsEditingAccount(false);
-    // If we have an authenticated user, persist changes to Firebase
-    // Otherwise this remains a local-only change
-  };
-
-  const handleSaveProfileWithData = async (changes?: { firstName?: string; lastName?: string; email?: string }) => {
-    setIsEditingAccount(false);
-    // Update local preview
-    if (changes?.firstName || changes?.lastName) {
-      setUserName(`${changes?.firstName || ''} ${changes?.lastName || ''}`.trim());
-    }
-    if (changes?.email) setUserEmail(changes.email);
-
-    // Persist to Firebase if logged in
-    try {
-      const u = auth.currentUser;
-      if (!u) return;
-
-      const displayName = `${changes?.firstName || u.displayName || ''} ${changes?.lastName || ''}`.trim() || u.displayName || undefined;
-      if (displayName) await updateProfile(u, { displayName });
-
-      await setDoc(doc(db, 'users', u.uid), {
-        firstName: changes?.firstName ?? null,
-        lastName: changes?.lastName ?? null,
-        displayName: displayName ?? null,
-        email: changes?.email ?? u.email ?? null,
-      }, { merge: true });
-    } catch (err) {
-      console.warn('Failed to persist profile changes', err);
-    }
-  };
 
   const handleSignOut = async () => {
     try {
@@ -99,6 +63,7 @@ export function ProfilePage({
     // navigate to login page
     onNavigate('login');
   };
+
 
   // Listen for auth state changes so the page updates after signup/login
   useEffect(() => {
@@ -134,20 +99,49 @@ export function ProfilePage({
     if (currentUser.email) setUserEmail(currentUser.email);
   }, [currentUser]);
 
+  // Sync when parent-provided currentUser prop changes (e.g., after login)
+  useEffect(() => {
+    if (!currentUser) return;
+    if (currentUser.displayName) setUserName(currentUser.displayName);
+    else if (currentUser.firstName || currentUser.lastName) setUserName(`${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim());
+    if (currentUser.email) setUserEmail(currentUser.email);
+  }, [currentUser]);
+
   return (
     <div className="min-h-screen">
+      <style>{`
+        [data-slot="tabs-trigger"] {
+          padding: 0.5rem !important;
+          height: 40px !important;
+          min-height: 40px !important;
+          max-height: 40px !important;
+        }
+        @media (min-width: 640px) {
+          [data-slot="tabs-trigger"] {
+            padding: 0.625rem 1rem !important;
+            height: 40px !important;
+            min-height: 40px !important;
+            max-height: 40px !important;
+          }
+        }
+        @media (max-width: 639px) {
+          html {
+            font-size: 14px;
+          }
+        }
+      `}</style>
       <Header currentPage="profile" onNavigate={onNavigate} />
 
-      <div className="container mx-auto px-6 py-12">
-        {/* Back Button - Fixed */}
+      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {/* Back Button - Sticky */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           whileHover={{ x: -4 }}
           onClick={onGoBack}
-          className="fixed top-24 left-6 z-50 flex items-center gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md"
+          className="sticky top-[84px] sm:top-[96px] z-40 flex items-center gap-1.5 sm:gap-2 text-pink-500 hover:text-pink-600 bg-white/90 backdrop-blur-sm rounded-full shadow-md w-fit px-2.5 sm:px-4 py-2 text-xs sm:text-base"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           <span>Back</span>
         </motion.button>
 
@@ -159,52 +153,40 @@ export function ProfilePage({
           onSignOut={handleSignOut}
         />
 
+        {/* Profile Stats */}
+        <ProfileStats
+          bookmarkedCount={bookmarkedEvents.length}
+          upcomingCount={rsvpedEvents.length}
+        />
+
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8 bg-white rounded-2xl p-1 shadow-md h-auto">
-            <TabsTrigger 
-              value="bookmarked" 
-              className="rounded-xl data-[state=active]:bg-purple-100 py-3 data-[state=active]:rounded-l-xl data-[state=active]:rounded-r-xl first:data-[state=active]:rounded-l-2xl last:data-[state=active]:rounded-r-2xl"
-            >
-              <Bookmark className="w-4 h-4 mr-2" />
-              Bookmarked
-            </TabsTrigger>
-            <TabsTrigger 
-              value="upcoming" 
-              className="rounded-xl data-[state=active]:bg-green-100 py-3"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Upcoming
-            </TabsTrigger>
-            <TabsTrigger 
-              value="past" 
-              className="rounded-xl data-[state=active]:bg-gray-100 py-3"
-            >
-              <Clock className="w-4 h-4 mr-2" />
-              Past Events
-            </TabsTrigger>
-            <TabsTrigger 
-              value="account" 
-              className="rounded-xl data-[state=active]:bg-blue-100 py-3"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Account
-            </TabsTrigger>
-            <TabsTrigger 
-              value="settings" 
-              className="rounded-xl data-[state=active]:bg-orange-100 py-3 data-[state=active]:rounded-l-xl data-[state=active]:rounded-r-xl first:data-[state=active]:rounded-l-2xl last:data-[state=active]:rounded-r-2xl"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </TabsTrigger>
-          </TabsList>
+            <TabsList className="grid grid-cols-2 w-full mb-6 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto gap-1 sm:!gap-1">
+              <TabsTrigger
+                value="bookmarked"
+                className="!rounded-lg data-[state=active]:bg-purple-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
+                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
+              >
+                <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="truncate">Bookmarked</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="upcoming"
+                className="!rounded-lg data-[state=active]:bg-green-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
+                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
+              >
+                <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="truncate">Upcoming</span>
+              </TabsTrigger>
+            </TabsList>
+
 
           {/* Bookmarked Events */}
           <TabsContent value="bookmarked">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="mb-6">
-                <h2 className="text-2xl mb-2">Bookmarked Events</h2>
-                <p className="text-gray-600">Events you've saved for later</p>
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-base sm:text-2xl mb-1 sm:mb-2">Bookmarked Events</h2>
+                <p className="text-xs sm:text-base text-gray-600">Events you've saved for later</p>
               </div>
 
               {bookmarkedEvents.length > 0 ? (
@@ -221,9 +203,9 @@ export function ProfilePage({
                   onRSVPChange={onRSVPChange}
                 />
               ) : (
-                <div className="bg-white rounded-3xl p-12 text-center">
-                  <Bookmark className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-xl text-gray-500">No bookmarked events yet</p>
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center">
+                  <Bookmark className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                  <p className="text-sm sm:text-xl text-gray-500">No bookmarked events yet</p>
                 </div>
               )}
             </motion.div>
@@ -232,9 +214,9 @@ export function ProfilePage({
           {/* Upcoming RSVP'd Events */}
           <TabsContent value="upcoming">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                <div className="mb-6">
-                  <h2 className="text-2xl mb-2">Upcoming Events</h2>
-                  <p className="text-gray-600">Events you've RSVP'd to</p>
+                <div className="mb-4 sm:mb-6">
+                  <h2 className="text-base sm:text-2xl mb-1 sm:mb-2">Upcoming Events</h2>
+                  <p className="text-xs sm:text-base text-gray-600">Events you've RSVP'd to</p>
                 </div>
 
                 {rsvpedEvents.length > 0 ? (
@@ -249,73 +231,16 @@ export function ProfilePage({
                     onRSVPChange={onRSVPChange}
                   />
                 ) : (
-                  <div className="bg-white rounded-3xl p-12 text-center">
-                    <CheckCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                    <p className="text-xl text-gray-500">No upcoming events</p>
+                  <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center">
+                    <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                    <p className="text-sm sm:text-xl text-gray-500">No upcoming events</p>
                   </div>
-                )}
-              </motion.div>
-            </TabsContent>
-
-          {/* Past Events */}
-          <TabsContent value="past">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="mb-6">
-                <h2 className="text-2xl mb-2">Past Events</h2>
-                <p className="text-gray-600">Events you've attended</p>
-              </div>
-
-              {pastEvents.length > 0 ? (
-                <EventsGrid
-                  events={pastEvents}
-                  onEventClick={(id) => onNavigate("event-info", { eventId: id })}
-                  bookmarkedEventIds={bookmarkedEventIds}
-                  rsvpedEventIds={rsvpedEventIds}
-                  onBookmarkChange={onBookmarkChange}
-                  onRSVPChange={onRSVPChange}
-                />
-              ) : (
-                <div className="bg-white rounded-3xl p-12 text-center">
-                  <Clock className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-xl text-gray-500">No past events</p>
-                </div>
               )}
             </motion.div>
           </TabsContent>
-
-          {/* Account Information */}
-          <TabsContent value="account">
-            <AccountPanel
-              isEditing={isEditingAccount}
-              name={userName}
-              email={userEmail}
-              memberSince={user.memberSince}
-              onChangeName={setUserName}
-              onChangeEmail={setUserEmail}
-              onSave={handleSaveProfileWithData}
-              onCancel={() => setIsEditingAccount(false)}
-            />
-            {!isEditingAccount && (
-              <div className="mt-4">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setIsEditingAccount(true)}
-                  className="px-6 py-3 bg-purple-100 text-purple-700 rounded-2xl hover:bg-purple-200 transition-all"
-                >
-                  Edit Profile
-                </motion.button>
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Settings */}
-          <TabsContent value="settings">
-            <SettingsPanel />
-          </TabsContent>
-
         </Tabs>
       </div>
+      <Footer />
     </div>
   );
 }

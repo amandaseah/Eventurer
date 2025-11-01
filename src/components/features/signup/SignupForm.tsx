@@ -5,6 +5,7 @@ import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { signUpWithEmail } from '../../../lib/firebase';
+import { friendlyAuthError } from '../../../lib/authErrorMessages';
 
 interface SignupFormProps {
   onNavigate: (page: string) => void;
@@ -26,6 +27,7 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
     if (!lastName) return setError('Please enter your last name');
     if (!email) return setError('Please enter an email');
     if (!password) return setError('Please enter a password');
+    if (password.length < 6) return setError('Password must be at least 6 characters');
     if (password !== confirm) return setError("Passwords don't match");
     setLoading(true);
     try {
@@ -33,7 +35,7 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
       // on success navigate to landing
       onNavigate('landing');
     } catch (err: any) {
-      setError(err?.message || 'Unable to create account');
+      setError(friendlyAuthError(err, 'Unable to create account'));
     } finally {
       setLoading(false);
     }
@@ -57,7 +59,7 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
             placeholder="First name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
         </div>
 
@@ -72,7 +74,7 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
             placeholder="Last name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
         </div>
 
@@ -87,7 +89,7 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
         </div>
       </motion.div>
@@ -108,7 +110,7 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
             placeholder="Create a password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
         </div>
       </motion.div>
@@ -129,7 +131,7 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
             placeholder="Confirm password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
         </div>
       </motion.div>
@@ -141,14 +143,14 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
           transition={{ duration: 0.18 }}
           role="alert"
           aria-live="assertive"
-          className="flex items-start gap-3 p-3 rounded-lg border border-pink-200 bg-gradient-to-r from-white to-pink-50"
+          className="flex items-start gap-3 p-3 rounded-lg border border-pink-200 bg-pink-50"
         >
           <div className="flex-shrink-0 mt-0.5">
             <AlertTriangle className="w-5 h-5 text-pink-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-pink-700">Something went wrong</p>
-            <p className="text-sm text-pink-600">{error}</p>
+            <p className="text-sm font-medium text-pink-500">Something went wrong</p>
+            <p className="text-sm text-pink-500">{error}</p>
           </div>
         </motion.div>
       )}
@@ -158,14 +160,14 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.6 }}
       >
-        <Button type="submit" disabled={loading} className="w-full h-12 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-300 hover:shadow-xl transition-all">
+        <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl bg-pink-400 hover:bg-pink-500 hover:shadow-lg transition-all font-semibold">
           {loading ? 'Creating account...' : 'Create account'}
         </Button>
       </motion.div>
 
       <div className="text-center mt-3 text-sm text-gray-500">
         Already have an account?{' '}
-        <button type="button" onClick={() => onNavigate('login')} className="text-purple-600 hover:underline font-medium">
+        <button type="button" onClick={() => onNavigate('login')} className="text-pink-500 hover:underline font-medium">
           Log in
         </button>
       </div>
