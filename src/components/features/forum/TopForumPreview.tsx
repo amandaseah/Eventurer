@@ -21,6 +21,7 @@ interface Post {
   upvotes: number;
   upvotedBy?: string[];
   replies?: Reply[];
+  image?: string;
 }
 
 interface TopForumPreviewProps {
@@ -122,6 +123,17 @@ export default function TopForumPreview({
               <p className="text-gray-800 leading-relaxed mb-3 line-clamp-3">
                 {post.text}
               </p>
+
+              {/* Display image if present */}
+              {post.image && (
+                <div className="mb-3 flex justify-center">
+                  <img 
+                    src={post.image} 
+                    alt="Post attachment" 
+                    className="rounded-xl h-96 w-96 object-cover"
+                  />
+                </div>
+              )}
 
               {/* Upvotes and Reply Count */}
               <div className="flex items-center gap-4">

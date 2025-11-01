@@ -107,7 +107,7 @@ export function EventInfoPage({
                 posts={posts.slice(0, 3)}
                 onViewAll={() => onNavigate("event-forum", { eventId })}
                 onPostClick={(postId) => onNavigate("event-forum", { eventId, postId })}
-                upvotePost={upvotePost} 
+                upvotePost={(postId) => upvotePost(postId, username)} 
                 username={username}
               />
             </div>
