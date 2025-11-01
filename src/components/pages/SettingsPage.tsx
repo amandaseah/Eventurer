@@ -162,7 +162,160 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               onClick={handleSaveAccountSettings}
               className="px-6 py-3 bg-pink-500 text-white rounded-2xl hover:bg-pink-600 transition-all font-semibold"
             >
-              Save Changes
+              Update Password
+            </motion.button>
+          </div>
+        </motion.section>
+
+        {/* Notification Preferences */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md mb-6"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <Bell className="w-5 h-5 text-pink-500" />
+            <h2 className="text-xl sm:text-2xl font-semibold">Notification Preferences</h2>
+          </div>
+
+          <div className="space-y-4">
+            <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <div>
+                <p className="font-medium">Email Notifications</p>
+                <p className="text-sm text-gray-600">Receive updates via email</p>
+              </div>
+              <input
+                type="checkbox"
+                checked={emailNotifications}
+                onChange={(e) => setEmailNotifications(e.target.checked)}
+                className="w-5 h-5 rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 cursor-pointer"
+              />
+            </label>
+
+            <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <div>
+                <p className="font-medium">Push Notifications</p>
+                <p className="text-sm text-gray-600">Receive push notifications</p>
+              </div>
+              <input
+                type="checkbox"
+                checked={pushNotifications}
+                onChange={(e) => setPushNotifications(e.target.checked)}
+                className="w-5 h-5 rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 cursor-pointer"
+              />
+            </label>
+
+            <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <div>
+                <p className="font-medium">Event Reminders</p>
+                <p className="text-sm text-gray-600">Get reminded about upcoming events</p>
+              </div>
+              <input
+                type="checkbox"
+                checked={eventReminders}
+                onChange={(e) => setEventReminders(e.target.checked)}
+                className="w-5 h-5 rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 cursor-pointer"
+              />
+            </label>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSavePreferences}
+              className="px-6 py-3 bg-pink-200 text-pink-600 rounded-2xl hover:bg-pink-300 transition-all font-semibold"
+            >
+              Save Preferences
+            </motion.button>
+          </div>
+        </motion.section>
+
+        {/* Privacy */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md mb-6"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <Lock className="w-5 h-5 text-pink-500" />
+            <h2 className="text-xl sm:text-2xl font-semibold">Privacy</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Profile Visibility
+              </label>
+              <select
+                value={profileVisibility}
+                onChange={(e) => setProfileVisibility(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+              >
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+                <option value="friends">Friends Only</option>
+              </select>
+            </div>
+
+            <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <div>
+                <p className="font-medium">Data Sharing</p>
+                <p className="text-sm text-gray-600">Allow anonymous usage data collection</p>
+              </div>
+              <input
+                type="checkbox"
+                checked={dataSharing}
+                onChange={(e) => setDataSharing(e.target.checked)}
+                className="w-5 h-5 rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 cursor-pointer"
+              />
+            </label>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSavePreferences}
+              className="px-6 py-3 bg-pink-200 text-pink-600 rounded-2xl hover:bg-pink-300 transition-all font-semibold"
+            >
+              Save Privacy Settings
+            </motion.button>
+          </div>
+        </motion.section>
+
+        {/* Preferences */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md mb-6"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <SettingsIcon className="w-5 h-5 text-pink-500" />
+            <h2 className="text-xl sm:text-2xl font-semibold">Preferences</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Default Event View
+              </label>
+              <select
+                value={defaultView}
+                onChange={(e) => setDefaultView(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+              >
+                <option value="grid">Grid View</option>
+                <option value="calendar">Calendar View</option>
+              </select>
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSavePreferences}
+              className="px-6 py-3 bg-pink-200 text-pink-600 rounded-2xl hover:bg-pink-300 transition-all font-semibold"
+            >
+              Save Preferences
             </motion.button>
           </div>
         </motion.section>

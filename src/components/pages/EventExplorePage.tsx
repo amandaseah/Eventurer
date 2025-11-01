@@ -1,17 +1,15 @@
 import RecommendationPanel from "../features/recommendation/RecommendationPanel";
 import FiltersPanel from "../features/explore/FiltersPanel";
 import Footer from "../shared/Footer";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
-import { ArrowLeft } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Calendar } from '../ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { Button } from '../ui/button';
-import { formatDateObjectToDDMMYYYY } from '../../lib/dateUtils';
+import { EventCalendarView } from '../features/event/EventCalendarView';
+import { ArrowLeft, Grid3x3, Calendar as CalendarIcon } from 'lucide-react';
 import { Star } from 'lucide-react';
+import { auth, db } from '../../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 
 
@@ -38,6 +36,30 @@ export function EventExplorePage({
   const [priceFilter, setPriceFilter] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
+  const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
+
+  // Load user's preferred view from Firebase
+  useEffect(() => {
+    const loadViewPreference = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          const preferredView = data?.preferences?.defaultView;
+          if (preferredView === 'grid' || preferredView === 'calendar') {
+            setViewMode(preferredView);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load view preference', err);
+      }
+    };
+
+    loadViewPreference();
+  }, []);
 
   // FIXME: Performance issue - filtering on every render. Move to useMemo
   let allEvents = [...events.filter(e => !e.isPast)];
@@ -144,45 +166,94 @@ export function EventExplorePage({
             date={dateFilter} setDate={setDateFilter}
           />
 
-          {/* All Events Grid */}
+          {/* All Events with View Switcher */}
           <div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 flex flex-col items-center gap-3 text-center"
+              className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4"
             >
-              <div className="flex items-center justify-center gap-3">
-                <Star className="w-6 h-6 text-yellow-500" />
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
-                  All Events
-                </h2>
-                <Star className="w-6 h-6 text-yellow-500" />
+              <div className="flex flex-col items-center sm:items-start gap-2 text-center sm:text-left">
+                <div className="flex items-center gap-3">
+                  <Star className="w-6 h-6 text-yellow-500" />
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                    All Events
+                  </h2>
+                  <Star className="w-6 h-6 text-yellow-500" />
+                </div>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Browse all available events
+                </p>
               </div>
-              <p className="text-xs sm:text-sm text-gray-500">
-                Browse all available events
-              </p>
+
+              {/* View Switcher */}
+              <div className="flex gap-2 bg-white rounded-xl p-1 shadow-md border border-gray-200">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewMode('grid')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                    viewMode === 'grid'
+                      ? 'bg-pink-200 text-pink-600'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <Grid3x3 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Grid</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewMode('calendar')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                    viewMode === 'calendar'
+                      ? 'bg-pink-200 text-pink-600'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <CalendarIcon className="w-4 h-4" />
+                  <span className="hidden sm:inline">Calendar</span>
+                </motion.button>
+              </div>
             </motion.div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {loading
-                ? skeletonItems.map((_, idx) => <ExploreCardSkeleton key={idx} />)
-                : allEvents.map((event, idx) => (
-                    <motion.div
-                      key={event.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                    >
-                      <EventCard 
-                        event={event} 
-                        onEventClick={(id) => onNavigate('event-info', { eventId: id })}
-                        isBookmarkedInitially={bookmarkedEventIds.includes(event.id)}
-                        isRSVPedInitially={rsvpedEventIds.includes(event.id)}
-                        onBookmarkChange={onBookmarkChange}
-                        onRSVPChange={onRSVPChange}
-                      />
-                    </motion.div>
-                  ))}
-            </div>
+
+            {/* Grid View */}
+            {viewMode === 'grid' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {loading
+                  ? skeletonItems.map((_, idx) => <ExploreCardSkeleton key={idx} />)
+                  : allEvents.map((event, idx) => (
+                      <motion.div
+                        key={event.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                      >
+                        <EventCard
+                          event={event}
+                          onEventClick={(id) => onNavigate('event-info', { eventId: id })}
+                          isBookmarkedInitially={bookmarkedEventIds.includes(event.id)}
+                          isRSVPedInitially={rsvpedEventIds.includes(event.id)}
+                          onBookmarkChange={onBookmarkChange}
+                          onRSVPChange={onRSVPChange}
+                        />
+                      </motion.div>
+                    ))}
+              </div>
+            )}
+
+            {/* Calendar View */}
+            {viewMode === 'calendar' && !loading && (
+              <EventCalendarView
+                events={allEvents}
+                onEventClick={(id) => onNavigate('event-info', { eventId: id })}
+                bookmarkedEventIds={bookmarkedEventIds}
+                rsvpedEventIds={rsvpedEventIds}
+                onBookmarkChange={onBookmarkChange}
+                onRSVPChange={onRSVPChange}
+              />
+            )}
+
             {!loading && allEvents.length === 0 && (
               <div className="mt-8 text-center text-gray-500">
                 No events match your filters yet. Try adjusting them.
