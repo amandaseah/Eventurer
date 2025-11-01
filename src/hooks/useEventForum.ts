@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { saveToIndexedDB, getFromIndexedDB } from "../lib/indexeddb";
 
 interface Reply {
   id: string;
@@ -28,14 +29,17 @@ export function useEventForum(eventId: number) {
   const [isLoading, setIsLoading] = useState(true);
   const [username, setUsername] = useState("Guest");
 
-  // 1️ Load posts from localStorage on mount
+  // 1️ Load posts from IndexedDB on mount
   useEffect(() => {
     setIsLoading(true);
-    const data = localStorage.getItem(`forum_posts_${eventId}`);
-    if (data) {
-      setPosts(JSON.parse(data));
-    }
-    setIsLoading(false);
+    getFromIndexedDB(`forum_posts_${eventId}`)
+      .then((data) => {
+        if (data) {
+          setPosts(data as Post[]);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
   }, [eventId]);
 
   // 2️ Simulate connection (always online for now)
@@ -43,19 +47,19 @@ export function useEventForum(eventId: number) {
     setIsConnected(true);
   }, []);
 
-  // 3️ Save posts to localStorage when they change
+  // 3️ Save posts to IndexedDB when they change
   useEffect(() => {
-    localStorage.setItem(`forum_posts_${eventId}`, JSON.stringify(posts));
+    saveToIndexedDB(`forum_posts_${eventId}`, posts).catch(console.error);
   }, [posts, eventId]);
 
   // 4️ Add a new post
-  const addPost = (text: string, image?: string) => {
+  const addPost = (text: string, image?: string, username?: string) => {
     const newPost: Post = {
       id: Date.now().toString(),
       text,
       image,
       createdAt: Date.now(),
-      username,
+      username: username || "Guest",
       upvotes: 0,
       upvotedBy: [],
       replies: [],
@@ -71,7 +75,7 @@ export function useEventForum(eventId: number) {
       text,
       image,
       createdAt: Date.now(),
-      username,
+      username: username || "Guest",
       replies: [],
       upvotes: 0,
       upvotedBy: [],

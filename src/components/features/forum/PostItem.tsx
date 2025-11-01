@@ -75,13 +75,15 @@ export default function PostItem({ post, username, depth = 0, onUpvote, onSubmit
 
         {/* Display image if present */}
         {post.image && (
-          <div className="mb-4 rounded-2xl overflow-hidden">
-            <img 
-              src={post.image} 
-              alt="Post attachment" 
-              className="w-full max-h-96 object-cover rounded-2xl" 
-            />
-          </div>
+          <>
+            <div className="mb-4 flex justify-center">
+              <img 
+                src={post.image} 
+                alt="Post attachment" 
+                className="rounded-2xl h-96"
+              />
+            </div>
+          </>
         )}
 
         <div className="flex items-center gap-4 mb-2">

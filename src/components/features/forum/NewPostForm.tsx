@@ -7,74 +7,65 @@ interface NewPostFormProps {
   onAddPost: (comment: string, image?: string) => void;
 }
 
-// Utility function to resize image while maintaining aspect ratio
-const resizeImage = (file: File, maxWidth: number, maxHeight: number): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+// // Utility function to resize image while maintaining aspect ratio
+// const resizeImage = (file: File, maxWidth: number, maxHeight: number): Promise<string> => {
+//   return new Promise((resolve, reject) => {
+//     const reader = new FileReader();
     
-    reader.onload = (e) => {
-      const img = new Image();
+//     reader.onload = (e) => {
+//       const img = new Image();
       
-      img.onload = () => {
-        // Calculate new dimensions while maintaining aspect ratio
-        let width = img.width;
-        let height = img.height;
+//       img.onload = () => {
+//         // Calculate new dimensions while maintaining aspect ratio
+//         let width = img.width;
+//         let height = img.height;
         
-        if (width > maxWidth || height > maxHeight) {
-          const aspectRatio = width / height;
+//         if (width > maxWidth || height > maxHeight) {
+//           const aspectRatio = width / height;
           
-          if (width > height) {
-            width = maxWidth;
-            height = width / aspectRatio;
-          } else {
-            height = maxHeight;
-            width = height * aspectRatio;
-          }
-        }
+//           if (width > height) {
+//             width = maxWidth;
+//             height = width / aspectRatio;
+//           } else {
+//             height = maxHeight;
+//             width = height * aspectRatio;
+//           }
+//         }
         
-        // Create canvas and draw resized image
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+//         // Create canvas and draw resized image
+//         const canvas = document.createElement('canvas');
+//         canvas.width = width;
+//         canvas.height = height;
         
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-        }
+//         const ctx = canvas.getContext('2d');
+//         if (ctx) {
+//           ctx.drawImage(img, 0, 0, width, height);
+//         }
         
-        // Convert to base64 with good quality
-        resolve(canvas.toDataURL('image/jpeg', 0.9));
-      };
+//         // Convert to base64 with good quality
+//         resolve(canvas.toDataURL('image/jpeg', 0.9));
+//       };
       
-      img.onerror = reject;
-      img.src = e.target?.result as string;
-    };
+//       img.onerror = reject;
+//       img.src = e.target?.result as string;
+//     };
     
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-};
+//     reader.onerror = reject;
+//     reader.readAsDataURL(file);
+//   });
+// };
 
 export default function NewPostForm({ onAddPost }: NewPostFormProps) {
   const [text, setText] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    
-    try {
-      // Resize image to max 800x800px while maintaining aspect ratio
-      const resizedImage = await resizeImage(f, 800, 800);
-      setImage(resizedImage);
-    } catch (error) {
-      console.error('Error resizing image:', error);
-      // Fallback to original behavior if resize fails
-      const reader = new FileReader();
-      reader.onloadend = () => setImage(reader.result as string);
-      reader.readAsDataURL(f);
-    }
+    const reader = new FileReader();
+    reader.onloadend = () => setImage(reader.result as string);
+    reader.readAsDataURL(f);
   };
 
   const handleSubmit = () => {

@@ -21,6 +21,7 @@ interface EventInfoPageProps {
   rsvpedEventIds: number[];
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
   onRSVPChange: (eventId: number, isRSVPed: boolean) => void;
+  username: string;
 }
 
 export function EventInfoPage({
@@ -32,7 +33,11 @@ export function EventInfoPage({
   rsvpedEventIds,
   onBookmarkChange,
   onRSVPChange,
+  username,
 }: EventInfoPageProps) {
+
+  //console.log("EventInfoPage loaded with username:", username);
+
   const [event, setEvent] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +48,7 @@ export function EventInfoPage({
   const [saves, setSaves] = useState(0);
 
   // Forum data
-  const { posts, addPost, upvotePost, username } = useEventForum(Number(eventId));
+  const { posts, addPost, upvotePost } = useEventForum(Number(eventId));
 
   // Fetch event details
   useEffect(() => {
@@ -157,8 +162,8 @@ export function EventInfoPage({
 
             <TopForumPreview
               posts={posts.slice(0, 3)}
-              onViewAll={() => onNavigate("event-forum", { eventId })}
-              onPostClick={(postId) => onNavigate("event-forum", { eventId, postId })}
+              onViewAll={() => onNavigate("event-forum", { eventId, username })}
+              onPostClick={(postId) => onNavigate("event-forum", { eventId, postId, username })}
               upvotePost={(postId) => upvotePost(postId, username)}
               username={username}
             />
