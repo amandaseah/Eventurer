@@ -47,19 +47,19 @@ export function useEventForum(eventId: number) {
     setIsConnected(true);
   }, []);
 
-  // 3️ Save posts to localStorage when they change
+  // 3️ Save posts to IndexedDB when they change
   useEffect(() => {
     saveToIndexedDB(`forum_posts_${eventId}`, posts).catch(console.error);
   }, [posts, eventId]);
 
   // 4️ Add a new post
-  const addPost = (text: string, image?: string) => {
+  const addPost = (text: string, image?: string, username?: string) => {
     const newPost: Post = {
       id: Date.now().toString(),
       text,
       image,
       createdAt: Date.now(),
-      username,
+      username: username || "Guest",
       upvotes: 0,
       upvotedBy: [],
       replies: [],

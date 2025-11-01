@@ -19,17 +19,13 @@ interface EventInfoPageProps {
   rsvpedEventIds: number[];
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
   onRSVPChange: (eventId: number, isRSVPed: boolean) => void;
+  username: string;
 }
 
-export function EventInfoPage({
-  eventId,
-  onNavigate,
-  onGoBack,
-  bookmarkedEventIds,
-  rsvpedEventIds,
-  onBookmarkChange,
-  onRSVPChange,
-}: EventInfoPageProps) {
+export function EventInfoPage({eventId, onNavigate, onGoBack, bookmarkedEventIds, rsvpedEventIds, onBookmarkChange, onRSVPChange, username}: EventInfoPageProps) {
+  
+  //console.log("EventInfoPage loaded with username:", username);
+  
   const event = events.find((e) => e.id === eventId);
   const [isBookmarked, setIsBookmarked] = useState(
     bookmarkedEventIds.includes(eventId)
@@ -38,7 +34,7 @@ export function EventInfoPage({
   const [showRSVPDialog, setShowRSVPDialog] = useState(false);
   const [saves, setSaves] = useState(event?.saves || 0);
 
-  const { posts, addPost, upvotePost, username } = useEventForum(eventId); // fetch all posts
+  const { posts, addPost, upvotePost } = useEventForum(eventId); // fetch all posts
 
   if (!event) return <div>Event not found</div>;
 
@@ -105,8 +101,8 @@ export function EventInfoPage({
             <div>
               <TopForumPreview
                 posts={posts.slice(0, 3)}
-                onViewAll={() => onNavigate("event-forum", { eventId })}
-                onPostClick={(postId) => onNavigate("event-forum", { eventId, postId })}
+                onViewAll={() => onNavigate("event-forum", { eventId, username })}
+                onPostClick={(postId) => onNavigate("event-forum", { eventId, postId, username })}
                 upvotePost={(postId) => upvotePost(postId, username)} 
                 username={username}
               />
@@ -128,7 +124,7 @@ export function EventInfoPage({
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onNavigate("event-forum", { eventId })}
+              onClick={() => onNavigate("event-forum", { eventId, username })}
               className="w-full bg-white rounded-3xl p-6 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
             >
               <MessageSquare className="w-5 h-5 text-purple-600" />

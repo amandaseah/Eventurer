@@ -34,6 +34,8 @@ export function EventForumPage({ eventId, onGoBack, onNavigate, username }: Even
     );
   }
 
+  //console.log("EventForumPage loaded with username:", username);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <Header onNavigate={onNavigate} />
@@ -87,7 +89,7 @@ export function EventForumPage({ eventId, onGoBack, onNavigate, username }: Even
         ) : (
           <>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-              <NewPostForm onAddPost={addPost} />
+              <NewPostForm onAddPost={(text, image) => addPost(text, image, username)}/>
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="space-y-4">

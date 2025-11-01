@@ -53,6 +53,8 @@ export function ProfilePage({
     // In a real app, this would save to backend
   };
 
+  //console.log("ProfilePage username:", userName);
+
   return (
     <div className="min-h-screen">
       <Header currentPage="profile" onNavigate={onNavigate} />
@@ -133,7 +135,7 @@ export function ProfilePage({
                       new Date(a.deadline || a.date).getTime() -
                       new Date(b.deadline || b.date).getTime()
                   )}
-                  onEventClick={(id) => onNavigate("event-info", { eventId: id })}
+                  onEventClick={(id) => onNavigate("event-info", { eventId: id, username: userName })}
                   bookmarkedEventIds={bookmarkedEventIds}
                   rsvpedEventIds={rsvpedEventIds}
                   onBookmarkChange={onBookmarkChange}
@@ -161,7 +163,7 @@ export function ProfilePage({
                     events={[...rsvpedEvents].sort(
                       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
                     )}
-                    onEventClick={(id) => onNavigate("event-info", { eventId: id })}
+                    onEventClick={(id) => onNavigate("event-info", { eventId: id, username: userName })}
                     bookmarkedEventIds={bookmarkedEventIds}
                     rsvpedEventIds={rsvpedEventIds}
                     onBookmarkChange={onBookmarkChange}
@@ -187,7 +189,7 @@ export function ProfilePage({
               {pastEvents.length > 0 ? (
                 <EventsGrid
                   events={pastEvents}
-                  onEventClick={(id) => onNavigate("event-info", { eventId: id })}
+                  onEventClick={(id) => onNavigate("event-info", { eventId: id, username: userName })}
                   bookmarkedEventIds={bookmarkedEventIds}
                   rsvpedEventIds={rsvpedEventIds}
                   onBookmarkChange={onBookmarkChange}

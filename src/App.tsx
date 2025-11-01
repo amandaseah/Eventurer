@@ -32,6 +32,7 @@ type Page =
 interface PageData {
   mood?: string;
   eventId?: number;
+  username?: string;
 }
 
 export default function App() {
@@ -118,6 +119,7 @@ export default function App() {
           rsvpedEventIds={rsvpedEventIds}
           onBookmarkChange={handleBookmarkChange}
           onRSVPChange={handleRSVPChange}
+          username={pageData?.username || "Guest"}
         />
       )}
 
