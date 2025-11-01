@@ -6,6 +6,7 @@ export default function Hero({ onStart }: { onStart: () => void }) {
   const [displayedText, setDisplayedText] = useState('');
   const fullText = "Right Now?";
 
+  // TODO: Replace this manual typing animation with a library (react-type-animation)
   useEffect(() => {
     let currentIndex = 0;
     let isDeleting = false;

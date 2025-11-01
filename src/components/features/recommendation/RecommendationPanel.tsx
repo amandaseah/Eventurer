@@ -45,7 +45,7 @@ export default function RecommendationPanel({
         <section className="mb-12">
           <RecommendationHeader title={title} />
           <div className="max-w-2xl mx-auto">
-            <CardSkeleton />
+            <RecommendationCardSkeleton />
           </div>
         </section>
       )
@@ -62,7 +62,7 @@ export default function RecommendationPanel({
         <section className="mb-12">
           <RecommendationHeader title={title} />
           <div className="max-w-2xl mx-auto">
-            <CardSkeleton />
+            <RecommendationCardSkeleton />
           </div>
         </section>
       )
@@ -77,7 +77,7 @@ export default function RecommendationPanel({
       <div className="relative max-w-2xl mx-auto">
         <div className="overflow-hidden rounded-3xl">
           {loading ? (
-            <CardSkeleton />
+            <RecommendationCardSkeleton />
           ) : (
             <motion.div
               animate={{ x: `-${current * 100}%` }}
@@ -158,7 +158,7 @@ function RecommendationHeader({ title }: { title: string }) {
   )
 }
 
-function CardSkeleton() {
+function RecommendationCardSkeleton() {
   return (
     <div className="min-w-full px-4">
       <div className="h-72 bg-white rounded-3xl border border-gray-100 shadow-sm animate-pulse flex flex-col">

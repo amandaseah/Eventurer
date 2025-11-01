@@ -1,16 +1,10 @@
 import RecommendationPanel from "../features/recommendation/RecommendationPanel";
 import FiltersPanel from "../features/explore/FiltersPanel";
 import Footer from "../shared/Footer";
-// import { sanityCheckMe, fetchEventbriteEventsForMe } from '../../lib/eventbriteService';
-
-
-
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
-// import { events } from '../../lib/mockData';
-// import { fetchEventbriteEventsForMe } from '../../lib/eventbriteService';
 import { ArrowLeft } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Calendar } from '../ui/calendar';
@@ -45,27 +39,7 @@ export function EventExplorePage({
   const [sortBy, setSortBy] = useState('popular');
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
 
-//   const [fetchedEvents, setFetchedEvents] = useState<any[]>([]);
-//   const [loadingEvents, setLoadingEvents] = useState(true);
-
-//  useEffect(() => {
-//   async function load() {
-//     setLoadingEvents(true);
-//     try {
-//       await sanityCheckMe();       // ← if this fails, stop and fix token/header
-//     } catch {
-//       setLoadingEvents(false);
-//       return;
-//     }
-//     const data = await fetchEventbriteEventsForMe();
-//     console.log('[Explore] fetched events:', data);  
-//     setFetchedEvents(data);
-//     console.log("Fetched:", data);
-//     setLoadingEvents(false);
-//   }
-//   load();
-// }, []);
-
+  // FIXME: Performance issue - filtering on every render. Move to useMemo
   let allEvents = [...events.filter(e => !e.isPast)];
 
 

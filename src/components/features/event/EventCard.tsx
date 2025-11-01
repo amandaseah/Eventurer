@@ -34,16 +34,14 @@ export function EventCard({
   // Update states when props change
   useEffect(() => {
     setIsBookmarked(isBookmarkedInitially);
-  }, [isBookmarkedInitially]);
-
-  useEffect(() => {
     setIsRSVPed(isRSVPedInitially);
-  }, [isRSVPedInitially]);
+  }, [isBookmarkedInitially, isRSVPedInitially]);
 
   const handleBookmark = () => {
     const newBookmarked = !isBookmarked;
     setIsBookmarked(newBookmarked);
     setSaves(newBookmarked ? saves + 1 : saves - 1);
+    // TODO: Sync bookmark state with backend API
     if (onBookmarkChange) {
       onBookmarkChange(event.id, newBookmarked);
     }
@@ -117,10 +115,7 @@ export function EventCard({
       whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)' }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white/70 backdrop-blur-lg rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl cursor-pointer group relative transition-all border border-white/50"
-      style={{
-        boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.5)',
-      }}
+      className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl cursor-pointer group relative transition-all border border-gray-200"
     >
 
       {/* RSVP Popup */}

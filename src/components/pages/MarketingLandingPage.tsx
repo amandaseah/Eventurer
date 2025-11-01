@@ -19,6 +19,13 @@ import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import Footer from '../shared/Footer';
 
+const TECH_ICONS: Record<string, string> = {
+  'React': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
+  'TypeScript': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg',
+  'Tailwind CSS': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg',
+  'Motion': 'https://cdn.worldvectorlogo.com/logos/framer-motion.svg',
+};
+
 interface MarketingLandingPageProps {
   onExplore?: () => void;
   onDemo?: () => void;
@@ -297,13 +304,7 @@ function TechSection() {
               <div className="text-center">
                 <div className="mb-3 sm:mb-4 flex justify-center">
                   <img
-                    src={
-                      tech === 'React' ? 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg' :
-                      tech === 'TypeScript' ? 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg' :
-                      tech === 'Tailwind CSS' ? 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg' :
-                      tech === 'Motion' ? 'https://cdn.worldvectorlogo.com/logos/framer-motion.svg' :
-                      'https://ui.shadcn.com/apple-touch-icon.png'
-                    }
+                    src={TECH_ICONS[tech] || 'https://ui.shadcn.com/apple-touch-icon.png'}
                     alt={tech}
                     className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain"
                   />
