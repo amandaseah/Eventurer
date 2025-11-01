@@ -493,8 +493,6 @@ function GlobalLoader({ opacity }: { opacity: number }) {
   )
 }
 
-const IMMERSIVE_STATE_KEY = 'eventurer-immersive-mode'
-
 export default function ThreeLanding() {
   const navigate = useNavigate()
   const controlsRef = useRef<OrbitControlsImpl | null>(null)
@@ -511,10 +509,7 @@ export default function ThreeLanding() {
   const [canvasDpr, setCanvasDpr] = useState<[number, number]>([1, 1.6])
   const [showLoader, setShowLoader] = useState(true)
   const [loaderOpacity, setLoaderOpacity] = useState(1)
-  const [startInInteractive] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return window.sessionStorage.getItem(IMMERSIVE_STATE_KEY) === 'monitor'
-  })
+  const [startInInteractive] = useState(false)
   useCursor(isHovering)
 
   const isZoomed = currentZoomState === 'ZOOMED'
@@ -608,13 +603,6 @@ export default function ThreeLanding() {
         }
         if (endState === 'WIDE') {
           setOverlayOpen(false)
-        }
-        if (typeof window !== 'undefined') {
-          if (endState === 'ZOOMED') {
-            window.sessionStorage.setItem(IMMERSIVE_STATE_KEY, 'monitor')
-          } else if (endState === 'WIDE') {
-            window.sessionStorage.removeItem(IMMERSIVE_STATE_KEY)
-          }
         }
         postComplete?.()
       })

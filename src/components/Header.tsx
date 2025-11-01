@@ -80,16 +80,22 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                     <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </motion.button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => handleNavClick('profile')}>
+                <DropdownMenuContent align="end" className="w-48 border border-pink-100 bg-white/95 shadow-xl">
+                  <DropdownMenuItem
+                    onClick={() => handleNavClick('profile')}
+                    className="text-gray-600 focus:bg-pink-50 focus:text-pink-600"
+                  >
                     <User className="w-4 h-4" />
                     <span>Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleNavClick('settings')}>
+                  <DropdownMenuItem
+                    onClick={() => handleNavClick('settings')}
+                    className="text-gray-600 focus:bg-pink-50 focus:text-pink-600"
+                  >
                     <Settings className="w-4 h-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-pink-100" />
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={async () => {

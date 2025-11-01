@@ -129,8 +129,14 @@ export function CountdownWidget({
       }
     });
 
-    // Only show events if there are bookmarked or RSVP'd events
-    // Do not show fallback events if no user-specific events exist
+    // If user has no saved events, fall back to general upcoming events
+    if (eventMap.size === 0) {
+      normalizeEvents(fallbackEvents, 'general').forEach(event => {
+        if (!eventMap.has(event.id)) {
+          eventMap.set(event.id, { ...event, sources: ['general'] });
+        }
+      });
+    }
 
     // Convert to array and sort by date
     const combined = Array.from(eventMap.values()).sort(

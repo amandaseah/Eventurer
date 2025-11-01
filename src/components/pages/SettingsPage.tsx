@@ -1,10 +1,10 @@
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import Footer from '../shared/Footer';
-import { ArrowLeft, User, Trash2 } from 'lucide-react';
+import { ArrowLeft, User, Trash2, Bell, Lock, Settings as SettingsIcon, KeyRound } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { auth, db } from '../../lib/firebase';
-import { updateProfile, onAuthStateChanged } from 'firebase/auth';
+import { updateProfile, onAuthStateChanged, reauthenticateWithCredential, updatePassword, EmailAuthProvider } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { toast } from 'sonner';
 
@@ -17,6 +17,15 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [eventReminders, setEventReminders] = useState(true);
+  const [profileVisibility, setProfileVisibility] = useState<'public' | 'private' | 'friends'>('public');
+  const [dataSharing, setDataSharing] = useState(true);
+  const [defaultView, setDefaultView] = useState<'grid' | 'calendar'>('grid');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Load user data
   useEffect(() => {
@@ -31,6 +40,12 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
           const data = userDoc.data();
           setFirstName(data.firstName || '');
           setLastName(data.lastName || '');
+          setEmailNotifications(data.preferences?.emailNotifications ?? true);
+          setPushNotifications(data.preferences?.pushNotifications ?? true);
+          setEventReminders(data.preferences?.eventReminders ?? true);
+          setProfileVisibility(data.preferences?.profileVisibility ?? 'public');
+          setDataSharing(data.preferences?.dataSharing ?? true);
+          setDefaultView(data.preferences?.defaultView ?? 'grid');
         }
       } catch (err) {
         console.warn('Failed to load user data', err);
@@ -64,6 +79,74 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
     } catch (err: any) {
       console.error('Failed to save account settings', err);
       toast.error('Failed to save account settings');
+    }
+  };
+
+  const handleSavePreferences = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        toast.error('Please sign in to save preferences');
+        return;
+      }
+
+      await setDoc(doc(db, 'users', user.uid), {
+        preferences: {
+          emailNotifications,
+          pushNotifications,
+          eventReminders,
+          profileVisibility,
+          dataSharing,
+          defaultView,
+        },
+      }, { merge: true });
+
+      toast.success('Preferences updated');
+    } catch (err: any) {
+      console.error('Failed to save preferences', err);
+      toast.error('Failed to save preferences');
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error('Please fill in all password fields');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast.error('Password should be at least 6 characters');
+      return;
+    }
+
+    try {
+      const user = auth.currentUser;
+      if (!user || !user.email) {
+        toast.error('Please sign in again to change your password');
+        return;
+      }
+
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      toast.success('Password updated successfully');
+    } catch (err: any) {
+      console.error('Failed to update password', err);
+      const message = err?.code === 'auth/wrong-password'
+        ? 'Current password is incorrect'
+        : err?.code === 'auth/too-many-requests'
+          ? 'Too many attempts. Please try again later.'
+          : 'Failed to update password';
+      toast.error(message);
     }
   };
 
@@ -160,6 +243,69 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleSaveAccountSettings}
+              className="px-6 py-3 bg-pink-500 text-white rounded-2xl hover:bg-pink-600 transition-all font-semibold"
+            >
+              Save Account Information
+            </motion.button>
+          </div>
+        </motion.section>
+
+        {/* Password */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md mb-6"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <KeyRound className="w-5 h-5 text-pink-500" />
+            <h2 className="text-xl sm:text-2xl font-semibold">Password</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Current Password
+              </label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="Enter current password"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  placeholder="Create a new password"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  placeholder="Re-enter new password"
+                />
+              </div>
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleChangePassword}
               className="px-6 py-3 bg-pink-500 text-white rounded-2xl hover:bg-pink-600 transition-all font-semibold"
             >
               Update Password

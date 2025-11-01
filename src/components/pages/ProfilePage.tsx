@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Bookmark, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Bookmark, CheckCircle, ArrowLeft, History } from 'lucide-react';
 
 interface ProfilePageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -53,6 +53,7 @@ export function ProfilePage({
   // Filter events based on bookmarked and RSVP'd IDs
   const bookmarkedEvents = events.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
   const rsvpedEvents = events.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
+  const pastEvents = events.filter(e => rsvpedEventIds.includes(e.id) && e.isPast);
 
   const handleSignOut = async () => {
     try {
@@ -99,16 +100,8 @@ export function ProfilePage({
     if (currentUser.email) setUserEmail(currentUser.email);
   }, [currentUser]);
 
-  // Sync when parent-provided currentUser prop changes (e.g., after login)
-  useEffect(() => {
-    if (!currentUser) return;
-    if (currentUser.displayName) setUserName(currentUser.displayName);
-    else if (currentUser.firstName || currentUser.lastName) setUserName(`${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim());
-    if (currentUser.email) setUserEmail(currentUser.email);
-  }, [currentUser]);
-
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen bg-gradient-to-br from-white via-[#faf7ff] to-white">
       <style>{`
         [data-slot="tabs-trigger"] {
           padding: 0.5rem !important;
@@ -130,9 +123,13 @@ export function ProfilePage({
           }
         }
       `}</style>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute inset-x-0 top-[-160px] h-64 bg-gradient-to-b from-pink-100/40 via-purple-100/20 to-transparent" />
+      </div>
+
       <Header currentPage="profile" onNavigate={onNavigate} />
 
-      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 py-10 sm:py-16 max-w-5xl">
         {/* Back Button - Sticky */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
@@ -145,26 +142,30 @@ export function ProfilePage({
           <span>Back</span>
         </motion.button>
 
-        {/* Profile Header */}
-        <ProfileHeader
-          name={user.name}
-          email={user.email}
-          memberSince={user.memberSince}
-          onSignOut={handleSignOut}
-        />
+        <div className="grid gap-6 sm:gap-8">
+          {/* Profile Header */}
+          <ProfileHeader
+            name={user.name}
+            email={user.email}
+            memberSince={user.memberSince}
+            onSignOut={handleSignOut}
+            onSettings={() => onNavigate('settings')}
+          />
 
-        {/* Profile Stats */}
-        <ProfileStats
-          bookmarkedCount={bookmarkedEvents.length}
-          upcomingCount={rsvpedEvents.length}
-        />
+          {/* Profile Stats */}
+          <ProfileStats
+            bookmarkedCount={bookmarkedEvents.length}
+            upcomingCount={rsvpedEvents.length}
+            pastCount={pastEvents.length}
+          />
+        </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-2 w-full mb-6 sm:mb-8 bg-white rounded-2xl !p-1 sm:!p-1.5 shadow-md !h-auto gap-1 sm:!gap-1">
+            <TabsList className="grid grid-cols-3 w-full mb-6 sm:mb-10 bg-white border border-gray-100 rounded-3xl !p-1.5 sm:!p-2 shadow-sm !h-auto gap-1 sm:!gap-1.5">
               <TabsTrigger
                 value="bookmarked"
-                className="!rounded-lg data-[state=active]:bg-purple-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
+                className="!rounded-2xl data-[state=active]:bg-pink-50 data-[state=active]:shadow-sm data-[state=active]:text-pink-600 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium text-gray-600"
                 style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
               >
                 <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -172,20 +173,32 @@ export function ProfilePage({
               </TabsTrigger>
               <TabsTrigger
                 value="upcoming"
-                className="!rounded-lg data-[state=active]:bg-green-100 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium"
+                className="!rounded-2xl data-[state=active]:bg-emerald-50 data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium text-gray-600"
                 style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
               >
                 <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                 <span className="truncate">Upcoming</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="past"
+                className="!rounded-2xl data-[state=active]:bg-slate-50 data-[state=active]:shadow-sm data-[state=active]:text-slate-600 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium text-gray-600"
+                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
+              >
+                <History className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="truncate">Past</span>
               </TabsTrigger>
             </TabsList>
 
 
           {/* Bookmarked Events */}
           <TabsContent value="bookmarked">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white border border-gray-100 rounded-3xl p-5 sm:p-8 shadow-sm"
+            >
               <div className="mb-4 sm:mb-6">
-                <h2 className="text-base sm:text-2xl mb-1 sm:mb-2">Bookmarked Events</h2>
+                <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Bookmarked Events</h2>
                 <p className="text-xs sm:text-base text-gray-600">Events you've saved for later</p>
               </div>
 
@@ -203,7 +216,7 @@ export function ProfilePage({
                   onRSVPChange={onRSVPChange}
                 />
               ) : (
-                <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center">
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center border border-dashed border-gray-200">
                   <Bookmark className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
                   <p className="text-sm sm:text-xl text-gray-500">No bookmarked events yet</p>
                 </div>
@@ -213,9 +226,13 @@ export function ProfilePage({
 
           {/* Upcoming RSVP'd Events */}
           <TabsContent value="upcoming">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white border border-gray-100 rounded-3xl p-5 sm:p-8 shadow-sm"
+              >
                 <div className="mb-4 sm:mb-6">
-                  <h2 className="text-base sm:text-2xl mb-1 sm:mb-2">Upcoming Events</h2>
+                  <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Upcoming Events</h2>
                   <p className="text-xs sm:text-base text-gray-600">Events you've RSVP'd to</p>
                 </div>
 
@@ -231,10 +248,42 @@ export function ProfilePage({
                     onRSVPChange={onRSVPChange}
                   />
                 ) : (
-                  <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center">
+                  <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center border border-dashed border-gray-200">
                     <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
                     <p className="text-sm sm:text-xl text-gray-500">No upcoming events</p>
                   </div>
+              )}
+            </motion.div>
+          </TabsContent>
+
+          {/* Past Events */}
+          <TabsContent value="past">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white border border-gray-100 rounded-3xl p-5 sm:p-8 shadow-sm"
+            >
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Past Events</h2>
+                <p className="text-xs sm:text-base text-gray-600">Events you've already attended</p>
+              </div>
+
+              {pastEvents.length > 0 ? (
+                <EventsGrid
+                  events={[...pastEvents].sort(
+                    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+                  )}
+                  onEventClick={(id) => onNavigate("event-info", { eventId: id })}
+                  bookmarkedEventIds={bookmarkedEventIds}
+                  rsvpedEventIds={rsvpedEventIds}
+                  onBookmarkChange={onBookmarkChange}
+                  onRSVPChange={onRSVPChange}
+                />
+              ) : (
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center border border-dashed border-gray-200">
+                  <History className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                  <p className="text-sm sm:text-xl text-gray-500">No past events yet</p>
+                </div>
               )}
             </motion.div>
           </TabsContent>
