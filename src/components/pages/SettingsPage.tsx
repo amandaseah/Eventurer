@@ -619,7 +619,7 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
           </div>
       </div>
 
-      <Footer />
+      <Footer onNavigate={onNavigate} />
 
       <style>{`
         .hide-scrollbar::-webkit-scrollbar {

@@ -116,7 +116,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
           </p>
         </motion.div>
       </div>
-      <Footer />
+      <Footer onNavigate={onNavigate} />
     </div>
   );
 }

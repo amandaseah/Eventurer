@@ -253,7 +253,7 @@ export function EventExplorePage({
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer onNavigate={onNavigate} />
     </div>
   );
 }

@@ -281,7 +281,7 @@ export function ProfilePage({
           </TabsContent>
         </Tabs>
       </div>
-      <Footer />
+      <Footer onNavigate={onNavigate} />
     </div>
   );
 }

@@ -187,7 +187,7 @@ export function EventInfoPage({
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer onNavigate={onNavigate} />
     </div>
   );
 }

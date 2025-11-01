@@ -160,7 +160,7 @@ export function LandingPage({
           </div>
         </section>
       </div>
-      <Footer />
+      <Footer onNavigate={onNavigate} />
     </div>
   );
 }
