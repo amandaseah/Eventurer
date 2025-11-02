@@ -71,7 +71,7 @@ function ShellApp() {
             const userData = userDoc.data();
             setBookmarkedEventIds(userData.bookmarkedEventIds || []);
             setRsvpedEventIds(userData.rsvpedEventIds || []);
-            setUsername(userData.username || user.displayName || "User");
+            setUsername(userData.username ||`${userData.firstName || ''} ${userData.lastName || ''}`.trim() || user.displayName || "User");
           }else{
             setUsername(user.displayName || "User");
           }

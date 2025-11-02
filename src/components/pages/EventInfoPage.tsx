@@ -37,7 +37,9 @@ export function EventInfoPage({
   username,
 }: EventInfoPageProps) {
 
-  console.log("EventInfoPage loaded with username:", username);
+  useEffect(() => {
+    console.log("[EventInfoPage] received username:", username);
+  }, [username]);
 
   const [event, setEvent] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
@@ -178,7 +180,7 @@ export function EventInfoPage({
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onNavigate("event-forum", { eventId, username })}
+              onClick={() => {console.log("Navigating to forum with:", eventId, username); onNavigate("event-forum", { eventId, username })}}
               className="w-full bg-white rounded-3xl p-6 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
             >
               <MessageSquare className="w-5 h-5 text-pink-500" />
