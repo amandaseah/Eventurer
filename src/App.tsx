@@ -338,6 +338,8 @@ function ShellApp() {
               rsvpedEventIds={rsvpedEventIds}
               onBookmarkChange={handleBookmarkChange}
               onRSVPChange={handleRSVPChange}
+              username={username}
+              onUsernameChange={setUsername}
             />
           }
         />

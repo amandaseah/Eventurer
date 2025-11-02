@@ -86,7 +86,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
         ) : (
           <>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-              <NewPostForm onAddPost={addPost} />
+              <NewPostForm onAddPost={(text, image) => addPost(text, image as any, username)} />
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="space-y-4">

@@ -22,6 +22,8 @@ interface ProfilePageProps {
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
   onRSVPChange: (eventId: number, isRSVPed: boolean) => void;
   currentUser?: any;
+  username?: string;
+  onUsernameChange?: (username: string) => void;
 }
 
 export function ProfilePage({
@@ -33,6 +35,8 @@ export function ProfilePage({
   onBookmarkChange,
   onRSVPChange,
   currentUser,
+  username,
+  onUsernameChange,
 }: ProfilePageProps & { events: any[] }) {
   const [activeTab, setActiveTab] = useState('bookmarked');
 
@@ -48,6 +52,8 @@ export function ProfilePage({
     }
     return 'January 2025';
   });
+
+  const [localUsername, setLocalUsername] = useState<string>(username ?? "");
 
   const user = { name: userName, email: userEmail, memberSince };
 
@@ -66,6 +72,15 @@ export function ProfilePage({
     onNavigate('login');
   };
 
+  const saveUsername = (newName: string) => {
+    try {
+      sessionStorage.setItem("username", newName);
+      localStorage.setItem("username", newName);
+    } catch (e) {
+      // ignore storage errors
+    }
+    if (onUsernameChange) onUsernameChange(newName);
+  };
 
   // Listen for auth state changes so the page updates after signup/login
   useEffect(() => {
@@ -100,6 +115,10 @@ export function ProfilePage({
     else if (currentUser.firstName || currentUser.lastName) setUserName(`${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim());
     if (currentUser.email) setUserEmail(currentUser.email);
   }, [currentUser]);
+
+  useEffect(() => {
+    if (username) setLocalUsername(username);
+  }, [username]);
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-white via-[#faf7ff] to-white">

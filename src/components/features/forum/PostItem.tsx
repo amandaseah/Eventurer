@@ -121,7 +121,7 @@ export default function PostItem({ post, username, depth = 0, onUpvote, onSubmit
                 <img 
                   src={replyImage} 
                   alt="Reply preview" 
-                  className="w-full max-h-48 object-cover rounded-2xl" 
+                  className="w-full h-full object-cover rounded-2xl" 
                 />
                 <button
                   onClick={() => setReplyImage(null)}

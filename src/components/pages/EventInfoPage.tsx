@@ -36,10 +36,16 @@ export function EventInfoPage({
   onRSVPChange,
   username,
 }: EventInfoPageProps) {
+  // Resolve username: prefer prop, fall back to session/local storage, then 'Guest'
+  const resolvedUsername =
+    username ||
+    (typeof sessionStorage !== "undefined" && sessionStorage.getItem("username")) ||
+    (typeof localStorage !== "undefined" && localStorage.getItem("username")) ||
+    "Guest";
 
   useEffect(() => {
-    console.log("[EventInfoPage] received username:", username);
-  }, [username]);
+    console.log("[EventInfoPage] resolved username:", resolvedUsername);
+  }, [resolvedUsername]);
 
   const [event, setEvent] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
@@ -158,9 +164,9 @@ export function EventInfoPage({
 
             <TopForumPreview
               posts={posts.slice(0, 3)}
-              onViewAll={() => onNavigate("event-forum", { eventId, username })}
-              onPostClick={(postId) => onNavigate("event-forum", { eventId, postId, username })}
-              upvotePost={(postId) => upvotePost(postId, username)}
+              onViewAll={() => onNavigate("event-forum", { eventId, username: resolvedUsername })}
+              onPostClick={(postId) => onNavigate("event-forum", { eventId, postId, username: resolvedUsername })}
+              upvotePost={(postId) => upvotePost(postId, resolvedUsername)}
               username={username}
             />
 
@@ -180,7 +186,10 @@ export function EventInfoPage({
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => {console.log("Navigating to forum with:", eventId, username); onNavigate("event-forum", { eventId, username })}}
+              onClick={() => {
+                console.log("Navigating to forum with:", eventId, resolvedUsername);
+                onNavigate("event-forum", { eventId, username: resolvedUsername });
+              }}
               className="w-full bg-white rounded-3xl p-6 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
             >
               <MessageSquare className="w-5 h-5 text-pink-500" />
