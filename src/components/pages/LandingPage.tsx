@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
-import { Sparkles, Star, Zap, Heart } from 'lucide-react';
+import { Star, Zap } from 'lucide-react';
 import { EventCard } from '../features/event/EventCard';
 // import { events } from '../../lib/mockData';
 
@@ -81,22 +81,6 @@ export function LandingPage({
                 className="text-xl text-gray-600 max-w-2xl mx-auto"
               >
               </motion.p>
-
-              {/* Decorative elements */}
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                className="absolute -top-4 -right-4 w-16 h-16 text-pink-300"
-              >
-                <Sparkles className="w-full h-full" />
-              </motion.div>
-              <motion.div
-                animate={{ rotate: [360, 0] }}
-                transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-                className="absolute -bottom-4 -left-4 w-12 h-12 text-pink-200"
-              >
-                <Heart className="w-full h-full" />
-              </motion.div>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">

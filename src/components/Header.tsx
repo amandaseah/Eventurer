@@ -179,11 +179,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 text-gray-600 hover:text-pink-500"
             >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
+              <Menu className="w-6 h-6" />
             </motion.button>
           </div>
         </div>
@@ -213,7 +209,18 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                 boxShadow: '-4px 0 24px 0 rgba(31, 38, 135, 0.15), inset 1px 0 0 0 rgba(255, 255, 255, 0.5)',
               }}
             >
-              <nav className="flex flex-col p-6 gap-1.5">
+              {/* Close button inside menu */}
+              <div className="flex justify-end p-4 pb-0">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 text-gray-600 hover:text-pink-500 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </motion.button>
+              </div>
+
+              <nav className="flex flex-col p-6 pt-2 gap-1.5">
                 {navItems.map((item) => (
                   <motion.button
                     key={item.id}

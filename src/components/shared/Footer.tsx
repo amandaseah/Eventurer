@@ -1,5 +1,4 @@
-import { motion } from 'motion/react';
-import { Twitter, Instagram, Facebook, Heart, Mail, Phone } from 'lucide-react';
+import { Twitter, Instagram, Facebook, Mail, Phone } from 'lucide-react';
 
 interface FooterProps {
   onNavigate?: (page: string) => void;
@@ -51,7 +50,6 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
             </p>
             <div className="flex items-center gap-1.5 text-xs text-gray-500">
               <span>Made by G6's Group 8</span>
-              <Heart className="w-3.5 h-3.5 fill-pink-500 text-pink-500" />
             </div>
           </div>
 

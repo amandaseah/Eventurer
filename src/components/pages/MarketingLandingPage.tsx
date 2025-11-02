@@ -109,10 +109,22 @@ function Header({ onExplore }: { onExplore?: () => void }) {
           <span className="text-xl tracking-tight text-gray-900 font-semibold">Eventurer</span>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          className="flex items-center gap-2 sm:gap-3"
+        >
+          <Button
+            onClick={() => window.location.href = '/app/login'}
+            variant="outline"
+            className="h-10 sm:h-11 rounded-full px-4 sm:px-6 text-sm sm:text-base border-gray-300 text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-400"
+          >
+            Skip to App
+          </Button>
           <Button
             onClick={() => onExplore?.()}
-            className="h-11 rounded-full bg-gray-900 px-6 text-white shadow-md transition-all duration-200 hover:bg-gray-800"
+            className="h-10 sm:h-11 rounded-full bg-gray-900 px-4 sm:px-6 text-sm sm:text-base text-white shadow-md transition-all duration-200 hover:bg-gray-800"
           >
             Get Started
           </Button>
