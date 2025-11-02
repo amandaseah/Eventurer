@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { saveToIndexedDB, getFromIndexedDB } from "../lib/indexeddb";
+import { saveToIndexedDB, getFromIndexedDB } from "../lib/indexedDB";
 
 interface Reply {
   id: string;

@@ -36,7 +36,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
     );
   }
 
-  //console.log("EventForumPage loaded with username:", username);
+  console.log("EventForumPage loaded with username:", username);
 
   return (
     <div className="min-h-screen bg-gray-50">

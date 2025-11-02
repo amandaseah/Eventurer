@@ -59,6 +59,7 @@ function ShellApp() {
   const location = useLocation();
   const [bookmarkedEventIds, setBookmarkedEventIds] = useState<number[]>([]);
   const [rsvpedEventIds, setRsvpedEventIds] = useState<number[]>([]);
+  const [username, setUsername] = useState<string>("Guest");
 
   // Load user's bookmarks and RSVPs from Firebase
   useEffect(() => {
@@ -70,6 +71,9 @@ function ShellApp() {
             const userData = userDoc.data();
             setBookmarkedEventIds(userData.bookmarkedEventIds || []);
             setRsvpedEventIds(userData.rsvpedEventIds || []);
+            setUsername(userData.username || user.displayName || "User");
+          }else{
+            setUsername(user.displayName || "User");
           }
         } catch (err) {
           console.warn('Failed to load user event data', err);
@@ -78,6 +82,7 @@ function ShellApp() {
         // User signed out, clear data
         setBookmarkedEventIds([]);
         setRsvpedEventIds([]);
+        setUsername("Guest");
       }
     });
 
@@ -308,6 +313,7 @@ function ShellApp() {
               rsvpedEventIds={rsvpedEventIds}
               onBookmarkChange={handleBookmarkChange}
               onRSVPChange={handleRSVPChange}
+              username={username}
             />
           }
         />
@@ -317,7 +323,7 @@ function ShellApp() {
             <EventForumRoute
               events={fetchedEvents}
               onNavigate={handleNavigate}
-              username="Guest"
+              username={username}
             />
           }
         />
@@ -421,6 +427,7 @@ function EventInfoRoute({
   rsvpedEventIds,
   onBookmarkChange,
   onRSVPChange,
+  username,
 }: {
   events: any[]
   onNavigate: (page: string, data?: NavigateData) => void
@@ -428,6 +435,7 @@ function EventInfoRoute({
   rsvpedEventIds: number[]
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void
   onRSVPChange: (eventId: number, isRSVPed: boolean) => void
+  username: string
 }) {
   const { eventId } = useParams<{ eventId?: string }>()
   const navigate = useNavigate()
@@ -446,6 +454,7 @@ function EventInfoRoute({
       rsvpedEventIds={rsvpedEventIds}
       onBookmarkChange={onBookmarkChange}
       onRSVPChange={onRSVPChange}
+      username={username}
     />
   )
 }

@@ -37,7 +37,7 @@ export function EventInfoPage({
   username,
 }: EventInfoPageProps) {
 
-  //console.log("EventInfoPage loaded with username:", username);
+  console.log("EventInfoPage loaded with username:", username);
 
   const [event, setEvent] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
