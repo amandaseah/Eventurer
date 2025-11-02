@@ -148,7 +148,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         <Button
           onClick={() => fileRef.current?.click()}
           variant="outline"
-          className="rounded-full text-sm sm:text-base py-2 sm:py-2.5 w-full sm:flex-1"
+          className="rounded-full text-sm sm:text-base py-2 sm:py-2.5 w-full sm:w-1/2"
         >
           <ImageIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
           Add Image
@@ -156,7 +156,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         <Button
           onClick={handleSubmit}
           disabled={!text.trim() && !imageBlob}
-          className="rounded-xl bg-pink-400 hover:bg-pink-500 hover:shadow-lg text-sm sm:text-base py-2 sm:py-2.5 w-full sm:w-auto font-semibold"
+          className="rounded-xl bg-pink-400 hover:bg-pink-500 hover:shadow-lg text-sm sm:text-base py-2 sm:py-2.5 w-full sm:w-1/2 font-semibold"
         >
           <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
           Post Comment
