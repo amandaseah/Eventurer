@@ -130,7 +130,7 @@ export default function RecommendationPanel({
                     scale: idx === current ? 1.2 : 1,
                     backgroundColor: idx === current ? "#f472b6" : "#fde2f2",
                   }}
-                  className="w-3 h-3 rounded-full cursor-pointer"
+                  className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full cursor-pointer"
                 />
               ))}
             </div>
@@ -148,7 +148,7 @@ function RecommendationHeader({ title }: { title: string }) {
       animate={{ opacity: 1, y: 0 }}
       className="text-center mb-8"
     >
-      <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold mb-2 text-gray-900">
+      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-gray-900">
         {title}
       </h2>
       <p className="text-[11px] sm:text-sm text-gray-500">

@@ -16,6 +16,7 @@ import { doc, getDoc } from 'firebase/firestore';
 
 interface EventExplorePageProps {
   onNavigate: (page: string, data?: any) => void;
+  events: any[];
   bookmarkedEventIds: number[];
   rsvpedEventIds: number[];
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
@@ -31,7 +32,7 @@ export function EventExplorePage({
   onBookmarkChange, 
   onRSVPChange,
   loading = false,
-}: EventExplorePageProps & { events: any[] }) {
+}: EventExplorePageProps) {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [priceFilter, setPriceFilter] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
@@ -125,11 +126,11 @@ export function EventExplorePage({
           className="text-center mb-10 sm:mb-12"
         >
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <Star className="w-4 h-4 sm:w-6 sm:w-8 text-yellow-500" />
-            <h1 className="text-xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
+            <Star className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-500" />
+            <h1 className="text-4xl sm:text-4xl md:text-4xl lg:text-5xl font-bold text-gray-900">
               Explore Events
             </h1>
-            <Star className="w-4 h-4 sm:w-6 sm:w-8 text-yellow-500" />
+            <Star className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-500" />
           </div>
           <p className="text-xs sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
             Filter by mood, price, date, or just browse everything
