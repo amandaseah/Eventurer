@@ -786,11 +786,10 @@ export default function ThreeLanding() {
           onClick={closeOverlay}
           style={{
             position: 'absolute',
-            top: 24,
-            right: 24,
-            padding: '0.6rem 1.2rem',
+            bottom: 6,
+            padding: '0.6rem 8rem',
             borderRadius: 999,
-            border: '1px solid rgba(255,255,255,0.25)',
+            border: '2px solid rgba(255,255,255,0.25)',
             background: 'rgba(10,10,12,0.8)',
             color: '#fff',
             fontSize: '0.9rem',
