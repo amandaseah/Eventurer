@@ -23,6 +23,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom'
 import ThreeLanding from './components/features/landing3D/ThreeLanding'
 import HomePreview from './components/pages/HomePreview'
+import { ChoicePage } from './components/pages/ChoicePage'
 
 interface Discussion {
   id: number;
@@ -500,6 +501,8 @@ export default function App() {
       <Routes>
         {/* Marketing landing as entry point */}
         <Route path="/" element={<MarketingScreen />} />
+        {/* Choice page for users to select experience */}
+        <Route path="/choice" element={<ChoiceScreen />} />
         {/* 3D landing experience */}
         <Route path="/immersive" element={<ThreeLanding />} />
         {/* The page shown inside the monitor iframe */}
@@ -517,8 +520,23 @@ function MarketingScreen() {
   const navigate = useNavigate();
   return (
     <MarketingLandingPage
-      onExplore={() => navigate('/immersive')}
-      onDemo={() => navigate('/immersive')}
+      onExplore={() => navigate('/choice')}
+      onDemo={() => navigate('/choice')}
+    />
+  );
+}
+
+function ChoiceScreen() {
+  const navigate = useNavigate();
+  return (
+    <ChoicePage
+      onChoice={(choice) => {
+        if (choice === '3d') {
+          navigate('/immersive');
+        } else {
+          navigate('/app/login');
+        }
+      }}
     />
   );
 }
