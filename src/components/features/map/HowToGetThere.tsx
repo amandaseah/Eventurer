@@ -702,23 +702,53 @@ export default function HowToGetThere({ event }: { event: any }) {
 
   // 3) User location
   const locateMe = () => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      console.warn('[HowToGetThere] Geolocation not supported');
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
     setGeoPending(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        console.log('[HowToGetThere] Location success:', pos.coords);
         setYouPos({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setGeoPending(false);
       },
-      () => {
+      (error) => {
+        console.warn('[HowToGetThere] Location error:', error.code, error.message);
+
+        // Provide user-friendly error messages
+        let errorMessage = 'Unable to get your location. ';
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage += 'Please allow location access in your browser settings.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage += 'Location information is unavailable.';
+            break;
+          case error.TIMEOUT:
+            errorMessage += 'Location request timed out. Please try again.';
+            break;
+          default:
+            errorMessage += 'An unknown error occurred.';
+        }
+        alert(errorMessage);
+
         setYouPos(null);
         setGeoPending(false);
       },
-      { enableHighAccuracy: true, timeout: 8000 }
+      {
+        enableHighAccuracy: false, // Use less accurate but faster location on mobile
+        timeout: 15000, // Increased timeout for iOS
+        maximumAge: 300000 // Cache location for 5 minutes
+      }
     );
   };
-  useEffect(() => {
-    locateMe();
-  }, []);
+
+  // Don't auto-request location on mount - wait for user to click the button
+  // useEffect(() => {
+  //   locateMe();
+  // }, []);
 
   useEffect(() => {
     if (!youPos || !selectedTransit || transitRouteLoadingKey) return;
