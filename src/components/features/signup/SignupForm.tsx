@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Mail, Lock, AlertTriangle, User } from 'lucide-react';
+import { Mail, Lock, AlertTriangle, User, Eye, EyeOff } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
@@ -19,6 +19,8 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,12 +108,20 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
             id="password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="Create a password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
+            className="pl-11 pr-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
         </div>
       </motion.div>
 
@@ -127,12 +137,20 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
             id="confirm"
-            type="password"
+            type={showConfirm ? 'text' : 'password'}
             placeholder="Confirm password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
+            className="pl-11 pr-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
+          <button
+            type="button"
+            onClick={() => setShowConfirm((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
+          >
+            {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
         </div>
       </motion.div>
 
