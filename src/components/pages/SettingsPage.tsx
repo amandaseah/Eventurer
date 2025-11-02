@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import Footer from '../shared/Footer';
-import { User, Trash2, Bell, Lock, Settings as SettingsIcon, KeyRound, LogOut, ChevronLeft, ChevronRight, HelpCircle, Shield } from 'lucide-react';
+import { User, Trash2, Lock, Settings as SettingsIcon, KeyRound, LogOut, ChevronLeft, ChevronRight, HelpCircle, Shield } from 'lucide-react';
 import { BackButton } from '../shared/BackButton';
 import { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../../lib/firebase';
@@ -18,9 +18,6 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [eventReminders, setEventReminders] = useState(true);
   const [dataSharing, setDataSharing] = useState(true);
   const [defaultView, setDefaultView] = useState<'grid' | 'calendar'>('grid');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -44,9 +41,6 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
           const data = userDoc.data();
           setFirstName(data.firstName || '');
           setLastName(data.lastName || '');
-          setEmailNotifications(data.preferences?.emailNotifications ?? true);
-          setPushNotifications(data.preferences?.pushNotifications ?? true);
-          setEventReminders(data.preferences?.eventReminders ?? true);
           setDataSharing(data.preferences?.dataSharing ?? true);
           setDefaultView(data.preferences?.defaultView ?? 'grid');
         }
@@ -124,9 +118,6 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
 
       await setDoc(doc(db, 'users', user.uid), {
         preferences: {
-          emailNotifications,
-          pushNotifications,
-          eventReminders,
           dataSharing,
           defaultView,
         },
@@ -215,7 +206,6 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
   const navItems = [
     { id: 'account', label: 'Account Info', icon: User, type: 'scroll' as const },
     { id: 'password', label: 'Password', icon: KeyRound, type: 'scroll' as const },
-    { id: 'notifications', label: 'Notifications', icon: Bell, type: 'scroll' as const },
     { id: 'privacy', label: 'Privacy', icon: Lock, type: 'scroll' as const },
     { id: 'preferences', label: 'Preferences', icon: SettingsIcon, type: 'scroll' as const },
     { id: 'help', label: 'Help & Safety', icon: HelpCircle, type: 'scroll' as const },
@@ -423,70 +413,6 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               </div>
             </motion.section>
 
-            {/* Notification Preferences */}
-            <motion.section
-              id="notifications"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <Bell className="w-5 h-5 text-pink-500" />
-                <h2 className="text-xl sm:text-2xl font-semibold">Notification Preferences</h2>
-              </div>
-
-              <div className="space-y-4">
-                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-                  <div>
-                    <p className="font-medium">Email Notifications</p>
-                    <p className="text-sm text-gray-600">Receive updates via email</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={emailNotifications}
-                    onChange={(e) => setEmailNotifications(e.target.checked)}
-                    className="w-5 h-5 rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 cursor-pointer"
-                  />
-                </label>
-
-                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-                  <div>
-                    <p className="font-medium">Push Notifications</p>
-                    <p className="text-sm text-gray-600">Receive push notifications</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={pushNotifications}
-                    onChange={(e) => setPushNotifications(e.target.checked)}
-                    className="w-5 h-5 rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 cursor-pointer"
-                  />
-                </label>
-
-                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-                  <div>
-                    <p className="font-medium">Event Reminders</p>
-                    <p className="text-sm text-gray-600">Get reminded about upcoming events</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={eventReminders}
-                    onChange={(e) => setEventReminders(e.target.checked)}
-                    className="w-5 h-5 rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 cursor-pointer"
-                  />
-                </label>
-
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleSavePreferences}
-                  className="px-6 py-3 bg-pink-200 text-pink-600 rounded-2xl hover:bg-pink-300 transition-all font-semibold"
-                >
-                  Save Preferences
-                </motion.button>
-              </div>
-            </motion.section>
-
             {/* Privacy */}
             <motion.section
               id="privacy"
@@ -631,7 +557,7 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               </div>
             </motion.section>
 
-            {/* Danger Zone */}
+            {/* Delete account */}
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

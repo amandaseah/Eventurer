@@ -142,7 +142,7 @@ export function EventCard({
         )}
       </AnimatePresence>
 
-      <div className="relative overflow-hidden h-48" onClick={() => onEventClick(event.id)}>
+      <div className="relative overflow-hidden h-40 sm:h-48" onClick={() => onEventClick(event.id)}>
         <Image
           src={event.imageUrl}
           alt={event.title}
@@ -159,16 +159,16 @@ export function EventCard({
         )}
 
         {/* Top badges row */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+        <div className="absolute top-2 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 flex items-center justify-between">
           {/* Closing Soon badge - left side */}
           {isClosingSoon() && !event.isPast && (
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-red-500/95 backdrop-blur-md shadow-lg"
+              className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-full bg-red-500/95 backdrop-blur-md shadow-lg"
             >
-              <Clock className="w-3 h-3 text-white" />
-              <span className="text-xs font-bold text-white">Closing Soon</span>
+              <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
+              <span className="text-[10px] sm:text-xs font-bold text-white">Closing Soon</span>
             </motion.div>
           )}
 
@@ -183,34 +183,34 @@ export function EventCard({
               e.stopPropagation();
               handleBookmark();
             }}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-full backdrop-blur-md transition-all shadow-md ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-2 rounded-full backdrop-blur-md transition-all shadow-md ${
               isBookmarked ? 'bg-pink-400 text-white' : 'bg-white/95 text-gray-700 hover:bg-white'
             }`}
           >
-            <Bookmark className="w-3.5 h-3.5" fill={isBookmarked ? 'currentColor' : 'none'} />
-            <span className="text-xs font-semibold">{saves}</span>
+            <Bookmark className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill={isBookmarked ? 'currentColor' : 'none'} />
+            <span className="text-[10px] sm:text-xs font-semibold">{saves}</span>
           </motion.button>
         </div>
 
         {/* Price badge */}
-        <div className="absolute bottom-3 left-3">
-          <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md">
-            <span className="text-sm font-bold text-pink-500">{event.price}</span>
+        <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3">
+          <div className="bg-white/95 backdrop-blur-md px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-md">
+            <span className="text-xs sm:text-sm font-bold text-pink-500">{event.price}</span>
           </div>
         </div>
       </div>
 
-      <div className={`p-5 ${centerText ? 'text-center' : ''}`} onClick={() => onEventClick(event.id)}>
-        <h3 className="mb-2 line-clamp-1 font-semibold text-lg text-gray-900">{event.title}</h3>
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{event.description}</p>
+      <div className={`p-3 sm:p-5 ${centerText ? 'text-center' : ''}`} onClick={() => onEventClick(event.id)}>
+        <h3 className="mb-1.5 sm:mb-2 line-clamp-1 font-semibold text-base sm:text-lg text-gray-900">{event.title}</h3>
+        <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 line-clamp-2">{event.description}</p>
 
-        <div className="space-y-2 mb-4">
-          <div className={`flex items-center gap-2 text-sm text-gray-600 ${centerText ? 'justify-center' : ''}`}>
-            <Calendar className="w-4 h-4 text-pink-500" />
+        <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
+          <div className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 ${centerText ? 'justify-center' : ''}`}>
+            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-500" />
             <span>{formatDateToDDMMYYYY(event.date)} at {event.time}</span>
           </div>
-          <div className={`flex items-center gap-2 text-sm text-gray-600 ${centerText ? 'justify-center' : ''}`}>
-            <MapPin className="w-4 h-4 text-pink-500" />
+          <div className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 ${centerText ? 'justify-center' : ''}`}>
+            <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-500" />
             <span className="line-clamp-1">{event.location}</span>
           </div>
         </div>
@@ -230,7 +230,7 @@ export function EventCard({
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
-                className={`w-full py-3 rounded-xl transition-all flex items-center justify-center font-semibold ${
+                className={`w-full py-2 sm:py-3 rounded-xl transition-all flex items-center justify-center text-sm sm:text-base font-semibold ${
                   isRSVPed
                     ? 'bg-green-500 text-white hover:bg-green-600 shadow-md'
                     : 'bg-pink-200 text-pink-600 border border-pink-300 hover:bg-pink-300 shadow-sm hover:shadow-md'

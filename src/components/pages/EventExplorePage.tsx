@@ -108,7 +108,7 @@ export function EventExplorePage({
     });
   }
 
-  const skeletonItems = Array.from({ length: 6 })
+  const skeletonItems = Array.from({ length: 6 }, (_, i) => i);
 
   return (
     <div className="min-h-screen">
@@ -124,14 +124,14 @@ export function EventExplorePage({
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10 sm:mb-12"
         >
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <Star className="w-8 h-8 text-yellow-500" />
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <Star className="w-4 h-4 sm:w-6 sm:w-8 text-yellow-500" />
+            <h1 className="text-xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
               Explore Events
             </h1>
-            <Star className="w-8 h-8 text-yellow-500" />
+            <Star className="w-4 h-4 sm:w-6 sm:w-8 text-yellow-500" />
           </div>
-          <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xs sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
             Filter by mood, price, date, or just browse everything
           </p>
         </motion.div>
@@ -210,7 +210,7 @@ export function EventExplorePage({
 
             {/* Grid View */}
             {viewMode === 'grid' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                 {loading
                   ? skeletonItems.map((_, idx) => <ExploreCardSkeleton key={idx} />)
                   : allEvents.map((event, idx) => (

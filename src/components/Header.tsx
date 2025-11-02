@@ -52,7 +52,6 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
   const navItems = [
     { name: 'Home', id: 'landing', icon: Home },
     { name: 'Explore', id: 'explore', icon: Search },
-    { name: 'My Events', id: 'profile', icon: Calendar },
   ];
 
   const handleNavClick = (page: string) => {
@@ -104,8 +103,8 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               ))}
             </nav>
 
-            {/* Mobile & Desktop Right Side */}
-            <div className="flex items-center gap-3">
+            {/* Desktop User Dropdown - Hidden on mobile */}
+            <div className="hidden md:flex items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <motion.button
@@ -171,21 +170,21 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              {/* Mobile Menu Button */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 text-gray-600 hover:text-pink-500"
-              >
-                {isMobileMenuOpen ? (
-                  <X className="w-6 h-6" />
-                ) : (
-                  <Menu className="w-6 h-6" />
-                )}
-              </motion.button>
             </div>
+
+            {/* Mobile Menu Button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 text-gray-600 hover:text-pink-500"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </motion.button>
           </div>
         </div>
       </motion.header>
@@ -214,41 +213,85 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                 boxShadow: '-4px 0 24px 0 rgba(31, 38, 135, 0.15), inset 1px 0 0 0 rgba(255, 255, 255, 0.5)',
               }}
             >
-              <nav className="flex flex-col p-6 gap-2">
+              <nav className="flex flex-col p-6 gap-1.5">
                 {navItems.map((item) => (
                   <motion.button
                     key={item.id}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleNavClick(item.id)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${
+                    className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-left text-sm ${
                       currentPage === item.id
                         ? 'bg-pink-200 text-pink-600'
                         : 'text-gray-600 hover:bg-gray-50'
                     }`}
                   >
-                    <item.icon className="w-5 h-5" />
+                    <item.icon className="w-4 h-4" />
                     <span className="font-medium">{item.name}</span>
                   </motion.button>
                 ))}
 
-                <div className="h-px bg-gray-200 my-2" />
+                <div className="h-px bg-gray-200 my-1.5" />
+
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleNavClick('profile')}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-left text-sm ${
+                    currentPage === 'profile'
+                      ? 'bg-pink-200 text-pink-600'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <User className="w-4 h-4" />
+                  <span className="font-medium">Profile</span>
+                </motion.button>
+
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleNavClick('settings')}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-left text-sm ${
+                    currentPage === 'settings'
+                      ? 'bg-pink-200 text-pink-600'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <Settings className="w-4 h-4" />
+                  <span className="font-medium">Settings</span>
+                </motion.button>
 
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleNavClick('faq')}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left text-gray-600 hover:bg-gray-50"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-left text-sm text-gray-600 hover:bg-gray-50"
                 >
-                  <HelpCircle className="w-5 h-5" />
+                  <HelpCircle className="w-4 h-4" />
                   <span className="font-medium">FAQ</span>
                 </motion.button>
 
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleNavClick('safety')}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left text-gray-600 hover:bg-gray-50"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-left text-sm text-gray-600 hover:bg-gray-50"
                 >
-                  <Shield className="w-5 h-5" />
+                  <Shield className="w-4 h-4" />
                   <span className="font-medium">Safety Guidelines</span>
+                </motion.button>
+
+                <div className="h-px bg-gray-200 my-1.5" />
+
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={async () => {
+                    try {
+                      await signOut(auth);
+                      handleNavClick('login');
+                    } catch (e) {
+                      console.warn('Sign out failed', e);
+                    }
+                  }}
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-left text-sm text-red-600 hover:bg-red-50"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="font-medium">Sign Out</span>
                 </motion.button>
               </nav>
             </motion.div>

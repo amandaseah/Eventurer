@@ -156,7 +156,7 @@ export function CountdownWidget({
       ref={widgetRef}
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
-      className="fixed bottom-6 right-6 z-40"
+      className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-40"
     >
       <AnimatePresence>
         {isExpanded ? (
@@ -164,7 +164,7 @@ export function CountdownWidget({
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl w-80 max-h-[28rem] overflow-hidden flex flex-col border border-white/50"
+            className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl w-72 sm:w-80 max-h-[28rem] overflow-hidden flex flex-col border border-white/50"
             style={{
               boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.5)',
             }}
@@ -251,37 +251,54 @@ export function CountdownWidget({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsExpanded(true)}
-            className="relative bg-pink-400/80 backdrop-blur-md text-white rounded-2xl px-4 py-3 shadow-lg flex flex-col items-center gap-1 min-w-[128px] border border-white/30"
+            className="relative bg-pink-400/80 backdrop-blur-md text-white rounded-2xl shadow-lg border border-white/30"
             style={{
               boxShadow: '0 8px 32px 0 rgba(236, 72, 153, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)',
             }}
           >
-            <Calendar className="w-4 h-4 opacity-90" />
-            <div className="flex items-baseline gap-1 leading-none">
-              <span className="text-2xl font-semibold">{nextEvent.countdownDays}</span>
-              <span className="text-sm uppercase tracking-wide">{pluraliseDays(nextEvent.countdownDays)}</span>
-            </div>
-            <div className="flex gap-1 mt-1 flex-wrap justify-center">
-              {nextEvent.sources.includes('bookmarked') && (
-                <span
-                  className={`text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses['bookmarked']}`}
-                >
-                  {sourceLabels['bookmarked']}
-                </span>
-              )}
-              {nextEvent.sources.includes('rsvped') && (
-                <span
-                  className={`text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses['rsvped']}`}
-                >
-                  {sourceLabels['rsvped']}
-                </span>
-              )}
-            </div>
-            {additionalEventCount > 0 && (
-              <div className="absolute -top-2 -right-2 bg-white text-pink-500 rounded-full px-2 py-[2px] text-xs font-medium shadow-lg border border-pink-200">
-                +{additionalEventCount}
+            {/* Mobile: Compact version */}
+            <div className="sm:hidden flex items-center gap-2 px-3 py-2">
+              <Calendar className="w-3.5 h-3.5 opacity-90" />
+              <div className="flex items-baseline gap-1 leading-none">
+                <span className="text-xl font-semibold">{nextEvent.countdownDays}</span>
+                <span className="text-xs uppercase tracking-wide">{pluraliseDays(nextEvent.countdownDays)}</span>
               </div>
-            )}
+              {additionalEventCount > 0 && (
+                <div className="bg-white text-pink-500 rounded-full px-1.5 py-[1px] text-[10px] font-medium">
+                  +{additionalEventCount}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop: Full version */}
+            <div className="hidden sm:flex flex-col items-center gap-1 px-4 py-3 min-w-[128px]">
+              <Calendar className="w-4 h-4 opacity-90" />
+              <div className="flex items-baseline gap-1 leading-none">
+                <span className="text-2xl font-semibold">{nextEvent.countdownDays}</span>
+                <span className="text-sm uppercase tracking-wide">{pluraliseDays(nextEvent.countdownDays)}</span>
+              </div>
+              <div className="flex gap-1 mt-1 flex-wrap justify-center">
+                {nextEvent.sources.includes('bookmarked') && (
+                  <span
+                    className={`text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses['bookmarked']}`}
+                  >
+                    {sourceLabels['bookmarked']}
+                  </span>
+                )}
+                {nextEvent.sources.includes('rsvped') && (
+                  <span
+                    className={`text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses['rsvped']}`}
+                  >
+                    {sourceLabels['rsvped']}
+                  </span>
+                )}
+              </div>
+              {additionalEventCount > 0 && (
+                <div className="absolute -top-2 -right-2 bg-white text-pink-500 rounded-full px-2 py-[2px] text-xs font-medium shadow-lg border border-pink-200">
+                  +{additionalEventCount}
+                </div>
+              )}
+            </div>
           </motion.button>
         )}
       </AnimatePresence>

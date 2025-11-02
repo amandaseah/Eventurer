@@ -74,7 +74,7 @@ export default function RecommendationPanel({
     <section className="mb-12">
       <RecommendationHeader title={title} />
 
-      <div className="relative max-w-2xl mx-auto">
+      <div className="relative max-w-2xl mx-auto px-2 sm:px-0">
         <div className="overflow-hidden rounded-3xl">
           {loading ? (
             <RecommendationCardSkeleton />
@@ -107,7 +107,7 @@ export default function RecommendationPanel({
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={prev}
-              className="absolute -left-6 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg z-10 hover:bg-white"
+              className="absolute left-1 sm:-left-6 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-2.5 sm:p-3 rounded-full shadow-lg z-10 hover:bg-white"
             >
               <ChevronLeft className="w-6 h-6 text-gray-700" />
             </motion.button>
@@ -116,7 +116,7 @@ export default function RecommendationPanel({
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={next}
-              className="absolute -right-6 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg z-10 hover:bg-white"
+              className="absolute right-1 sm:-right-6 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-2.5 sm:p-3 rounded-full shadow-lg z-10 hover:bg-white"
             >
               <ChevronRight className="w-6 h-6 text-gray-700" />
             </motion.button>
@@ -128,7 +128,7 @@ export default function RecommendationPanel({
                   onClick={() => setCurrent(idx)}
                   animate={{
                     scale: idx === current ? 1.2 : 1,
-                    backgroundColor: idx === current ? "#a78bfa" : "#e5e7eb",
+                    backgroundColor: idx === current ? "#f472b6" : "#fde2f2",
                   }}
                   className="w-3 h-3 rounded-full cursor-pointer"
                 />
@@ -148,10 +148,10 @@ function RecommendationHeader({ title }: { title: string }) {
       animate={{ opacity: 1, y: 0 }}
       className="text-center mb-8"
     >
-      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-gray-900">
+      <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold mb-2 text-gray-900">
         {title}
       </h2>
-      <p className="text-xs sm:text-sm text-gray-500">
+      <p className="text-[11px] sm:text-sm text-gray-500">
         Curated picks just for you
       </p>
     </motion.div>

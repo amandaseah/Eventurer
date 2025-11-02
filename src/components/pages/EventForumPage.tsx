@@ -36,22 +36,20 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
     );
   }
 
-  console.log("EventForumPage loaded with username:", username);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onNavigate={onNavigate} />
 
-      <div className="container mx-auto px-6 py-12 max-w-4xl">
+      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
         {/* Back Button - Sticky */}
         <BackButton onClick={onGoBack} label="Back to Event" />
 
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-4xl font-bold mb-2">{event.title}</h1>
-              <div className="flex items-center gap-3 text-gray-600">
-                <MessageSquare className="w-5 h-5" />
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">{event.title}</h1>
+              <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base text-gray-600">
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Forum Discussion</span>
                 <span className="text-gray-400">•</span>
                 <span>{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>

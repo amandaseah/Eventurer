@@ -30,7 +30,7 @@ export function LandingPage({
 }: LandingPageProps) {
   const [quizStarted, setQuizStarted] = useState(false);
   const featuredEvents = (events ?? []).filter(e => !e.isPast).slice(0, 3); // filter out past events
-  const skeletonCards = Array.from({ length: 3 });
+  const skeletonCards = Array.from({ length: 3 }, (_, i) => i);
 
   return (
     <div className="min-h-screen relative bg-gray-50">
@@ -50,27 +50,27 @@ export function LandingPage({
 
       {/* Featured Events */}
       <div className="relative">
-        <section className="relative bg-gradient-to-b from-white/50 to-gray-50/80 backdrop-blur-sm py-20">
-          <div className="container mx-auto px-6">
+        <section className="relative bg-gradient-to-b from-white/50 to-gray-50/80 backdrop-blur-sm py-12 sm:py-16 lg:py-20">
+          <div className="container mx-auto px-4 sm:px-6">
             <motion.div
               initial={{ opacity: 0, y: 60 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-              className="text-center mb-16"
+              className="text-center mb-10 sm:mb-14 lg:mb-16"
             >
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ delay: 0.2, duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-                className="inline-flex items-center gap-3 mb-6"
+                className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"
               >
-                <Star className="w-8 h-8 text-yellow-500" />
-                <h2 className="text-5xl md:text-6xl font-bold text-gray-900">
+                <Star className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
                   Featured Events
                 </h2>
-                <Star className="w-8 h-8 text-yellow-500" />
+                <Star className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
               </motion.div>
               
               <motion.p
@@ -99,7 +99,7 @@ export function LandingPage({
               </motion.div>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
               {loading
                 ? skeletonCards.map((_, idx) => <FeaturedEventSkeleton key={idx} />)
                 : featuredEvents.map((event, idx) => (

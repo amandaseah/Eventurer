@@ -953,7 +953,7 @@ export default function HowToGetThere({ event }: { event: any }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <Navigation className="w-6 h-6 text-pink-500" />
-          <h2 className="text-2xl font-semibold">How to Get There</h2>
+          <h2 className="text-2xl sm:text-xl font-semibold">How to Get There</h2>
         </div>
         <button
           onClick={locateMe}
@@ -1041,7 +1041,7 @@ export default function HowToGetThere({ event }: { event: any }) {
       {/* Public Transport */}
       <div className="mt-6 p-4 rounded-2xl bg-gray-50">
         <div className="flex items-center justify-between">
-          <p className="font-semibold text-gray-800">Public Transport Options</p>
+          <p className="font-semibold text-gray-800 text-xl">Public Transport Options</p>
           {transitLoading && (
             <span className="inline-flex items-center gap-2 rounded-full border border-pink-400 bg-white px-3 py-1 text-xs font-semibold text-pink-500 shadow-sm">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
