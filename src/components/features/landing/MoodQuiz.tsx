@@ -31,7 +31,7 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
   const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
 
   return (
-    <div className="container mx-auto px-6 relative z-10">
+    <div className="container mx-auto px-6 py-12 relative z-10">
       <AnimatePresence mode="wait">
         {quizStarted && !quizComplete && (
           <motion.div
@@ -39,7 +39,7 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="max-w-2xl mx-auto mt-12 bg-white rounded-3xl p-8 shadow-xl"
+            className="max-w-2xl mx-auto bg-white rounded-3xl p-8 shadow-xl"
           >
             <div className="mb-6">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
@@ -68,12 +68,12 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
                   whileHover={{ scale: 1.02, x: 4 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleAnswer(option.mood)}
-                  className="p-4 text-left rounded-2xl border-2 border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all group"
+                  className="p-4 text-left rounded-2xl border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50 transition-all group"
                 >
-                  <span className="text-gray-700 group-hover:text-purple-700">
+                  <span className="text-gray-700 group-hover:text-pink-600">
                     {option.text}
                   </span>
-                  <ChevronRight className="inline-block ml-2 w-4 h-4 text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="inline-block ml-2 w-4 h-4 text-gray-400 group-hover:text-pink-500 group-hover:translate-x-1 transition-transform" />
                 </motion.button>
               ))}
             </div>
@@ -85,7 +85,7 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
             key="quiz-result"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="max-w-2xl mx-auto mt-12 bg-white rounded-3xl p-8 shadow-xl text-center"
+            className="max-w-2xl mx-auto bg-white rounded-3xl p-8 shadow-xl text-center"
           >
             <motion.div
               initial={{ scale: 0 }}
@@ -103,7 +103,7 @@ export default function MoodQuiz({ onComplete }: { onComplete: (mood: string) =>
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => onComplete(selectedMood)}
-              className="px-8 py-4 bg-gradient-to-r from-purple-400 to-pink-300 text-white rounded-full text-lg hover:shadow-2xl transition-all"
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-pink-400 text-white rounded-xl text-base sm:text-lg font-semibold hover:bg-pink-500 hover:shadow-lg transition-all"
             >
               See Matching Events
             </motion.button>

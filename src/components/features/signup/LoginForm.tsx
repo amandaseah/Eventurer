@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Mail, Lock, AlertTriangle } from 'lucide-react';
+import { Mail, Lock, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { signInWithEmail } from '../../../lib/firebase';
+import { friendlyAuthError } from '../../../lib/authErrorMessages';
 
 interface LoginFormProps {
   onNavigate: (page: string) => void;
@@ -13,6 +14,7 @@ interface LoginFormProps {
 export default function LoginForm({ onNavigate }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -24,11 +26,11 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
 
     setLoading(true);
     try {
-  await signInWithEmail({ email, password });
-  // after successful login, navigate to landing
-  onNavigate('landing');
+      await signInWithEmail({ email, password });
+      // after successful login, navigate to landing
+      onNavigate('landing');
     } catch (err: any) {
-      setError(err?.message || 'Unable to sign in');
+      setError(friendlyAuthError(err, 'Unable to sign in'));
     } finally {
       setLoading(false);
     }
@@ -52,7 +54,7 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
         </div>
       </motion.div>
@@ -69,12 +71,24 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
             id="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            className="pl-11 pr-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? (
+              <EyeOff className="w-5 h-5" />
+            ) : (
+              <Eye className="w-5 h-5" />
+            )}
+          </button>
         </div>
       </motion.div>
 
@@ -85,14 +99,14 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
           transition={{ duration: 0.18 }}
           role="alert"
           aria-live="assertive"
-          className="flex items-start gap-3 p-3 rounded-lg border border-pink-200 bg-gradient-to-r from-white to-pink-50"
+          className="flex items-start gap-3 p-3 rounded-lg border border-pink-200 bg-pink-50"
         >
           <div className="flex-shrink-0 mt-0.5">
             <AlertTriangle className="w-5 h-5 text-pink-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-pink-700">Sign in failed</p>
-            <p className="text-sm text-pink-600">{error}</p>
+            <p className="text-sm font-medium text-pink-500">Sign in failed</p>
+            <p className="text-sm text-pink-500">{error}</p>
           </div>
         </motion.div>
       )}
@@ -102,7 +116,7 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <Button type="submit" disabled={loading} className="w-full h-12 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-300 hover:shadow-xl transition-all">
+        <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl bg-pink-400 hover:bg-pink-500 hover:shadow-lg transition-all font-semibold">
           {loading ? 'Signing in...' : 'Login'}
         </Button>
       </motion.div>
@@ -112,7 +126,7 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
         <button
           type="button"
           onClick={() => onNavigate('signup')}
-          className="text-purple-600 hover:underline font-medium"
+          className="text-pink-500 hover:underline font-medium"
         >
           Sign up here!
         </button>

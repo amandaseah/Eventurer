@@ -1,31 +1,27 @@
 import RecommendationPanel from "../features/recommendation/RecommendationPanel";
 import FiltersPanel from "../features/explore/FiltersPanel";
-// import { sanityCheckMe, fetchEventbriteEventsForMe } from '../../lib/eventbriteService';
-
-
-
+import Footer from "../shared/Footer";
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
-// import { events } from '../../lib/mockData';
-// import { fetchEventbriteEventsForMe } from '../../lib/eventbriteService';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, SlidersHorizontal, ArrowLeft } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Calendar } from '../ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { Button } from '../ui/button';
-import { formatDateObjectToDDMMYYYY } from '../../lib/dateUtils';
+import { EventCalendarView } from '../features/event/EventCalendarView';
+import { Grid3x3, Calendar as CalendarIcon, Star } from 'lucide-react';
+import { BackButton } from '../shared/BackButton';
+import { auth, db } from '../../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 
 
 
 interface EventExplorePageProps {
   onNavigate: (page: string, data?: any) => void;
+  events: any[];
   bookmarkedEventIds: number[];
   rsvpedEventIds: number[];
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
   onRSVPChange: (eventId: number, isRSVPed: boolean) => void;
+  loading?: boolean;
 }
 
 export function EventExplorePage({ 
@@ -34,36 +30,39 @@ export function EventExplorePage({
   bookmarkedEventIds, 
   rsvpedEventIds, 
   onBookmarkChange, 
-  onRSVPChange 
-}: EventExplorePageProps & { events: any[] }) {
+  onRSVPChange,
+  loading = false,
+}: EventExplorePageProps) {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [priceFilter, setPriceFilter] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
-  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
+  const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
 
-//   const [fetchedEvents, setFetchedEvents] = useState<any[]>([]);
-//   const [loadingEvents, setLoadingEvents] = useState(true);
+  // Load user's preferred view from Firebase
+  useEffect(() => {
+    const loadViewPreference = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
 
-//  useEffect(() => {
-//   async function load() {
-//     setLoadingEvents(true);
-//     try {
-//       await sanityCheckMe();       // ← if this fails, stop and fix token/header
-//     } catch {
-//       setLoadingEvents(false);
-//       return;
-//     }
-//     const data = await fetchEventbriteEventsForMe();
-//     console.log('[Explore] fetched events:', data);  
-//     setFetchedEvents(data);
-//     console.log("Fetched:", data);
-//     setLoadingEvents(false);
-//   }
-//   load();
-// }, []);
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          const preferredView = data?.preferences?.defaultView;
+          if (preferredView === 'grid' || preferredView === 'calendar') {
+            setViewMode(preferredView);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load view preference', err);
+      }
+    };
 
-  const recommendedEvents = events.filter(e => !e.isPast).slice(0, 4);
+    loadViewPreference();
+  }, []);
+
+  // FIXME: Performance issue - filtering on every render. Move to useMemo
   let allEvents = [...events.filter(e => !e.isPast)];
 
 
@@ -110,52 +109,44 @@ export function EventExplorePage({
     });
   }
 
-  const nextCarousel = () => {
-    setCurrentCarouselIndex((prev) =>
-      prev === recommendedEvents.length - 1 ? 0 : prev + 1
-    );
-  };
-
-  const prevCarousel = () => {
-    setCurrentCarouselIndex((prev) =>
-      prev === 0 ? recommendedEvents.length - 1 : prev - 1
-    );
-  };
+  const skeletonItems = Array.from({ length: 6 }, (_, i) => i);
 
   return (
     <div className="min-h-screen">
       <Header currentPage="explore" onNavigate={onNavigate} />
 
-      <div className="container mx-auto px-6 py-8">
-        {/* Back Button - Fixed */}
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          whileHover={{ x: -4 }}
-          onClick={() => onNavigate('landing')}
-          className="fixed top-24 left-6 z-50 flex items-center gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Home</span>
-        </motion.button>
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Back Button - Sticky */}
+        <BackButton onClick={() => onNavigate('landing')} label="Back to Home" />
 
-        <motion.h1
+        {/* Main Title */}
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl mb-6 text-center"
+          className="text-center mb-10 sm:mb-12"
         >
-          Explore Events
-        </motion.h1>
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <Star className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-500" />
+            <h1 className="text-4xl sm:text-4xl md:text-4xl lg:text-5xl font-bold text-gray-900">
+              Explore Events
+            </h1>
+            <Star className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-500" />
+          </div>
+          <p className="text-xs sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
+            Filter by mood, price, date, or just browse everything
+          </p>
+        </motion.div>
 
         <div className="w-full space-y-6">
           {/* Carousel Section */}
           <RecommendationPanel
-            events={events}
+            events={events.filter(e => !e.isPast)}
             onSelect={(id) => onNavigate("event-info", { eventId: id })}
             bookmarkedEventIds={bookmarkedEventIds}
             rsvpedEventIds={rsvpedEventIds}
             onBookmarkChange={onBookmarkChange}
             onRSVPChange={onRSVPChange}
+            loading={loading}
           />
           
           {/* Filters */}
@@ -167,31 +158,121 @@ export function EventExplorePage({
             date={dateFilter} setDate={setDateFilter}
           />
 
-          {/* All Events Grid */}
+          {/* All Events with View Switcher */}
           <div>
-            <h2 className="text-2xl mb-4">All Events</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allEvents.map((event, idx) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4"
+            >
+              <div className="flex flex-col items-center sm:items-start gap-2 text-center sm:text-left">
+                <div className="flex items-center gap-3">
+                  <Star className="w-6 h-6 text-yellow-500" />
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                    All Events
+                  </h2>
+                  <Star className="w-6 h-6 text-yellow-500" />
+                </div>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Browse all available events
+                </p>
+              </div>
+
+              {/* View Switcher */}
+              <div className="flex gap-2 bg-white rounded-xl p-1 shadow-md border border-gray-200">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewMode('grid')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                    viewMode === 'grid'
+                      ? 'bg-pink-200 text-pink-600'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
                 >
-                  <EventCard 
-                    event={event} 
-                    onEventClick={(id) => onNavigate('event-info', { eventId: id })}
-                    isBookmarkedInitially={bookmarkedEventIds.includes(event.id)}
-                    isRSVPedInitially={rsvpedEventIds.includes(event.id)}
-                    onBookmarkChange={onBookmarkChange}
-                    onRSVPChange={onRSVPChange}
-                  />
-                </motion.div>
-              ))}
-            </div>
+                  <Grid3x3 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Grid</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewMode('calendar')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                    viewMode === 'calendar'
+                      ? 'bg-pink-200 text-pink-600'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <CalendarIcon className="w-4 h-4" />
+                  <span className="hidden sm:inline">Calendar</span>
+                </motion.button>
+              </div>
+            </motion.div>
+
+            {/* Grid View */}
+            {viewMode === 'grid' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+                {loading
+                  ? skeletonItems.map((_, idx) => <ExploreCardSkeleton key={idx} />)
+                  : allEvents.map((event, idx) => (
+                      <motion.div
+                        key={event.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                      >
+                        <EventCard
+                          event={event}
+                          onEventClick={(id) => onNavigate('event-info', { eventId: id })}
+                          isBookmarkedInitially={bookmarkedEventIds.includes(event.id)}
+                          isRSVPedInitially={rsvpedEventIds.includes(event.id)}
+                          onBookmarkChange={onBookmarkChange}
+                          onRSVPChange={onRSVPChange}
+                        />
+                      </motion.div>
+                    ))}
+              </div>
+            )}
+
+            {/* Calendar View */}
+            {viewMode === 'calendar' && !loading && (
+              <EventCalendarView
+                events={allEvents}
+                onEventClick={(id) => onNavigate('event-info', { eventId: id })}
+                bookmarkedEventIds={bookmarkedEventIds}
+                rsvpedEventIds={rsvpedEventIds}
+                onBookmarkChange={onBookmarkChange}
+                onRSVPChange={onRSVPChange}
+              />
+            )}
+
+            {!loading && allEvents.length === 0 && (
+              <div className="mt-8 text-center text-gray-500">
+                No events match your filters yet. Try adjusting them.
+              </div>
+            )}
           </div>
         </div>
       </div>
+      <Footer onNavigate={onNavigate} />
     </div>
   );
+}
+
+function ExploreCardSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm animate-pulse h-full">
+      <div className="h-48 bg-gray-200 rounded-t-2xl" />
+      <div className="p-5 space-y-4">
+        <div className="h-5 bg-gray-200 rounded w-3/4" />
+        <div className="h-4 bg-gray-200 rounded w-full" />
+        <div className="h-4 bg-gray-200 rounded w-5/6" />
+        <div className="flex gap-3">
+          <div className="h-4 bg-gray-200 rounded w-1/3" />
+          <div className="h-4 bg-gray-200 rounded w-1/4" />
+        </div>
+        <div className="h-10 bg-gray-200 rounded-xl" />
+      </div>
+    </div>
+  )
 }

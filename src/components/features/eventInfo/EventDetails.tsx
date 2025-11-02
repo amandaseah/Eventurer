@@ -47,33 +47,33 @@ export default function EventDetails({
         {/* Date & Time */}
         <div className="flex items-start gap-4">
           <div className="bg-purple-100 p-3 rounded-2xl">
-            <Calendar className="w-6 h-6 text-purple-600" />
+            <Calendar className="w-4 h-4 text-purple-600" />
           </div>
           <div>
             <p className="text-sm text-gray-600">Date & Time</p>
-            <p className="text-lg">{formattedDate}</p>
+            <p className="text-md sm:text-sm">{formattedDate}</p>
           </div>
         </div>
 
         {/* Location */}
         <div className="flex items-start gap-4">
           <div className="bg-pink-100 p-3 rounded-2xl">
-            <MapPin className="w-6 h-6 text-pink-600" />
+            <MapPin className="w-4 h-4 text-pink-500" />
           </div>
           <div>
             <p className="text-sm text-gray-600">Location</p>
-            <p className="text-lg">{location}</p>
+            <p className="text-md sm:text-sm">{location}</p>
           </div>
         </div>
 
         {/* Category */}
         <div className="flex items-start gap-4">
           <div className="bg-blue-100 p-3 rounded-2xl">
-            <Users className="w-6 h-6 text-blue-600" />
+            <Users className="w-4 h-4 text-blue-600" />
           </div>
           <div>
             <p className="text-sm text-gray-600">Category</p>
-            <p className="text-lg">{category}</p>
+            <p className="text-md sm:text-sm">{category}</p>
           </div>
         </div>
       </div>
@@ -81,7 +81,7 @@ export default function EventDetails({
       {/* About */}
       <div className="border-t border-gray-200 pt-6 mb-6">
         <h3 className="text-xl mb-3">About this event</h3>
-        <p className="text-gray-700 leading-relaxed whitespace-pre-line">{description}</p>
+        <p className="text-gray-700 leading-relaxed whitespace-pre-line text-md sm:text-sm">{description}</p>
       </div>
 
       {/* Saves */}

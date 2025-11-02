@@ -17,48 +17,37 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
+import Footer from '../shared/Footer';
+
+const TECH_ICONS: Record<string, string> = {
+  'React': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
+  'TypeScript': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg',
+  'Tailwind CSS': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg',
+  'Motion': 'https://cdn.worldvectorlogo.com/logos/framer-motion.svg',
+};
 
 interface MarketingLandingPageProps {
   onExplore?: () => void;
-  onDemo?: () => void;
 }
 
 const features = [
   {
     icon: <Filter className="h-6 w-6" />,
-    title: 'Mood-Based Discovery',
+    title: 'Your Mood = Your Feed',
     description:
-      'Find events that match your vibe — Chill & Relax, Active, Social, or Educational. Smart filters by pricing, date, and popularity.',
-  },
-  {
-    icon: <Zap className="h-6 w-6" />,
-    title: 'Instant RSVP',
-    description:
-      'Book your spot in just a few clicks with instant confirmation notifications. Stay organized with all your upcoming events.',
-  },
-  {
-    icon: <Heart className="h-6 w-6" />,
-    title: 'Save for Later',
-    description:
-      "Bookmark events you're interested in and view them anytime. Never miss out with countdown widgets for each saved event.",
+      'Feeling introverted? Get quiet art workshops. Want chaos? Here are the wildest parties. Events sorted by how you actually feel.',
   },
   {
     icon: <MapPin className="h-6 w-6" />,
-    title: 'Integrated Maps',
+    title: 'No More "Where Is This?"',
     description:
-      'Get precise locations with nearest bus stops and MRT stations. Interactive maps with real-time directions to arrive on time.',
+      'Every event shows you the nearest bus stop and MRT station. One tap to Google Maps. Actually get there on time.',
   },
   {
     icon: <MessageSquare className="h-6 w-6" />,
-    title: 'Event Forums',
+    title: 'Talk to People Going',
     description:
-      'Join per-event discussions, ask questions, share tips, and coordinate plans. Upvote key discussions to help the community.',
-  },
-  {
-    icon: <Clock className="h-6 w-6" />,
-    title: 'Smart Reminders',
-    description:
-      'Countdown widgets keep you aware of deadlines. Get timely notifications so you never miss an event you care about.',
+      'Ask questions before you commit. See who else is going. Make plans. Way better than showing up alone and awkward.',
   },
 ];
 
@@ -80,20 +69,14 @@ const moods = [
   },
   {
     name: 'Educational',
-    color: 'bg-purple-100 text-purple-600',
+    color: 'bg-pink-200 text-pink-500',
     icon: <GraduationCap className="h-4 w-4" />,
   },
 ];
 
 const techStack = ['React', 'TypeScript', 'Tailwind CSS', 'Motion', 'Shadcn/ui'];
 
-const footerLinks = {
-  Product: ['Features', 'Pricing', 'Events', 'Community'],
-  Company: ['About Us', 'Careers', 'Blog', 'Press'],
-  Support: ['Help Center', 'Contact Us', 'Privacy Policy', 'Terms of Service'],
-};
-
-export function MarketingLandingPage({ onExplore, onDemo }: MarketingLandingPageProps) {
+export function MarketingLandingPage({ onExplore }: MarketingLandingPageProps) {
   return (
     <div className="min-h-screen relative isolate bg-white">
       <AnimatedBackground />
@@ -104,9 +87,9 @@ export function MarketingLandingPage({ onExplore, onDemo }: MarketingLandingPage
           <HeroSection onExplore={onExplore} />
           <FeaturesSection />
           <TechSection />
-          <CTASection onExplore={onExplore} onDemo={onDemo} />
+          <CTASection onExplore={onExplore} />
         </main>
-        <Footer />
+        <Footer onNavigate={() => onExplore?.()} />
       </div>
     </div>
   );
@@ -122,9 +105,7 @@ function Header({ onExplore }: { onExplore?: () => void }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
-            <Sparkles className="h-5 w-5 text-white" />
-          </div>
+          <img src="/favicon.png" alt="Eventurer" className="h-10 w-10 rounded-2xl" />
           <span className="text-xl tracking-tight text-gray-900 font-semibold">Eventurer</span>
         </motion.div>
 
@@ -151,36 +132,28 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
           transition={{ duration: 1, delay: 0.2 }}
           className="w-full"
         >
-          <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.3] tracking-tight text-gray-900 px-4">
-            <div className="mb-2">Your Journey to</div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.2] tracking-tight text-gray-900 px-4">
+            <div className="mb-2">Events That Actually</div>
             <div className="my-3">
               <motion.span
-                className="inline-block bg-gradient-to-r from-purple-700 via-pink-600 to-purple-700 bg-clip-text text-transparent drop-shadow-sm"
-                animate={{ scale: [1, 1.05, 1] }}
+                className="inline-block text-pink-400"
+                animate={{ scale: [1, 1.02, 1] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                style={{
-                  backgroundImage: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #7c3aed 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
-                }}
               >
-                Unforgettable
+                Match Your Vibe
               </motion.span>
             </div>
-            <div className="mt-2">Experiences</div>
           </h1>
         </motion.div>
 
         <motion.p
-          className="max-w-4xl text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-600 px-4"
+          className="max-w-3xl text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-600 px-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4 }}
         >
-          Discover local events tailored to your mood and interests. From wellness retreats to adventure sports, find your
-          perfect experience.
+          Feeling social? We'll show you the best parties. Need to chill? Here are quiet art sessions.
+          Stop scrolling through events that don't fit your mood.
         </motion.p>
 
         <motion.div
@@ -191,10 +164,10 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
         >
           <Button
             onClick={() => onExplore?.()}
-            className="group flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 text-lg text-white shadow-xl transition-all duration-200 hover:scale-105 hover:from-purple-700 hover:to-pink-700 hover:shadow-2xl"
+            className="group flex items-center justify-center gap-2 rounded-xl bg-pink-400 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:bg-pink-500 hover:shadow-xl hover:-translate-y-0.5"
           >
             <Calendar className="h-5 w-5" />
-            Explore Events
+            Browse Events
           </Button>
         </motion.div>
 
@@ -243,48 +216,36 @@ function FeaturesSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-tight text-gray-900 px-4">
-            Why Choose{' '}
-            <span 
-              style={{
-                backgroundImage: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #7c3aed 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
-              }}
-            >
-              Eventurer
-            </span>
-            ?
+          <h2 className="text-3xl sm:text-4xl md:text-5xl tracking-tight text-gray-900 px-4">
+            How It Works
           </h2>
         </motion.div>
         <motion.p
-          className="mx-auto max-w-4xl text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-600 px-4"
+          className="mx-auto max-w-2xl text-lg sm:text-xl leading-relaxed text-gray-600 px-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          Powered by modern web technologies including React, Tailwind CSS, and Motion for smooth animations.
+          Three things that make Eventurer different
         </motion.p>
       </motion.div>
 
-      <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-8 sm:gap-12 grid-cols-1 lg:grid-cols-3">
         {features.map((feature, index) => (
           <motion.div
             key={feature.title}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
+            transition={{ duration: 0.6, delay: index * 0.15 }}
           >
-            <Card className="h-full overflow-hidden rounded-3xl border border-purple-100 bg-white/60 p-6 sm:p-8 shadow-lg shadow-purple-200/30 backdrop-blur-md transition hover:-translate-y-1 hover:border-purple-200 hover:shadow-purple-200/60">
-              <div className="mb-4 sm:mb-6 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 text-white">
+            <Card className="h-full overflow-hidden rounded-2xl border-2 border-gray-200 bg-white p-8 shadow-sm transition hover:border-pink-300 hover:shadow-md">
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-pink-400 text-white">
                 {feature.icon}
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
-              <p className="text-sm sm:text-base leading-relaxed text-gray-600">{feature.description}</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+              <p className="text-base leading-relaxed text-gray-600">{feature.description}</p>
             </Card>
           </motion.div>
         ))}
@@ -310,17 +271,9 @@ function TechSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight text-gray-900 px-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl tracking-tight text-gray-900 px-4">
             Built with{' '}
-            <span 
-              style={{
-                backgroundImage: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #7c3aed 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
-              }}
-            >
+            <span className="text-pink-400">
               Modern Tech
             </span>
           </h2>
@@ -346,12 +299,17 @@ function TechSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
           >
-            <div className="relative rounded-3xl border border-purple-100 bg-white/70 p-4 sm:p-6 lg:p-8 transition-all duration-300 hover:-translate-y-2 hover:border-purple-300 hover:shadow-xl backdrop-blur-sm">
+            <div className="relative rounded-3xl border border-pink-200 bg-white/70 p-4 sm:p-6 lg:p-8 transition-all duration-300 hover:-translate-y-2 hover:border-pink-300 hover:shadow-xl backdrop-blur-sm">
               <div className="text-center">
-                <div className="mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl">{tech === 'Motion' ? '✨' : tech === 'Tailwind CSS' ? '🎨' : tech === 'Shadcn/ui' ? '🎯' : tech === 'TypeScript' ? '📘' : '⚛️'}</div>
+                <div className="mb-3 sm:mb-4 flex justify-center">
+                  <img
+                    src={TECH_ICONS[tech] || 'https://ui.shadcn.com/apple-touch-icon.png'}
+                    alt={tech}
+                    className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain"
+                  />
+                </div>
                 <div className="text-sm sm:text-base text-gray-900 font-medium">{tech}</div>
               </div>
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/0 to-pink-500/0 transition-all duration-300 group-hover:from-purple-500/5 group-hover:to-pink-500/5" />
             </div>
           </motion.div>
         ))}
@@ -360,59 +318,42 @@ function TechSection() {
   );
 }
 
-function CTASection({ onExplore, onDemo }: MarketingLandingPageProps) {
+function CTASection({ onExplore }: MarketingLandingPageProps) {
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
       <motion.div
-        className="relative overflow-hidden rounded-[2rem] sm:rounded-[3rem] bg-gradient-to-br from-purple-600 via-pink-600 to-purple-700 p-1"
+        className="relative overflow-hidden rounded-2xl bg-pink-400 px-6 sm:px-8 lg:px-16 py-16 sm:py-20 text-center text-white shadow-xl"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
       >
-        <CTAAnimatedBackground />
-        <div className="relative overflow-hidden rounded-[1.8rem] sm:rounded-[2.8rem] bg-gradient-to-br from-purple-500 to-pink-500 px-6 sm:px-8 lg:px-16 py-16 sm:py-20 text-center text-white">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
-            <motion.div className="mb-6 sm:mb-8 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 sm:px-5 py-2 backdrop-blur-sm">
-              <Sparkles className="h-4 w-4" />
-              <span className="text-sm">Start Your Adventure Today</span>
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight px-4">
+            Ready to Find
+            <br />
+            Your Next Event?
+          </h2>
+
+          <p className="mx-auto mt-4 sm:mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-white/90 px-4">
+            Stop scrolling through events that don't match your mood. Start here.
+          </p>
+
+          <div className="mt-8 sm:mt-10 flex items-center justify-center">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                onClick={() => onExplore?.()}
+                className="flex items-center justify-center gap-2 rounded-xl bg-white px-8 sm:px-10 py-4 sm:py-6 text-base sm:text-lg font-semibold text-pink-400 shadow-lg hover:bg-gray-50 hover:shadow-xl"
+              >
+                <Calendar className="h-5 w-5" />
+                Browse Events
+                <ArrowRight className="h-5 w-5" />
+              </Button>
             </motion.div>
+          </div>
 
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight px-4">
-              Ready to Discover
-              <br />
-              Your Next Adventure?
-            </h2>
-
-            <p className="mx-auto mt-4 sm:mt-6 max-w-3xl text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 px-4">
-              Join thousands of users finding amazing events tailored to their mood. Your perfect experience is just a click away.
-            </p>
-
-            <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  onClick={() => onExplore?.()}
-                  className="flex items-center justify-center gap-2 rounded-full bg-white px-8 sm:px-10 py-4 sm:py-7 text-base sm:text-lg text-purple-600 shadow-2xl hover:bg-gray-50"
-                >
-                  <Calendar className="h-5 w-5" />
-                  Start Exploring Now
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  variant="outline"
-                  onClick={() => onDemo?.()}
-                  className="rounded-full border-2 border-white bg-transparent px-8 sm:px-10 py-4 sm:py-7 text-base sm:text-lg text-white hover:bg-white/10"
-                >
-                  View Demo
-                </Button>
-              </motion.div>
-            </div>
-
-            <CTAStats />
-          </motion.div>
-        </div>
+          <CTAStats />
+        </motion.div>
       </motion.div>
     </section>
   );
@@ -447,52 +388,6 @@ function CTAStats() {
         </motion.div>
       ))}
     </motion.div>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="w-full max-w-7xl mx-auto border-t border-purple-100 bg-white/40 px-4 sm:px-6 lg:px-8 py-12 sm:py-16 backdrop-blur-sm">
-      <div className="grid gap-8 sm:gap-12 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="sm:col-span-2 lg:col-span-1">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-purple-400 to-pink-400">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-gray-900 font-semibold">Eventurer</span>
-          </div>
-          <p className="text-sm leading-6 text-gray-600 max-w-sm">
-            Discover events that match your mood and create unforgettable experiences.
-          </p>
-        </div>
-
-        {Object.entries(footerLinks).map(([section, links]) => (
-          <div key={section}>
-            <h3 className="mb-4 font-semibold text-gray-900">{section}</h3>
-            <ul className="space-y-3 text-sm text-gray-600">
-              {links.map((link) => (
-                <li key={link}>
-                  <a href="#" className="transition hover:text-purple-600">
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-8 sm:mt-10 flex flex-col items-center justify-between gap-4 border-t border-purple-100 pt-6 sm:pt-8 text-sm text-gray-600 sm:flex-row">
-        <p>© {new Date().getFullYear()} Eventurer. All rights reserved.</p>
-        <div className="flex items-center gap-4 sm:gap-6">
-          {['Twitter', 'Instagram', 'Facebook', 'LinkedIn'].map((social) => (
-            <a key={social} href="#" className="transition hover:text-purple-600">
-              {social}
-            </a>
-          ))}
-        </div>
-      </div>
-    </footer>
   );
 }
 

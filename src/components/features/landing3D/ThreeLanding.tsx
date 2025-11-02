@@ -103,6 +103,7 @@ function tweenFocus(
 function DeskWithMonitor({
   onMonitorEnter,
   onMonitorLeave,
+  onMonitorActivate,
   onModelReady,
   htmlPointerEnabled,
   showInstruction,
@@ -111,6 +112,7 @@ function DeskWithMonitor({
 }: {
   onMonitorEnter: () => void
   onMonitorLeave: () => void
+  onMonitorActivate: () => void
   onModelReady: (object: THREE.Object3D) => void
   htmlPointerEnabled: boolean
   showInstruction: boolean
@@ -184,6 +186,14 @@ function DeskWithMonitor({
         onPointerOut={(event) => {
           event.stopPropagation()
           onMonitorLeave()
+        }}
+        onDoubleClick={(event) => {
+          event.stopPropagation()
+          onMonitorActivate()
+        }}
+        onClick={(event) => {
+          event.stopPropagation()
+          onMonitorActivate()
         }}
       >
         <planeGeometry args={planeSize} />
@@ -272,7 +282,7 @@ function DeskWithMonitor({
               
             }}
           >
-            hover over the screen to explore Eventurer ✨
+            hover over/click the screen to explore Eventurer ✨
           </Html>
         )}
       </mesh>
@@ -499,6 +509,7 @@ export default function ThreeLanding() {
   const [canvasDpr, setCanvasDpr] = useState<[number, number]>([1, 1.6])
   const [showLoader, setShowLoader] = useState(true)
   const [loaderOpacity, setLoaderOpacity] = useState(1)
+  const [startInInteractive] = useState(false)
   useCursor(isHovering)
 
   const isZoomed = currentZoomState === 'ZOOMED'
@@ -556,12 +567,17 @@ export default function ThreeLanding() {
 
     const camera = controls.object as THREE.PerspectiveCamera
     fitCameraToObject(camera, model, controls, 1.15)
-    camera.position.set(...FOCUS.wide.position)
-    controls.target.set(...FOCUS.wide.target)
+    const nextFocus = startInInteractive ? FOCUS.monitor : FOCUS.wide
+    camera.position.set(...nextFocus.position)
+    controls.target.set(...nextFocus.target)
     controls.update()
-    zoomStateRef.current = 'WIDE'
-    setCurrentZoomState('WIDE')
-  }, [modelReady])
+    const nextZoomState: ZoomState = startInInteractive ? 'ZOOMED' : 'WIDE'
+    zoomStateRef.current = nextZoomState
+    setCurrentZoomState(nextZoomState)
+    if (startInInteractive) {
+      setOverlayOpen(false)
+    }
+  }, [modelReady, startInInteractive])
 
   const clearDwell = useCallback(() => {
     if (dwellTimerRef.current !== null) {
@@ -619,6 +635,13 @@ export default function ThreeLanding() {
     }
   }, [clearDwell, overlayOpen, runTransition])
 
+  const handleMonitorActivate = useCallback(() => {
+    clearDwell()
+    const state = zoomStateRef.current
+    if (state === 'ZOOMING_IN' || state === 'ZOOMED') return
+    runTransition('monitor', 'ZOOMING_IN', 'ZOOMED')
+  }, [clearDwell, runTransition])
+
   useEffect(() => {
     return () => {
       clearDwell()
@@ -632,6 +655,17 @@ export default function ThreeLanding() {
       runTransition('wide', 'ZOOMING_OUT', 'WIDE')
     }
   }, [overlayOpen, runTransition])
+
+  useEffect(() => {
+    if (!startInInteractive || !modelReady) return
+    const controls = controlsRef.current
+    if (!controls) return
+    const camera = controls.object as THREE.PerspectiveCamera
+    camera.position.set(...FOCUS.monitor.position)
+    controls.target.set(...FOCUS.monitor.target)
+    controls.update()
+    setOverlayOpen(false)
+  }, [modelReady, startInInteractive])
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -705,6 +739,7 @@ export default function ThreeLanding() {
             deskGroupRef={deskGroupRef}
             onMonitorEnter={handleMonitorEnter}
             onMonitorLeave={handleMonitorLeave}
+            onMonitorActivate={handleMonitorActivate}
             onModelReady={handleDeskReady}
           />
           <ContactShadows position={[0, -0.001, 0]} opacity={0.35} scale={10} blur={2} frames={1} />
@@ -781,48 +816,50 @@ export default function ThreeLanding() {
       </div>
       
       {/* Back Button */}
-      <div
-        style={{
-          position: 'fixed',
-          top: '24px',
-          left: '24px',
-          zIndex: 1000,
-          pointerEvents: 'auto',
-        }}
-      >
-        <button
-          onClick={() => navigate('/')}
+      {!overlayOpen && (
+        <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '12px 16px',
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            border: '1px solid rgba(0, 0, 0, 0.1)',
-            borderRadius: '12px',
-            color: '#374151',
-            fontSize: '14px',
-            fontWeight: '500',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            backdropFilter: 'blur(8px)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)'
-            e.currentTarget.style.transform = 'translateY(-2px)'
-            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.2)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)'
+            position: 'fixed',
+            top: '24px',
+            left: '24px',
+            zIndex: 1000,
+            pointerEvents: 'auto',
           }}
         >
-          <ArrowLeft size={16} />
-          <span>Back to Home</span>
-        </button>
-      </div>
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 16px',
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
+              borderRadius: '12px',
+              color: '#374151',
+              fontSize: '14px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              backdropFilter: 'blur(8px)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)'
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.2)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)'
+            }}
+          >
+            <ArrowLeft size={16} />
+            <span>Back to Home</span>
+          </button>
+        </div>
+      )}
       
       {showLoader && <GlobalLoader opacity={loaderOpacity} />}
     </>

@@ -952,14 +952,14 @@ export default function HowToGetThere({ event }: { event: any }) {
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <Navigation className="w-6 h-6 text-purple-600" />
-          <h2 className="text-2xl font-semibold">How to Get There</h2>
+          <Navigation className="w-6 h-6 text-pink-500" />
+          <h2 className="text-2xl sm:text-xl font-semibold">How to Get There</h2>
         </div>
         <button
           onClick={locateMe}
-          className="px-4 py-2 rounded-full bg-white border hover:bg-purple-50 flex items-center gap-2 transition-colors"
+          className="px-4 py-2 rounded-full bg-white border hover:bg-pink-50 flex items-center gap-2 transition-colors"
         >
-          <Crosshair className="w-4 h-4 text-purple-600" />
+          <Crosshair className="w-4 h-4 text-pink-500" />
           <span>{geoPending ? 'Locating…' : 'Use My Location'}</span>
         </button>
       </div>
@@ -974,7 +974,7 @@ export default function HowToGetThere({ event }: { event: any }) {
           />
           {!mapReady && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/80 backdrop-blur-sm text-gray-500 text-sm font-medium animate-pulse pointer-events-none">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-100 text-purple-500 shadow-sm">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-pink-400 text-pink-600 shadow-sm">
                 <Navigation className="h-5 w-5" />
               </span>
               <span>Loading interactive map…</span>
@@ -997,13 +997,13 @@ export default function HowToGetThere({ event }: { event: any }) {
           transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-50 via-violet-100/45 to-white text-slate-900 shadow-2xl p-6 border-2 border-purple-200 ring-2 ring-purple-200/50"
+          className="relative overflow-hidden rounded-2xl bg-white text-slate-900 shadow-lg p-6 border border-gray-200"
         >
           <span aria-hidden className="htgt-route-card-gradient" />
           <span aria-hidden className="htgt-card-dim" />
           <div className="relative z-10 text-center flex flex-col items-center">
-            <span className="block w-14 rounded-full bg-purple-400/80 mb-2 shadow-[0_0_10px_rgba(168,85,247,0.45)]" />
-            <p className="text-xl font-semibold uppercase tracking-[0.2em] text-purple-900 mb-3 drop-shadow-[0_3px_8px_rgba(168,85,247,0.24)]">Route Summary</p>
+            <span className="block w-14 rounded-full bg-pink-500/80 mb-2 shadow-[0_0_10px_rgba(190,24,93,0.45)]" />
+            <p className="text-xl font-semibold uppercase tracking-[0.2em] text-pink-900 mb-3 drop-shadow-[0_3px_8px_rgba(190,24,93,0.24)]">Route Summary</p>
             {showSummary ? (
               <>
                 <p className="text-xl font-extrabold leading-tight text-slate-900 drop-shadow-[0_10px_22px_rgba(168,85,247,0.3)]">
@@ -1024,7 +1024,7 @@ export default function HowToGetThere({ event }: { event: any }) {
           transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="relative overflow-hidden rounded-3xl bg-pink-50 shadow-xl p-6 border border-pink-100"
+          className="relative overflow-hidden rounded-3xl bg-pink-50 shadow-xl p-6 border border-pink-200"
         >
           <span aria-hidden className="htgt-tips-card-gradient" />
           <span aria-hidden className="htgt-card-dim" />
@@ -1041,9 +1041,9 @@ export default function HowToGetThere({ event }: { event: any }) {
       {/* Public Transport */}
       <div className="mt-6 p-4 rounded-2xl bg-gray-50">
         <div className="flex items-center justify-between">
-          <p className="font-semibold text-gray-800">Public Transport Options</p>
+          <p className="font-semibold text-gray-800 text-xl">Public Transport Options</p>
           {transitLoading && (
-            <span className="inline-flex items-center gap-2 rounded-full border border-purple-100 bg-white px-3 py-1 text-xs font-semibold text-purple-600 shadow-sm">
+            <span className="inline-flex items-center gap-2 rounded-full border border-pink-400 bg-white px-3 py-1 text-xs font-semibold text-pink-500 shadow-sm">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
               <span>Fetching nearby stops…</span>
             </span>
@@ -1052,7 +1052,7 @@ export default function HowToGetThere({ event }: { event: any }) {
 
         {/* MRT */}
         <div className="mt-3">
-          <p className="flex items-center gap-2 font-semibold text-purple-700">
+          <p className="flex items-center gap-2 font-semibold text-purple-600">
             <span className="text-lg leading-none">🚇</span>
             <span>Nearest MRT Stations</span>
           </p>
@@ -1069,7 +1069,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                 {Array.from({ length: 2 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="h-16 rounded-2xl bg-gradient-to-r from-purple-100/70 to-purple-50/50 animate-pulse"
+                    className="h-16 rounded-xl bg-gray-200 animate-pulse"
                   />
                 ))}
               </motion.div>
@@ -1091,10 +1091,10 @@ export default function HowToGetThere({ event }: { event: any }) {
                     // active: extra-thick purple border + strong glow shadow
                     // inside MRT cardClasses
                     isActive
-                    ? 'overflow-visible border-[3px] border-purple-600 outline outline-2 outline-purple-500/60 shadow-[0_0_0_4px_rgba(168,85,247,0.4),0_18px_40px_rgba(124,58,237,0.3)]'
-                    : 'overflow-hidden border border-purple-100 bg-white shadow-sm shadow-purple-100/30',
+                    ? 'overflow-visible border-[3px] border-purple-400 outline outline-2 outline-purple-500/60 shadow-[0_0_0_4px_rgba(168,85,247,0.4),0_18px_40px_rgba(168,85,247,0.3)]'
+                    : 'overflow-hidden border border-purple-400 bg-white shadow-sm shadow-purple-400/30',
                     isClickable
-                      ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-200/60'
+                      ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-300/60'
                       : 'cursor-default opacity-70',
                     !isClickable ? 'pointer-events-none' : '',
                   ]
@@ -1125,7 +1125,6 @@ export default function HowToGetThere({ event }: { event: any }) {
                           isActive ? 'opacity-100 bg-purple-500' : 'opacity-0 group-hover:opacity-60 bg-purple-400'
                         }`}
                       />
-                      <span className={`pointer-events-none absolute inset-x-0 -top-8 h-12 bg-gradient-to-br from-purple-100/60 via-purple-50/0 to-transparent transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-90'}`} />
                       <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-purple-900">
                         <span className="flex-1">{station.name}</span>
                         <div className="flex flex-col items-end gap-1">
@@ -1143,24 +1142,24 @@ export default function HowToGetThere({ event }: { event: any }) {
                         </div>
                       </div>
                       {station.address && (
-                        <p className="relative mt-1 text-xs text-purple-600/80">{station.address}</p>
+                        <p className="relative mt-1 text-xs text-gray-500">{station.address}</p>
                       )}
                       {summary ? (
                         <div className="relative mt-3 space-y-3 text-xs text-gray-600">
                           <div className="flex flex-wrap items-center gap-2">
                             {summary.walkToEvent?.durationText && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-medium text-purple-700/80">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-medium text-purple-700">
                                 🚶‍♀️ Station → Event {summary.walkToEvent.durationText}
                               </span>
                             )}
                           </div>
                           {!summary.transitToEvent && (
-                            <p className="text-[11px] text-purple-600/80">
+                            <p className="text-[11px] text-gray-500">
                               Transit details unavailable from Google right now — showing walking route from the station to the event.
                             </p>
                           )}
                           {(summary.lines?.length ?? 0) > 0 && (
-                            <p className="text-[11px] text-purple-600/90">
+                            <p className="text-[11px] text-purple-600">
                               {summary.lines?.join(' • ')}
                             </p>
                           )}
@@ -1172,7 +1171,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                                   href={summary.googleMapsUrls.transit}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-purple-700 shadow-sm ring-1 ring-purple-100 hover:bg-purple-50"
+                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-purple-600 shadow-sm ring-1 ring-purple-400 hover:bg-purple-50"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   🚇 Station → Event
@@ -1183,7 +1182,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                                   href={summary.googleMapsUrls.fullTransit}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-purple-700 shadow-sm ring-1 ring-purple-100 hover:bg-purple-50"
+                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-purple-600 shadow-sm ring-1 ring-purple-400 hover:bg-purple-50"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   🗺️ Full transit
@@ -1193,7 +1192,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                           )}
                         </div>
                       ) : (
-                        <p className="relative mt-3 text-[11px] text-purple-600/80">
+                        <p className="relative mt-3 text-[11px] text-gray-500">
                           Tap to preview route details on the map.
                         </p>
                       )}
@@ -1222,7 +1221,7 @@ export default function HowToGetThere({ event }: { event: any }) {
 
         {/* Buses */}
         <div className="mt-6">
-          <p className="flex items-center gap-2 font-semibold text-pink-700">
+          <p className="flex items-center gap-2 font-semibold text-pink-500">
             <span className="text-lg leading-none">🚌</span>
             <span>Nearby Bus Stops</span>
           </p>
@@ -1239,7 +1238,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                 {Array.from({ length: 3 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="h-16 rounded-2xl bg-gradient-to-r from-pink-100/70 to-pink-50/40 animate-pulse"
+                    className="h-16 rounded-xl bg-gray-200 animate-pulse"
                   />
                 ))}
               </motion.div>
@@ -1260,10 +1259,10 @@ export default function HowToGetThere({ event }: { event: any }) {
                     'group relative w-full rounded-2xl bg-white px-4 py-4 text-left transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline-none',
                     // active: extra-thick pink border + strong glow shadow
                     isActive
-                      ? 'overflow-visible border-[3px] border-pink-600 outline outline-2 outline-pink-500/60 shadow-[0_0_0_4px_rgba(244,114,182,0.4),0_18px_40px_rgba(236,72,153,0.3)]'
-                      : 'overflow-hidden border border-pink-100 bg-white shadow-sm shadow-pink-100/40',
+                      ? 'overflow-visible border-[3px] border-pink-500 outline outline-2 outline-pink-400/60 shadow-[0_0_0_4px_rgba(244,114,182,0.4),0_18px_40px_rgba(236,72,153,0.3)]'
+                      : 'overflow-hidden border border-pink-200 bg-white shadow-sm shadow-pink-200/40',
                     isClickable
-                      ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-200/60'
+                      ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-400/60'
                       : 'cursor-default opacity-70',
                     !isClickable ? 'pointer-events-none' : '',
                   ]
@@ -1293,45 +1292,44 @@ export default function HowToGetThere({ event }: { event: any }) {
                       <span
                         aria-hidden
                         className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 rounded-l-2xl transition-opacity duration-200 ${
-                          isActive ? 'opacity-100 bg-pink-500' : 'opacity-0 group-hover:opacity-60 bg-pink-400'
+                          isActive ? 'opacity-100 bg-pink-500' : 'opacity-0 group-hover:opacity-60 bg-pink-500'
                         }`}
                       />
-                      <span className={`pointer-events-none absolute inset-x-0 -top-8 h-12 bg-gradient-to-br from-pink-100/60 via-pink-50/0 to-transparent transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-90'}`} />
-                      <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-pink-900">
+                      <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-pink-600">
                         <span className="flex-1">{stop.name}</span>
                         <div className="flex flex-col items-end gap-1">
                           {isActive && (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-pink-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-pink-600 shadow-sm">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-pink-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-pink-500 shadow-sm">
                               <Navigation className="h-3 w-3" />
                               On map
                             </span>
                           )}
                           {typeof stop.dist === 'number' && (
-                            <span className="inline-flex items-center justify-center rounded-full bg-pink-100 px-2 py-0.5 text-xs text-pink-700">
+                            <span className="inline-flex items-center justify-center rounded-full bg-pink-400 px-2 py-0.5 text-xs text-white font-medium">
                               {stop.dist} m
                             </span>
                           )}
                         </div>
                       </div>
                       {stop.address && (
-                        <p className="relative mt-1 text-xs text-pink-700/80">{stop.address}</p>
+                        <p className="relative mt-1 text-xs text-pink-500/80">{stop.address}</p>
                       )}
                       {summary ? (
-                        <div className="relative mt-3 space-y-3 text-xs text-pink-900/80">
+                        <div className="relative mt-3 space-y-3 text-xs text-pink-600/80">
                           <div className="flex flex-wrap items-center gap-2">
                             {summary.walkToEvent?.durationText && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-pink-50 px-2.5 py-1 text-[11px] font-medium text-pink-700/80">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-pink-50 px-2.5 py-1 text-[11px] font-medium text-pink-500/80">
                                 🚶‍♀️ Stop → Event {summary.walkToEvent.durationText}
                               </span>
                             )}
                           </div>
                           {!summary.transitToEvent && (
-                            <p className="text-[11px] text-pink-600/80">
+                            <p className="text-[11px] text-pink-500/80">
                               Transit details unavailable — showing the walking path from this stop.
                             </p>
                           )}
                           {(summary.lines?.length ?? 0) > 0 && (
-                            <p className="text-[11px] text-pink-600/90">
+                            <p className="text-[11px] text-pink-500/90">
                               {summary.lines?.join(' • ')}
                             </p>
                           )}
@@ -1342,7 +1340,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                                   href={summary.googleMapsUrls.transit}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-pink-700 shadow-sm ring-1 ring-pink-100 hover:bg-pink-50"
+                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-pink-500 shadow-sm ring-1 ring-pink-200 hover:bg-pink-50"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   🚌 Stop → Event
@@ -1353,7 +1351,7 @@ export default function HowToGetThere({ event }: { event: any }) {
                                   href={summary.googleMapsUrls.fullTransit}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-pink-700 shadow-sm ring-1 ring-pink-100 hover:bg-pink-50"
+                                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 font-semibold text-pink-500 shadow-sm ring-1 ring-pink-200 hover:bg-pink-50"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   🗺️ Full transit
@@ -1363,12 +1361,12 @@ export default function HowToGetThere({ event }: { event: any }) {
                           )}
                         </div>
                       ) : (
-                        <p className="relative mt-3 text-[11px] text-pink-600/80">
+                        <p className="relative mt-3 text-[11px] text-pink-500/80">
                           Tap to preview route details on the map.
                         </p>
                       )}
                       {loadingThis && (
-                        <div className="relative mt-3 flex items-center gap-2 text-[11px] font-medium text-pink-600">
+                        <div className="relative mt-3 flex items-center gap-2 text-[11px] font-medium text-pink-500">
                           <Loader2 className="h-3 w-3 animate-spin" />
                           Calculating route…
                         </div>
@@ -1393,7 +1391,7 @@ export default function HowToGetThere({ event }: { event: any }) {
 
       {event?.location && (
         <div className="mt-6 flex items-center gap-2 text-gray-600">
-          <MapPin className="w-4 h-4 text-purple-500" />
+          <MapPin className="w-4 h-4 text-pink-500" />
           <span className="text-sm">{event.location}</span>
         </div>
       )}

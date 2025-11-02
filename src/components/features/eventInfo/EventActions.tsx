@@ -60,10 +60,10 @@ export default function EventActions({
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className={`w-full py-4 rounded-2xl mb-4 transition-all flex items-center justify-center ${
+            className={`w-full py-4 rounded-xl mb-4 transition-all flex items-center justify-center font-semibold ${
               isRSVPed
-                ? "bg-green-500 text-white border-2 border-green-600"
-                : "bg-gradient-to-r from-purple-400 to-pink-300 text-white hover:shadow-xl"
+                ? "bg-green-500 text-white hover:bg-green-600 shadow-md"
+                : "bg-pink-200 text-pink-600 hover:bg-pink-300 border border-pink-300 shadow-sm hover:shadow-md"
             }`}
           >
             {isRSVPed ? "✓ RSVP'd" : "RSVP to Event"}
@@ -80,7 +80,10 @@ export default function EventActions({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirmRSVP}>
+            <AlertDialogAction
+              onClick={onConfirmRSVP}
+              className="bg-pink-200 text-pink-600 hover:bg-pink-300 focus:ring-pink-200 focus:ring-offset-2"
+            >
               {isRSVPed ? "Cancel RSVP" : "Confirm RSVP"}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -94,8 +97,8 @@ export default function EventActions({
         onClick={onToggleBookmark}
         className={`w-full py-4 rounded-2xl transition-all flex items-center justify-center gap-2 ${
           isBookmarked
-            ? "bg-pink-100 text-pink-700 border-2 border-pink-300"
-            : "border-2 border-gray-200 text-gray-700 hover:border-purple-300 hover:bg-purple-50"
+            ? "bg-pink-100 text-pink-500 border-2 border-pink-200"
+            : "border-2 border-gray-200 text-gray-700 hover:border-pink-300 hover:bg-pink-50"
         }`}
       >
         <Bookmark className="w-5 h-5" />
