@@ -61,7 +61,11 @@ export default defineConfig({
       target: 'https://www.eventbriteapi.com/v3',
       changeOrigin: true,
       rewrite: (path) => path.replace(/^\/eventbrite/, '')
-  }
-}
+      },
+      '/api': {
+        target: 'http://localhost:4242',
+        changeOrigin: true,
+  },
+},
   },
 });

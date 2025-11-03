@@ -38,29 +38,49 @@ export function EventExplorePage({
   const [sortBy, setSortBy] = useState('popular');
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
+  const [localBookmarkedIds, setLocalBookmarkedIds] = useState<number[]>(bookmarkedEventIds);
+  const [localRSVPedIds, setLocalRSVPedIds] = useState<number[]>(rsvpedEventIds);
 
-  // Load user's preferred view from Firebase
   useEffect(() => {
-    const loadViewPreference = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
+    setLocalBookmarkedIds(bookmarkedEventIds);
+    setLocalRSVPedIds(rsvpedEventIds);
+  }, [bookmarkedEventIds, rsvpedEventIds]);
 
-      try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          const preferredView = data?.preferences?.defaultView;
-          if (preferredView === 'grid' || preferredView === 'calendar') {
-            setViewMode(preferredView);
-          }
-        }
-      } catch (err) {
-        console.warn('Failed to load view preference', err);
-      }
-    };
+  const handleBookmarkChangeLocal = (eventId: number, isBookmarked: boolean) => {
+    setLocalBookmarkedIds(prev =>
+      isBookmarked ? [...prev, eventId] : prev.filter(id => id !== eventId)
+    );
+    onBookmarkChange(eventId, isBookmarked);
+  };
 
-    loadViewPreference();
-  }, []);
+  const handleRSVPChangeLocal = (eventId: number, isRSVPed: boolean) => {
+    setLocalRSVPedIds(prev =>
+      isRSVPed ? [...prev, eventId] : prev.filter(id => id !== eventId)
+    );
+    onRSVPChange(eventId, isRSVPed);
+  };
+  // // Load user's preferred view from Firebase
+  // useEffect(() => {
+  //   const loadViewPreference = async () => {
+  //     const user = auth.currentUser;
+  //     if (!user) return;
+
+  //     try {
+  //       const userDoc = await getDoc(doc(db, 'users', user.uid));
+  //       if (userDoc.exists()) {
+  //         const data = userDoc.data();
+  //         const preferredView = data?.preferences?.defaultView;
+  //         if (preferredView === 'grid' || preferredView === 'calendar') {
+  //           setViewMode(preferredView);
+  //         }
+  //       }
+  //     } catch (err) {
+  //       console.warn('Failed to load view preference', err);
+  //     }
+  //   };
+
+  //   loadViewPreference();
+  // }, []);
 
   // FIXME: Performance issue - filtering on every render. Move to useMemo
   let allEvents = [...events.filter(e => !e.isPast)];
@@ -221,14 +241,14 @@ export function EventExplorePage({
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.05 }}
                       >
-                        <EventCard
-                          event={event}
-                          onEventClick={(id) => onNavigate('event-info', { eventId: id })}
-                          isBookmarkedInitially={bookmarkedEventIds.includes(event.id)}
-                          isRSVPedInitially={rsvpedEventIds.includes(event.id)}
-                          onBookmarkChange={onBookmarkChange}
-                          onRSVPChange={onRSVPChange}
-                        />
+                      <EventCard
+                        event={event}
+                        onEventClick={(id) => onNavigate('event-info', { eventId: id })}
+                        isBookmarkedInitially={localBookmarkedIds.includes(event.id)}
+                        isRSVPedInitially={localRSVPedIds.includes(event.id)}
+                        onBookmarkChange={handleBookmarkChangeLocal}
+                        onRSVPChange={handleRSVPChangeLocal}
+                      />
                       </motion.div>
                     ))}
               </div>
