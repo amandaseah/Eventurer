@@ -1,15 +1,11 @@
 // api/create-payment-intent.js
-require('dotenv').config({ path: '.env.local' }); // install dotenv so this auto reads .env.local file
-
-console.log("Loaded Stripe key:", process.env.STRIPE_SECRET_KEY ? "✅ Found" : "❌ Missing");
-
 const express = require("express");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
+// --- Universal handler (used in both local + Vercel) ---
 async function handler(req, res) {
   if (req.method !== "POST") {
-    res.status(405).json({ error: "Method Not Allowed" });
-    return;
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
   try {
@@ -18,8 +14,9 @@ async function handler(req, res) {
       amount,
       currency,
       description,
+      automatic_payment_methods: { enabled: true },
     });
-    res.json({ clientSecret: paymentIntent.client_secret });
+    res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
     console.error("Stripe error:", err);
     res.status(500).json({ error: err.message });
@@ -29,8 +26,9 @@ async function handler(req, res) {
 // ✅ Export for Vercel serverless usage
 module.exports = handler;
 
-// ✅ Local dev mode: spin up lightweight Express app automatically
+// ✅ Local dev mode only
 if (require.main === module) {
+  require("dotenv").config({ path: ".env.local" }); // load keys locally
   const app = express();
   app.use(express.json());
   app.post("/api/create-payment-intent", handler);
