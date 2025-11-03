@@ -13,6 +13,8 @@ import {
 } from "../../ui/alert-dialog"; // changed from "@/components/ui/alert-dialog"
 import { Bookmark } from "lucide-react";
 import { formatDateToDDMMYYYY } from "../../../lib/dateUtils"; // changed from "@/lib/dateUtils"
+import { useState } from "react";
+import StripePaymentFormWrapper from "../payments/StripePaymentFormWrapper";
 
 type EventShape = {
   title: string;
@@ -39,7 +41,15 @@ export default function EventActions({
   openDialog?: boolean;
   setOpenDialog?: (v: boolean) => void;
 }) {
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
+
+  // clean numeric price and safely convert to cents
+const numericPrice = parseFloat(String(price).replace(/[^0-9.]/g, ""));
+const amountInCents = isNaN(numericPrice) ? 0 : Math.round(numericPrice * 100);
+
   return (
+  <>
     <div className="bg-white rounded-3xl p-6 shadow-md">
       {/* Price and deadline block */}
       <div className="text-center mb-6">
@@ -69,6 +79,7 @@ export default function EventActions({
             {isRSVPed ? "✓ RSVP'd" : "RSVP to Event"}
           </motion.button>
         </AlertDialogTrigger>
+
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -78,13 +89,36 @@ export default function EventActions({
               {/* optional: dynamic price/free message */}
             </AlertDialogDescription>
           </AlertDialogHeader>
+
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={onConfirmRSVP}
-              className="bg-pink-200 text-pink-600 hover:bg-pink-300 focus:ring-pink-200 focus:ring-offset-2"
-            >
-              {isRSVPed ? "Cancel RSVP" : "Confirm RSVP"}
+            <AlertDialogAction asChild>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  const numericPrice = parseFloat(String(price).replace(/[^0-9.]/g, ""));
+                  const isPaidEvent = !isNaN(numericPrice) && numericPrice > 0;
+
+                  setOpenDialog?.(false);
+
+                  if (isRSVPed) {
+                    // if already RSVP'ed, user is canceling
+                    onConfirmRSVP(); 
+                  } else {
+                    // if not RSVP'ed yet, user is confirming RSVP
+                    if (isPaidEvent) {
+                      // Only open payment modal for paid events
+                      setTimeout(() => setShowPaymentModal(true), 50);
+                    } else {
+                      // free event, just confirm directly
+                      onConfirmRSVP();
+                    }
+                  }
+                }}
+                className="bg-pink-200 text-pink-600 hover:bg-pink-300 focus:ring-pink-200 focus:ring-offset-2 w-full py-2 rounded-md"
+              >
+                {isRSVPed ? "Cancel RSVP" : "Confirm RSVP"}
+              </button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -105,5 +139,35 @@ export default function EventActions({
         {isBookmarked ? "Saved" : "Save for Later"}
       </motion.button>
     </div>
-  );
+
+    {/* Payment modal lives OUTSIDE the main card */}
+    {showPaymentModal && (
+      <AlertDialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Complete Payment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Pay now to confirm your RSVP for this event.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <StripePaymentFormWrapper
+            amount={amountInCents}  // make sure amountInCents is computed above
+            onSuccess={() => {
+              setShowPaymentModal(false);
+              setIsPaid(true);
+              onConfirmRSVP();
+            }}
+          />
+
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowPaymentModal(false)}>
+              Cancel
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    )}
+  </>
+);
 }
