@@ -11,7 +11,7 @@ interface PostListProps {
 export default function PostList({ posts, username, onUpvote, onAddReply }: PostListProps) {
   return (
     <div className="space-y-4">
-      {posts.map((post) => (
+      {posts?.map((post) => (
         <PostItem
           key={post.id}
           post={post}

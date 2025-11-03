@@ -174,7 +174,7 @@ export default function PostItem({ post, username, depth = 0, onUpvote, onSubmit
         )}
 
         {/* Nested replies */}
-        {post.replies.map(reply => (
+        {post.replies?.map(reply => (
           <PostItem
             key={reply.id}
             post={reply}
