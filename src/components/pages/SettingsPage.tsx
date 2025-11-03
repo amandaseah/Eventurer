@@ -215,7 +215,7 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
     <div className="min-h-screen bg-gray-50">
       <Header currentPage="settings" onNavigate={onNavigate} />
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-12 max-w-7xl">
         {/* Back Button */}
         <BackButton onClick={onGoBack} />
 
@@ -223,17 +223,17 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-4 sm:mb-6 lg:mb-8"
         >
-          <div className="flex items-center gap-3 mb-2">
-            <User className="w-8 h-8 text-pink-500" />
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Account Settings</h1>
+          <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+            <User className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-pink-500" />
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Account Settings</h1>
           </div>
-          <p className="text-gray-600">Manage your profile information and preferences</p>
+          <p className="text-sm sm:text-base text-gray-600">Manage your profile information and preferences</p>
         </motion.div>
 
         {/* Horizontal Navigation - Visible on all screen sizes */}
-        <div className="bg-white rounded-2xl shadow-md p-4 mb-6 relative">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-md p-3 sm:p-4 mb-4 sm:mb-6 relative">
           {/* Left scroll arrow - only show on small screens when scrollable */}
           {showLeftArrow && (
             <motion.button
@@ -241,9 +241,9 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => scroll('left')}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 sm:hidden hover:bg-gray-50 transition-all"
+              className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-1.5 sm:p-2 sm:hidden hover:bg-gray-50 transition-all"
             >
-              <ChevronLeft className="w-5 h-5 text-gray-700" />
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
             </motion.button>
           )}
 
@@ -254,9 +254,9 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => scroll('right')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 sm:hidden hover:bg-gray-50 transition-all"
+              className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-1.5 sm:p-2 sm:hidden hover:bg-gray-50 transition-all"
             >
-              <ChevronRight className="w-5 h-5 text-gray-700" />
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
             </motion.button>
           )}
 
@@ -269,71 +269,71 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl whitespace-nowrap transition-all flex-shrink-0 ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 rounded-lg sm:rounded-xl whitespace-nowrap transition-all flex-shrink-0 ${
                   activeSection === item.id
                     ? 'bg-pink-50 text-pink-600 font-medium'
                     : 'text-gray-700 bg-gray-50'
                 }`}
               >
-                <item.icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-sm sm:text-base">{item.label}</span>
+                <item.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
+                <span className="text-xs sm:text-sm lg:text-base">{item.label}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
             {/* Account Information */}
             <motion.section
               id="account"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md"
+              className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-md"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <User className="w-5 h-5 text-pink-500" />
-                <h2 className="text-xl sm:text-2xl font-semibold">Account Information</h2>
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <User className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold">Account Information</h2>
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                       First Name
                     </label>
                     <input
                       type="text"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
                       placeholder="John"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                       Last Name
                     </label>
                     <input
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
                       placeholder="Doe"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                     Email Address
                   </label>
                   <input
                     type="email"
                     value={email}
                     disabled
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed"
                   />
                   <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
                 </div>
@@ -342,7 +342,7 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleSaveAccountSettings}
-                  className="px-6 py-3 bg-pink-500 text-white rounded-2xl hover:bg-pink-600 transition-all font-semibold"
+                  className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-pink-500 text-white rounded-xl sm:rounded-2xl hover:bg-pink-600 transition-all font-semibold"
                 >
                   Save Account Information
                 </motion.button>
@@ -355,11 +355,11 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md"
+              className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-md"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <KeyRound className="w-5 h-5 text-pink-500" />
-                <h2 className="text-xl sm:text-2xl font-semibold">Password</h2>
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <KeyRound className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold">Password</h2>
               </div>
 
               <div className="space-y-4">
@@ -406,7 +406,7 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleChangePassword}
-                  className="px-6 py-3 bg-pink-500 text-white rounded-2xl hover:bg-pink-600 transition-all font-semibold"
+                  className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-pink-500 text-white rounded-xl sm:rounded-2xl hover:bg-pink-600 transition-all font-semibold"
                 >
                   Update Password
                 </motion.button>
@@ -419,11 +419,11 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md"
+              className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-md"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <Lock className="w-5 h-5 text-pink-500" />
-                <h2 className="text-xl sm:text-2xl font-semibold">Privacy</h2>
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold">Privacy</h2>
               </div>
 
               <div className="space-y-4">
@@ -457,11 +457,11 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md"
+              className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-md"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <SettingsIcon className="w-5 h-5 text-pink-500" />
-                <h2 className="text-xl sm:text-2xl font-semibold">Preferences</h2>
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <SettingsIcon className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold">Preferences</h2>
               </div>
 
               <div className="space-y-4">
@@ -498,7 +498,7 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               transition={{ delay: 0.6 }}
               className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md border border-blue-100"
             >
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <HelpCircle className="w-5 h-5 text-blue-600" />
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Help & Safety</h2>
               </div>
@@ -535,11 +535,11 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
-              className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md"
+              className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-md"
             >
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <LogOut className="w-5 h-5 text-gray-700" />
-                <h2 className="text-xl sm:text-2xl font-semibold">Sign Out</h2>
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold">Sign Out</h2>
               </div>
 
               <div className="space-y-4">
@@ -564,7 +564,7 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
               transition={{ delay: 0.7 }}
               className="bg-red-50 border-2 border-red-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8"
             >
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <Trash2 className="w-5 h-5 text-red-500" />
                 <h2 className="text-xl sm:text-2xl font-semibold text-red-700">Delete Account</h2>
               </div>
