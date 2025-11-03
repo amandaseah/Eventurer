@@ -4,8 +4,8 @@ import { Textarea } from "../../ui/textarea";
 import { Image as ImageIcon, Send, X } from "lucide-react";
 
 interface NewPostFormProps {
-  // async handler returning true on success
-  onAddPost: (comment: string, image?: Blob) => Promise<boolean>;
+  // pass a Blob for images to allow binary storage in IndexedDB
+  onAddPost: (comment: string, image?: Blob) => void;
 }
 
 export default function NewPostForm({ onAddPost }: NewPostFormProps) {
@@ -14,7 +14,6 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   // binary blob to store/forward to storage layer
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -90,16 +89,10 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
     reader.readAsDataURL(f);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!text.trim() && !imageBlob) return;
-    setError(null); // Clear previous errors
     try {
-      const ok = await onAddPost(text, imageBlob || undefined);
-      if (!ok) {
-        setError("Failed to post comment. Please check your connection or try again.");
-        return;
-      }
-      // success: clear UI
+      onAddPost(text, imageBlob || undefined);
       setText("");
       if (imagePreview) {
         URL.revokeObjectURL(imagePreview);
@@ -107,8 +100,9 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
       }
       setImageBlob(null);
     } catch (err: any) {
+      // If storage layer throws QuotaExceeded, catch it there; you can also surface it here
       console.error("Failed to add post:", err);
-      setError("An error occurred while posting. Please try again.");
+      // Optionally show a toast or fallback UI here
     }
   };
 
@@ -122,12 +116,6 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         placeholder="Share your thoughts, ask questions, or connect with other attendees..."
         className="rounded-xl sm:rounded-2xl min-h-[80px] sm:min-h-[100px] mb-3 sm:mb-4 text-sm sm:text-base"
       />
-
-      {error && (
-        <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
-          {error}
-        </div>
-      )}
 
       {imagePreview && (
         <div className="relative mb-3 sm:mb-4 rounded-xl sm:rounded-2xl overflow-hidden">

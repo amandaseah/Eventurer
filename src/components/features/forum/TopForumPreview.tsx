@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 interface Reply {
   id: string;
   text: string;
-  timestamp: number;
+  createdAt: number;
   username: string;
   upvotes: number;
   upvotedBy: string[];
@@ -16,7 +16,7 @@ interface Reply {
 interface Post {
   id: string;
   text: string;
-  timestamp: number;
+  createdAt: number;
   username: string;
   upvotes: number;
   upvotedBy?: string[];
@@ -113,7 +113,7 @@ export default function TopForumPreview({
                   @{post.username}
                 </p>
                 <p className="text-xs text-gray-400">
-                  {formatDistanceToNow(new Date(post.timestamp), {
+                  {formatDistanceToNow(new Date(post.createdAt), {
                     addSuffix: true,
                   })}
                 </p>

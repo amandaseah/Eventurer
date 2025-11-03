@@ -78,12 +78,7 @@ export function EventInfoPage({
       } else if (typeof p.image === "string") {
         imageUrl = p.image;
       }
-      return { 
-        ...p, 
-        image: imageUrl,
-        timestamp: p.timestamp || Date.now() 
-      };
-      
+      return { ...p, imageUrl };
     });
 
     setPreviewPosts(mapped);

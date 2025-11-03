@@ -17,32 +17,9 @@ export function useEventForum(eventId: number) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
-  const [dbReady, setDbReady] = useState(false); 
 
   useEffect(() => {
-    // ensure DB is initialized before any operations
-    let mounted = true;
-    async function initAndLoad() {
-      try {
-        const ok = await db.init();
-        if (!ok) {
-          console.warn("IndexedDB init failed");
-          setIsConnected(false);
-          setDbReady(false);
-        }else{
-          setDbReady(true);
-        }
-      } catch (err) {
-        console.error("DB init error:", err);
-        setIsConnected(false);
-        setDbReady(false);
-      }
-      if (mounted) await loadPosts();
-    }
-    initAndLoad();
-    return () => {
-      mounted = false;
-    };
+    loadPosts();
   }, [eventId]);
 
   const loadPosts = async () => {
@@ -57,16 +34,11 @@ export function useEventForum(eventId: number) {
     }
   };
 
-  // returns true on success, false on failure
   const addPost = async (
     text: string,
     image: Blob | undefined,
     username: string
-  ): Promise<boolean> => {
-    if (!dbReady) {
-      console.error("Database not ready");
-      return false;
-    }
+  ) => {
     const newPost: Post = {
       id: `post_${Date.now()}`,
       eventId,
@@ -80,13 +52,12 @@ export function useEventForum(eventId: number) {
       const success = await db.addPost(newPost, image);
       if (success) {
         await loadPosts(); // Reload posts to get fresh data
-        return true;
+      } else {
+        throw new Error("Failed to add post");
       }
-      console.error("db.addPost returned false");
-      return false;
     } catch (error) {
       console.error("Error adding post:", error);
-      return false;
+      throw error;
     }
   };
 
@@ -167,7 +138,6 @@ export function useEventForum(eventId: number) {
     posts,
     isLoading,
     isConnected,
-    dbReady,
     addPost,
     upvotePost,
     addReply,
