@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import { Header } from '../Header';
 import Footer from '../shared/Footer';
 import { BackButton } from '../shared/BackButton';
-import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, HelpCircle, Search, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface FAQPageProps {
@@ -68,10 +68,17 @@ const faqs: FAQItem[] = [
 
 export function FAQPage({ onNavigate, onGoBack }: FAQPageProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const toggleQuestion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
+
+  // Filter FAQs based on search query
+  const filteredFaqs = faqs.filter(faq =>
+    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-pink-50/30 to-white">
@@ -98,9 +105,45 @@ export function FAQPage({ onNavigate, onGoBack }: FAQPageProps) {
           </p>
         </motion.div>
 
+        {/* Chatbot Disclaimer */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-6 bg-pink-50 border border-pink-200 rounded-2xl p-4 flex items-start gap-3"
+        >
+          <MessageCircle className="w-5 h-5 text-pink-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold text-pink-600">Psst, quick tip!</span> See that pink chat button in the bottom right?
+              That's your instant FAQ helper. Just type your question there for faster answers instead of scrolling through everything here.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Search Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-6"
+        >
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search FAQs..."
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white shadow-sm"
+            />
+          </div>
+        </motion.div>
+
         {/* FAQ List */}
         <div className="space-y-4">
-          {faqs.map((faq, index) => (
+          {filteredFaqs.length > 0 ? (
+            filteredFaqs.map((faq, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
@@ -134,7 +177,22 @@ export function FAQPage({ onNavigate, onGoBack }: FAQPageProps) {
                 </motion.div>
               )}
             </motion.div>
-          ))}
+          ))
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl p-8 text-center shadow-md border border-gray-100"
+            >
+              <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                No FAQs found
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Try a different search term or use the chatbot in the bottom right for instant help!
+              </p>
+            </motion.div>
+          )}
         </div>
 
         {/* Still have questions section */}

@@ -158,6 +158,13 @@ export function EventInfoPage({
     }
   };
 
+  console.log('Preview posts being passed:', previewPosts.map(p => ({
+    id: p.id,
+    timestamp: p.timestamp,
+    hasTimestamp: !!p.timestamp,
+    timestampType: typeof p.timestamp
+  })));
+
   return (
     <div className="min-h-screen">
       <style>{`

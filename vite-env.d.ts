@@ -2,10 +2,10 @@
 
 interface ImportMetaEnv {
     readonly VITE_GOOGLE_MAPS_API_KEY: string;
+    readonly VITE_STRIPE_PUBLISHABLE_KEY: string;
+    readonly VITE_API_URL?: string;
     // add other env vars here if needed, e.g.
     // readonly VITE_BACKEND_URL: string;
-
-
   }
   
   interface ImportMeta {
