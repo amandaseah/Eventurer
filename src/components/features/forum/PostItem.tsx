@@ -8,6 +8,7 @@ interface ReplyType {
   id: string;
   text: string;
   image?: string;
+  timestamp: number;
   createdAt: number;
   username: string;
   replies: ReplyType[];
@@ -20,6 +21,7 @@ interface PostType {
   text: string;
   image?: string;
   username: string;
+  timestamp: number;
   createdAt: number;
   upvotes: number;
   upvotedBy?: string[];
@@ -68,7 +70,7 @@ export default function PostItem({ post, username, depth = 0, onUpvote, onSubmit
       >
         <div className="flex items-center justify-between mb-2">
           <span className="font-semibold text-pink-500">{post.username}</span>
-          <span className="text-gray-400 text-sm">{new Date(post.createdAt).toLocaleString()}</span>
+          <span className="text-gray-400 text-sm">{new Date(post.timestamp).toLocaleString()}</span>
         </div>
 
         <p className="text-gray-800 mb-4 whitespace-pre-wrap">{post.text}</p>
