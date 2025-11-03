@@ -1,8 +1,7 @@
-// api/create-payment-intent.js
 const express = require("express");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-// --- Universal handler (used in both local + Vercel) ---
+// universal handler (used in both local & vercel)
 async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
@@ -23,12 +22,13 @@ async function handler(req, res) {
   }
 }
 
-// ✅ Export for Vercel serverless usage
+// export for vercel serverless usage
 module.exports = handler;
 
-// ✅ Local dev mode only
+// local dev mode only
 if (require.main === module) {
-  require("dotenv").config({ path: ".env.local" }); // load keys locally
+  // load keys from .env.local if running on localhost
+  require("dotenv").config({ path: ".env.local" }); 
   const app = express();
   app.use(express.json());
   app.post("/api/create-payment-intent", handler);
