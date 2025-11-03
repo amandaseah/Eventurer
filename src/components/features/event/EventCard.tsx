@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { formatDateToDDMMYYYY } from '../../../lib/dateUtils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../ui/alert-dialog';
 import { toast } from 'sonner';
+import StripePaymentFormWrapper from "../payments/PaymentForm";
 
 interface EventCardProps {
   event: any;
@@ -30,6 +31,8 @@ export function EventCard({
   const [showRSVPPopup, setShowRSVPPopup] = useState(false);
   const [showRSVPDialog, setShowRSVPDialog] = useState(false);
   const [saves, setSaves] = useState(event.saves || 0);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState(0);
 
   // Update states when props change
   useEffect(() => {
@@ -51,33 +54,33 @@ export function EventCard({
     setShowRSVPDialog(true);
   };
 
-  const confirmRSVP = () => {
-    const isFree = event.price === 'Free' || event.price === '$0';
-    const newRSVPStatus = !isRSVPed;
-    
-    setIsRSVPed(newRSVPStatus);
-    setShowRSVPDialog(false);
-    
-    if (onRSVPChange) {
-      onRSVPChange(event.id, newRSVPStatus);
-    }
+const confirmRSVP = () => {
+  const isFree = event.price === 'Free' || event.price === '$0';
+  const numericPrice = parseFloat(String(event.price).replace(/[^0-9.]/g, ""));
+  const isPaidEvent = !isFree && !isNaN(numericPrice) && numericPrice > 0;
+  const newRSVPStatus = !isRSVPed;
 
-    if (newRSVPStatus) {
-      // Confirming RSVP
-      if (isFree) {
-        toast.success('RSVP confirmed! See you at the event!');
-      } else {
-        toast.success('RSVP confirmed! A confirmation email with payment details has been sent to you.');
-      }
-    } else {
-      // Cancelling RSVP
-      if (isFree) {
-        toast.success('RSVP cancelled successfully.');
-      } else {
-        toast.success('RSVP cancelled. A cancellation email has been sent to you.');
-      }
-    }
-  };
+  setShowRSVPDialog(false);
+
+  if (!newRSVPStatus) {
+    // Cancelling RSVP
+    setIsRSVPed(false);
+    onRSVPChange?.(event.id, false);
+    toast.success(isFree ? 'RSVP cancelled successfully.' : 'RSVP cancelled. A cancellation email has been sent.');
+    return;
+  }
+
+  if (isPaidEvent) {
+    // 🟢 Open Stripe payment modal
+    setPaymentAmount(Math.round(numericPrice * 100));
+    setShowPaymentModal(true);
+  } else {
+    // 🟢 Free event — directly confirm
+    setIsRSVPed(true);
+    onRSVPChange?.(event.id, true);
+    toast.success('RSVP confirmed! See you at the event!');
+  }
+};
 
   // Check if deadline is less than 3 days away
   const isClosingSoon = () => {
@@ -261,7 +264,7 @@ export function EventCard({
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={confirmRSVP}
+                  onClick={(e: React.MouseEvent) => { e.stopPropagation(); confirmRSVP(); }}
                   className="bg-pink-200 text-pink-600 hover:bg-pink-300 focus:ring-pink-200 focus:ring-offset-2"
                 >
                   {isRSVPed ? 'Cancel RSVP' : 'Confirm RSVP'}
@@ -271,6 +274,35 @@ export function EventCard({
           </AlertDialog>
         ) : null}
       </div>
+      {/* Stripe Payment Modal */}
+{showPaymentModal && (
+  <AlertDialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Complete Payment</AlertDialogTitle>
+        <AlertDialogDescription>
+          Pay now to confirm your RSVP for this event.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+
+      <StripePaymentFormWrapper
+        amount={paymentAmount}
+        onSuccess={() => {
+          setShowPaymentModal(false);
+          setIsRSVPed(true);
+          onRSVPChange?.(event.id, true);
+          toast.success('Payment successful! You’re RSVP’d 🎉');
+        }}
+      />
+
+      <AlertDialogFooter>
+        <AlertDialogCancel onClick={() => setShowPaymentModal(false)}>
+          Cancel
+        </AlertDialogCancel>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+)}
     </motion.div>
   );
 }
