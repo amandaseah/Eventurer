@@ -50,7 +50,9 @@ export function ProfilePage({
         return d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
       } catch { /* fallthrough */ }
     }
-    return 'January 2025';
+    // Use current date as fallback for accounts without createdAt
+    const now = new Date();
+    return now.toLocaleString(undefined, { month: 'long', year: 'numeric' });
   });
 
   const [localUsername, setLocalUsername] = useState<string>(username ?? "");

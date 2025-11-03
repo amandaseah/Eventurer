@@ -24,6 +24,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, usePa
 import ThreeLanding from './components/features/landing3D/ThreeLanding'
 import HomePreview from './components/pages/HomePreview'
 import { ChoicePage } from './components/pages/ChoicePage'
+import { FAQChatbot } from './components/features/FAQChatbot'
 
 interface Discussion {
   id: number;
@@ -382,7 +383,10 @@ function ShellApp() {
           onEventClick={(id) => handleNavigate('event-info', { eventId: id })}
         />
       )}
-      
+
+      {/* FAQ Chatbot - Available on all pages except login/signup */}
+      {!isAuthRoute && <FAQChatbot />}
+
       <Toaster />
     </div>
   );
