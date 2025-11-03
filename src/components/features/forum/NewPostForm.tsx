@@ -14,6 +14,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   // binary blob to store/forward to storage layer
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -91,11 +92,11 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
 
   const handleSubmit = async () => {
     if (!text.trim() && !imageBlob) return;
+    setError(null); // Clear previous errors
     try {
       const ok = await onAddPost(text, imageBlob || undefined);
       if (!ok) {
-        // show minimal feedback; you can replace with a toast
-        console.error("Failed to persist post (storage may be full or DB not initialized).");
+        setError("Failed to post comment. Please check your connection or try again.");
         return;
       }
       // success: clear UI
@@ -107,6 +108,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
       setImageBlob(null);
     } catch (err: any) {
       console.error("Failed to add post:", err);
+      setError("An error occurred while posting. Please try again.");
     }
   };
 
@@ -120,6 +122,12 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         placeholder="Share your thoughts, ask questions, or connect with other attendees..."
         className="rounded-xl sm:rounded-2xl min-h-[80px] sm:min-h-[100px] mb-3 sm:mb-4 text-sm sm:text-base"
       />
+
+      {error && (
+        <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+          {error}
+        </div>
+      )}
 
       {imagePreview && (
         <div className="relative mb-3 sm:mb-4 rounded-xl sm:rounded-2xl overflow-hidden">
@@ -160,7 +168,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         <Button
           onClick={handleSubmit}
           disabled={!text.trim() && !imageBlob}
-          className="rounded-xl bg-pink-400 hover:bg-pink-500 hover:shadow-lg text-sm sm:text-base py-2 sm:py-2.5 w-full sm:w-1/2 font-semibold"
+          className="rounded-xl bg-pink-400 hover:bg-pink-500 hover:shadow-lg text-sm sm:text-base py-2 sm:py-2.5 w-full sm:flex-1 font-semibold"
         >
           <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
           Post Comment

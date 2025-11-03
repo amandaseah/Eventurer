@@ -17,6 +17,7 @@ export function useEventForum(eventId: number) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
+  const [dbReady, setDbReady] = useState(false); 
 
   useEffect(() => {
     // ensure DB is initialized before any operations
@@ -27,10 +28,14 @@ export function useEventForum(eventId: number) {
         if (!ok) {
           console.warn("IndexedDB init failed");
           setIsConnected(false);
+          setDbReady(false);
+        }else{
+          setDbReady(true);
         }
       } catch (err) {
         console.error("DB init error:", err);
         setIsConnected(false);
+        setDbReady(false);
       }
       if (mounted) await loadPosts();
     }
@@ -58,6 +63,10 @@ export function useEventForum(eventId: number) {
     image: Blob | undefined,
     username: string
   ): Promise<boolean> => {
+    if (!dbReady) {
+      console.error("Database not ready");
+      return false;
+    }
     const newPost: Post = {
       id: `post_${Date.now()}`,
       eventId,
@@ -158,6 +167,7 @@ export function useEventForum(eventId: number) {
     posts,
     isLoading,
     isConnected,
+    dbReady,
     addPost,
     upvotePost,
     addReply,

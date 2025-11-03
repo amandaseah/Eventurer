@@ -93,31 +93,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
               posts={posts}
               username={username}
               onAddReply={(postId, text, image, parentReplyId) => {
-                const normalizeImage = (img: string | Blob | undefined): Blob | undefined => {
-                if (!img) return undefined;
-                if (typeof img === 'string') {
-                  try {
-                  // Convert data URL (base64) to Blob
-                  if (img.startsWith('data:')) {
-                    const parts = img.split(',');
-                    const match = parts[0].match(/:(.*?);/);
-                    const mime = match ? match[1] : '';
-                    const bstr = atob(parts[1]);
-                    let n = bstr.length;
-                    const u8arr = new Uint8Array(n);
-                    while (n--) u8arr[n] = bstr.charCodeAt(n);
-                    return new Blob([u8arr], { type: mime });
-                  }
-                  // If it's a plain URL, you could fetch() and convert to Blob here if needed.
-                  return undefined;
-                  } catch {
-                  return undefined;
-                  }
-                }
-                return img as Blob;
-                };
-
-                return addReply(postId, text, normalizeImage(image), parentReplyId, username);
+                return addReply(postId, text, image as Blob | undefined, parentReplyId, username);
               }}
               onUpvote={(postId) => upvotePost(postId, username)}
               />
