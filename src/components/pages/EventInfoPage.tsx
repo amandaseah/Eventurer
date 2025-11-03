@@ -78,7 +78,12 @@ export function EventInfoPage({
       } else if (typeof p.image === "string") {
         imageUrl = p.image;
       }
-      return { ...p, imageUrl };
+      return { 
+        ...p, 
+        image: imageUrl,
+        timestamp: p.timestamp || Date.now() 
+      };
+      
     });
 
     setPreviewPosts(mapped);
@@ -157,6 +162,13 @@ export function EventInfoPage({
       }
     }
   };
+
+  console.log('Preview posts being passed:', previewPosts.map(p => ({
+    id: p.id,
+    timestamp: p.timestamp,
+    hasTimestamp: !!p.timestamp,
+    timestampType: typeof p.timestamp
+  })));
 
   return (
     <div className="min-h-screen">
