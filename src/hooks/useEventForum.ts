@@ -19,7 +19,25 @@ export function useEventForum(eventId: number) {
   const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
-    loadPosts();
+    // ensure DB is initialized before any operations
+    let mounted = true;
+    async function initAndLoad() {
+      try {
+        const ok = await db.init();
+        if (!ok) {
+          console.warn("IndexedDB init failed");
+          setIsConnected(false);
+        }
+      } catch (err) {
+        console.error("DB init error:", err);
+        setIsConnected(false);
+      }
+      if (mounted) await loadPosts();
+    }
+    initAndLoad();
+    return () => {
+      mounted = false;
+    };
   }, [eventId]);
 
   const loadPosts = async () => {
@@ -34,11 +52,12 @@ export function useEventForum(eventId: number) {
     }
   };
 
+  // returns true on success, false on failure
   const addPost = async (
     text: string,
     image: Blob | undefined,
     username: string
-  ) => {
+  ): Promise<boolean> => {
     const newPost: Post = {
       id: `post_${Date.now()}`,
       eventId,
@@ -52,12 +71,13 @@ export function useEventForum(eventId: number) {
       const success = await db.addPost(newPost, image);
       if (success) {
         await loadPosts(); // Reload posts to get fresh data
-      } else {
-        throw new Error("Failed to add post");
+        return true;
       }
+      console.error("db.addPost returned false");
+      return false;
     } catch (error) {
       console.error("Error adding post:", error);
-      throw error;
+      return false;
     }
   };
 

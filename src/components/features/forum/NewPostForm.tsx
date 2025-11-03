@@ -4,8 +4,8 @@ import { Textarea } from "../../ui/textarea";
 import { Image as ImageIcon, Send, X } from "lucide-react";
 
 interface NewPostFormProps {
-  // pass a Blob for images to allow binary storage in IndexedDB
-  onAddPost: (comment: string, image?: Blob) => void;
+  // async handler returning true on success
+  onAddPost: (comment: string, image?: Blob) => Promise<boolean>;
 }
 
 export default function NewPostForm({ onAddPost }: NewPostFormProps) {
@@ -89,10 +89,16 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
     reader.readAsDataURL(f);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!text.trim() && !imageBlob) return;
     try {
-      onAddPost(text, imageBlob || undefined);
+      const ok = await onAddPost(text, imageBlob || undefined);
+      if (!ok) {
+        // show minimal feedback; you can replace with a toast
+        console.error("Failed to persist post (storage may be full or DB not initialized).");
+        return;
+      }
+      // success: clear UI
       setText("");
       if (imagePreview) {
         URL.revokeObjectURL(imagePreview);
@@ -100,9 +106,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
       }
       setImageBlob(null);
     } catch (err: any) {
-      // If storage layer throws QuotaExceeded, catch it there; you can also surface it here
       console.error("Failed to add post:", err);
-      // Optionally show a toast or fallback UI here
     }
   };
 
@@ -137,7 +141,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-3 mt-3">
+      <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-3 mt-3 w-full">
         <input
           ref={fileRef}
           type="file"
@@ -148,7 +152,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         <Button
           onClick={() => fileRef.current?.click()}
           variant="outline"
-          className="rounded-full text-sm sm:text-base py-2 sm:py-2.5 w-full sm:w-1/2"
+          className="rounded-full text-sm sm:text-base py-2 sm:py-2.5 w-full sm:flex-1"
         >
           <ImageIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
           Add Image
