@@ -16,6 +16,9 @@ const FOCUS: Record<FocusKey, { position: [number, number, number]; target: [num
   monitor: { position: [1.0, 1.15, 1.35], target: [0, 1.12, 0] },
 }
 
+const BASE_WIDE_POSITION = new THREE.Vector3(...FOCUS.wide.position)
+const BASE_WIDE_TARGET = new THREE.Vector3(...FOCUS.wide.target)
+
 const DWELL_DELAY_MS = 220
 const TWEEN_DURATION = 1.1
 const TWEEN_EASE = 'power3.inOut'
@@ -311,6 +314,9 @@ function CameraParallax({
   mouseRef: React.MutableRefObject<{ x: number; y: number }>
 }) {
   const parallaxRef = useRef({ x: 0, y: 0 })
+  const timeRef = useRef(0)
+  const aimPosition = useRef(new THREE.Vector3())
+  const aimTarget = useRef(new THREE.Vector3())
 
   useFrame((_, delta) => {
     const controls = controlsRef.current
@@ -322,55 +328,46 @@ function CameraParallax({
 
     const camera = controls.object as THREE.PerspectiveCamera
     const canParallax = dwellTimerRef.current === null
-    const targetOffsetX = (canParallax ? mouseRef.current.x : 0) * 0.15
-    const targetOffsetY = (canParallax ? mouseRef.current.y : 0) * 0.08
 
-    const parallaxSmoothing = 4
-    parallaxRef.current.x = THREE.MathUtils.damp(parallaxRef.current.x, targetOffsetX, parallaxSmoothing, delta)
-    parallaxRef.current.y = THREE.MathUtils.damp(parallaxRef.current.y, targetOffsetY, parallaxSmoothing, delta)
+    const parallaxSmoothing = 3.6
+    const pointerGoalX = canParallax ? mouseRef.current.x : 0
+    const pointerGoalY = canParallax ? mouseRef.current.y : 0
+    parallaxRef.current.x = THREE.MathUtils.damp(parallaxRef.current.x, pointerGoalX, parallaxSmoothing, delta)
+    parallaxRef.current.y = THREE.MathUtils.damp(parallaxRef.current.y, pointerGoalY, parallaxSmoothing, delta)
 
-    const offsetX = parallaxRef.current.x
-    const offsetY = parallaxRef.current.y
+    timeRef.current += delta * 0.55
+    const t = timeRef.current
 
-    const cinematicFactor = 5
+    const idleSwingX = Math.sin(t * 0.72) * 0.12
+    const idleSwingZ = Math.cos(t * 0.64) * 0.16
+    const idleLift = Math.sin(t * 1.1) * 0.05
+    const idleOrbitTargetX = Math.sin(t * 0.52) * 0.05
+    const idleOrbitTargetZ = Math.cos(t * 0.5) * 0.04
+    const idleOrbitTargetY = Math.cos(t * 0.85) * 0.03
 
-    camera.position.x = THREE.MathUtils.damp(
-      camera.position.x,
-      FOCUS.wide.position[0] + offsetX * 1.0,
-      cinematicFactor,
-      delta,
-    )
-    camera.position.y = THREE.MathUtils.damp(
-      camera.position.y,
-      FOCUS.wide.position[1] + offsetY * 0.4,
-      cinematicFactor,
-      delta,
-    )
-    camera.position.z = THREE.MathUtils.damp(
-      camera.position.z,
-      FOCUS.wide.position[2] - offsetX * 0.45,
-      cinematicFactor,
-      delta,
+    const pointerX = parallaxRef.current.x
+    const pointerY = parallaxRef.current.y
+
+    aimPosition.current.set(
+      BASE_WIDE_POSITION.x + idleSwingX + pointerX * 0.5,
+      BASE_WIDE_POSITION.y + idleLift + pointerY * 0.24,
+      BASE_WIDE_POSITION.z + idleSwingZ - pointerX * 0.55,
     )
 
-    controls.target.x = THREE.MathUtils.damp(
-      controls.target.x,
-      FOCUS.wide.target[0] + offsetX * 0.6,
-      cinematicFactor,
-      delta,
+    aimTarget.current.set(
+      BASE_WIDE_TARGET.x + idleOrbitTargetX + pointerX * 0.15,
+      BASE_WIDE_TARGET.y + idleOrbitTargetY + pointerY * 0.2,
+      BASE_WIDE_TARGET.z + idleOrbitTargetZ - pointerX * 0.1,
     )
-    controls.target.y = THREE.MathUtils.damp(
-      controls.target.y,
-      FOCUS.wide.target[1] + offsetY * 0.75,
-      cinematicFactor,
-      delta,
-    )
-    controls.target.z = THREE.MathUtils.damp(
-      controls.target.z,
-      FOCUS.wide.target[2] - offsetX * 0.3,
-      cinematicFactor,
-      delta,
-    )
+
+    const followFactor = 4.5
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, aimPosition.current.x, followFactor, delta)
+    camera.position.y = THREE.MathUtils.damp(camera.position.y, aimPosition.current.y, followFactor, delta)
+    camera.position.z = THREE.MathUtils.damp(camera.position.z, aimPosition.current.z, followFactor, delta)
+
+    controls.target.x = THREE.MathUtils.damp(controls.target.x, aimTarget.current.x, followFactor, delta)
+    controls.target.y = THREE.MathUtils.damp(controls.target.y, aimTarget.current.y, followFactor, delta)
+    controls.target.z = THREE.MathUtils.damp(controls.target.z, aimTarget.current.z, followFactor, delta)
 
     controls.update()
   })
@@ -544,6 +541,9 @@ export default function ThreeLanding() {
       controls.enableRotate = false
       controls.enableZoom = false
     } else if (zoomStateRef.current === 'WIDE') {
+      controls.enableRotate = false
+      controls.enableZoom = false
+    } else {
       controls.enableRotate = true
       controls.enableZoom = true
     }
