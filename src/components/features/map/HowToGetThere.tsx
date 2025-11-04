@@ -1138,14 +1138,13 @@ export default function HowToGetThere({ event }: { event: any }) {
                   const isActive = selectedCardKey === cardKey;
                   const isClickable = Boolean(station.position);
                   const cardClasses = [
-                    'group relative w-full rounded-2xl bg-white px-4 py-4 text-left transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline-none',
-                    // active: extra-thick purple border + strong glow shadow
-                    // inside MRT cardClasses
+                    'group relative w-full rounded-2xl bg-white px-4 py-4 text-left transition-[transform,box-shadow,border-color,background] duration-200 focus-visible:outline-none',
+                    // active: sleeker border with softened glow
                     isActive
-                    ? 'overflow-visible border-[3px] border-purple-400 outline outline-2 outline-purple-500/60 shadow-[0_0_0_4px_rgba(168,85,247,0.4),0_18px_40px_rgba(168,85,247,0.3)]'
-                    : 'overflow-hidden border border-purple-400 bg-white shadow-sm shadow-purple-400/30',
+                      ? 'overflow-visible border border-purple-300/80 shadow-[0_16px_32px_-18px_rgba(168,85,247,0.45)] ring-1 ring-purple-200/60 backdrop-blur-[1px]'
+                      : 'overflow-hidden border border-gray-200 bg-white shadow-sm hover:border-purple-200/70',
                     isClickable
-                      ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-300/60'
+                      ? 'cursor-pointer hover:-translate-y-[6px] hover:shadow-lg hover:shadow-purple-100/60'
                       : 'cursor-default opacity-70',
                     !isClickable ? 'pointer-events-none' : '',
                   ]
@@ -1169,24 +1168,26 @@ export default function HowToGetThere({ event }: { event: any }) {
                       className={cardClasses}
                       disabled={!isClickable}
                     >
-                      {/* left accent bar to make the active state unmistakable */}
+                      {/* left accent bar with modern gradient accent */}
                       <span
                         aria-hidden
-                        className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 rounded-l-2xl transition-opacity duration-200 ${
-                          isActive ? 'opacity-100 bg-purple-500' : 'opacity-0 group-hover:opacity-60 bg-purple-400'
+                        className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 rounded-l-2xl transition-all duration-200 ${
+                          isActive
+                            ? 'opacity-100 bg-gradient-to-b from-purple-400/90 via-fuchsia-400/80 to-purple-500/80'
+                            : 'opacity-0 group-hover:opacity-40 bg-gradient-to-b from-purple-300/80 to-purple-400/60'
                         }`}
                       />
                       <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-purple-900">
                         <span className="flex-1">{station.name}</span>
                         <div className="flex flex-col items-end gap-1">
                           {isActive && (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-purple-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-purple-600 shadow-sm">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-purple-200/60 bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-purple-600 shadow-sm backdrop-blur">
                               <Navigation className="h-3 w-3" />
                               On map
                             </span>
                           )}
                           {typeof station.dist === 'number' && (
-                            <span className="inline-flex items-center justify-center rounded-full bg-purple-100 px-2 py-0.5 text-xs text-purple-700">
+                            <span className="inline-flex items-center justify-center rounded-full bg-purple-100/80 px-2 py-0.5 text-xs text-purple-700">
                               {station.dist} m
                             </span>
                           )}
@@ -1307,13 +1308,13 @@ export default function HowToGetThere({ event }: { event: any }) {
                   const isActive = selectedCardKey === cardKey;
                   const isClickable = Boolean(stop.position);
                   const cardClasses = [
-                    'group relative w-full rounded-2xl bg-white px-4 py-4 text-left transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline-none',
-                    // active: extra-thick pink border + strong glow shadow
+                    'group relative w-full rounded-2xl bg-white px-4 py-4 text-left transition-[transform,box-shadow,border-color,background] duration-200 focus-visible:outline-none',
+                    // active: sleeker border with softened glow
                     isActive
-                      ? 'overflow-visible border-[3px] border-pink-500 outline outline-2 outline-pink-400/60 shadow-[0_0_0_4px_rgba(244,114,182,0.4),0_18px_40px_rgba(236,72,153,0.3)]'
-                      : 'overflow-hidden border border-pink-200 bg-white shadow-sm shadow-pink-200/40',
+                      ? 'overflow-visible border border-pink-300/80 shadow-[0_16px_32px_-18px_rgba(236,72,153,0.45)] ring-1 ring-pink-200/60 backdrop-blur-[1px]'
+                      : 'overflow-hidden border border-gray-200 bg-white shadow-sm hover:border-pink-200/70',
                     isClickable
-                      ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-400/60'
+                      ? 'cursor-pointer hover:-translate-y-[6px] hover:shadow-lg hover:shadow-pink-100/60'
                       : 'cursor-default opacity-70',
                     !isClickable ? 'pointer-events-none' : '',
                   ]
@@ -1339,24 +1340,26 @@ export default function HowToGetThere({ event }: { event: any }) {
                       className={cardClasses}
                       disabled={!isClickable}
                     >
-                      {/* left accent bar to make the active state unmistakable */}
+                      {/* left accent bar with modern gradient accent */}
                       <span
                         aria-hidden
-                        className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 rounded-l-2xl transition-opacity duration-200 ${
-                          isActive ? 'opacity-100 bg-pink-500' : 'opacity-0 group-hover:opacity-60 bg-pink-500'
+                        className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 rounded-l-2xl transition-all duration-200 ${
+                          isActive
+                            ? 'opacity-100 bg-gradient-to-b from-pink-400/90 via-rose-400/80 to-pink-500/80'
+                            : 'opacity-0 group-hover:opacity-40 bg-gradient-to-b from-pink-300/80 to-pink-400/60'
                         }`}
                       />
                       <div className="relative flex items-start justify-between gap-3 text-sm font-semibold text-pink-600">
                         <span className="flex-1">{stop.name}</span>
                         <div className="flex flex-col items-end gap-1">
                           {isActive && (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-pink-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-pink-500 shadow-sm">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-pink-200/60 bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-pink-500 shadow-sm backdrop-blur">
                               <Navigation className="h-3 w-3" />
                               On map
                             </span>
                           )}
                           {typeof stop.dist === 'number' && (
-                            <span className="inline-flex items-center justify-center rounded-full bg-pink-400 px-2 py-0.5 text-xs text-white font-medium">
+                            <span className="inline-flex items-center justify-center rounded-full bg-pink-400/90 px-2 py-0.5 text-xs text-white font-medium">
                               {stop.dist} m
                             </span>
                           )}
