@@ -287,6 +287,7 @@ const confirmRSVP = () => {
 
       <StripePaymentFormWrapper
         amount={paymentAmount}
+        eventTitle={event.title}
         onSuccess={() => {
           setShowPaymentModal(false);
           setIsRSVPed(true);
