@@ -94,7 +94,7 @@ function CheckoutForm({
             // displays customer name and email!
             name: payerName || undefined,
             email: email || undefined,
-          },
+        },
         },
       });
 
