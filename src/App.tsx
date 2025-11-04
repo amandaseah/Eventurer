@@ -525,7 +525,6 @@ function MarketingScreen() {
   return (
     <MarketingLandingPage
       onExplore={() => navigate('/choice')}
-      onDemo={() => navigate('/choice')}
     />
   );
 }

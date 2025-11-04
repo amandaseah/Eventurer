@@ -6,6 +6,7 @@ import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { signUpWithEmail } from '../../../lib/firebase';
 import { friendlyAuthError } from '../../../lib/authErrorMessages';
+import GoogleSignInButton from './GoogleSignInButton';
 
 interface SignupFormProps {
   onNavigate: (page: string) => void;
@@ -182,6 +183,24 @@ export default function SignupForm({ onNavigate }: SignupFormProps) {
           {loading ? 'Creating account...' : 'Create account'}
         </Button>
       </motion.div>
+
+      {/* Divider */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7 }}
+        className="relative"
+      >
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="bg-white px-4 text-gray-500">or</span>
+        </div>
+      </motion.div>
+
+      {/* Google Sign-In Button */}
+      <GoogleSignInButton onNavigate={onNavigate} text="Sign up with Google" />
 
       <div className="text-center mt-3 text-sm text-gray-500">
         Already have an account?{' '}
