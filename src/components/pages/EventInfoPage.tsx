@@ -59,6 +59,17 @@ export function EventInfoPage({
   // Forum data
   const { posts, addPost, upvotePost } = useEventForum(Number(eventId));
 
+  useEffect(() => {
+    console.log('Posts from useEventForum:', posts);
+    console.log('Posts length:', posts.length);
+    console.log('Posts data:', posts.map(p => ({
+      id: p.id,
+      text: p.text?.substring(0, 20),
+      timestamp: p.timestamp,
+      hasImage: !!p.image
+    })));
+  }, [posts]);
+
   // Create preview-friendly posts for TopForumPreview:
   // convert Blob images to object URLs (or pass through string images)
   const previewUrlsRef = useRef<string[]>([]);

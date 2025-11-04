@@ -23,9 +23,11 @@ export function useEventForum(eventId: number) {
   }, [eventId]);
 
   const loadPosts = async () => {
+    console.log('[loadPosts] Starting load for eventId:', eventId);
     setIsLoading(true);
     try {
       const eventPosts = await db.getPostsByEvent(eventId);
+      console.log('[loadPosts] Loaded posts:', eventPosts.length, eventPosts);
       setPosts(eventPosts);
     } catch (error) {
       console.error("Failed to load posts:", error);
