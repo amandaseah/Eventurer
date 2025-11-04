@@ -1,145 +1,154 @@
-import { useState, useEffect } from "react";
-import { db } from "../lib/indexedDB";
+import { useEffect, useState } from "react";
+import { saveToIndexedDB, getFromIndexedDB } from "../lib/indexedDB";
+
+interface Reply {
+  id: string;
+  text: string;
+  image?: string;
+  createdAt: number;
+  username: string;
+  upvotes: number;
+  upvotedBy: string[];
+  replies: Reply[]; // nested replies
+}
 
 interface Post {
   id: string;
-  eventId: number;
   text: string;
-  imageId?: string;
-  image?: Blob | null;
+  image?: string;
+  createdAt: number;
   username: string;
-  timestamp: number;
-  upvotes: string[];
-  replies?: Post[];
+  upvotes: number;
+  upvotedBy: string[]; // track usernames who upvoted
+  replies: Reply[];
 }
 
 export function useEventForum(eventId: number) {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [username, setUsername] = useState("Guest");
 
+  // 1️ Load posts from IndexedDB on mount
   useEffect(() => {
-    loadPosts();
+    setIsLoading(true);
+    getFromIndexedDB(`forum_posts_${eventId}`)
+      .then((data) => {
+        if (data) {
+          setPosts(data as Post[]);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
   }, [eventId]);
 
-  const loadPosts = async () => {
-    console.log('[loadPosts] Starting load for eventId:', eventId);
-    setIsLoading(true);
-    try {
-      const eventPosts = await db.getPostsByEvent(eventId);
-      console.log('[loadPosts] Loaded posts:', eventPosts.length, eventPosts);
-      setPosts(eventPosts);
-    } catch (error) {
-      console.error("Failed to load posts:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // 2️ Simulate connection (always online for now)
+  useEffect(() => {
+    setIsConnected(true);
+  }, []);
 
-  const addPost = async (
-    text: string,
-    image: Blob | undefined,
-    username: string
-  ) => {
+  // 3️ Save posts to IndexedDB when they change
+  useEffect(() => {
+    saveToIndexedDB(`forum_posts_${eventId}`, posts).catch(console.error);
+  }, [posts, eventId]);
+
+  // 4️ Add a new post
+  const addPost = (text: string, image?: string, username?: string) => {
     const newPost: Post = {
-      id: `post_${Date.now()}`,
-      eventId,
+      id: Date.now().toString(),
       text,
-      username,
-      timestamp: Date.now(),
-      upvotes: [],
-    };
-
-    try {
-      const success = await db.addPost(newPost, image);
-      if (success) {
-        await loadPosts(); // Reload posts to get fresh data
-      } else {
-        throw new Error("Failed to add post");
-      }
-    } catch (error) {
-      console.error("Error adding post:", error);
-      throw error;
-    }
-  };
-
-  const upvotePost = async (postId: string, username: string) => {
-    try {
-      // toggle locally first for snappy UI
-      setPosts((currentPosts) =>
-        currentPosts.map((post) => {
-          if (post.id === postId) {
-            const hasUpvoted = post.upvotes.includes(username);
-            return {
-              ...post,
-              upvotes: hasUpvoted
-                ? post.upvotes.filter((u) => u !== username)
-                : [...post.upvotes, username],
-            };
-          }
-          return post;
-        })
-      );
-
-      // persist change to DB
-      const post = await db.getPostById(postId);
-      if (!post) return;
-      const hasUpvoted = post.upvotes?.includes(username);
-      const newUpvotes = hasUpvoted
-        ? (post.upvotes || []).filter((u) => u !== username)
-        : [...(post.upvotes || []), username];
-      await db.updatePost(postId, { upvotes: newUpvotes });
-      // reload to ensure consistent state
-      await loadPosts();
-    } catch (error) {
-      console.error("Failed to upvote post:", error);
-    }
-  };
-
-  const addReply = async (
-    postId: string,
-    text: string,
-    image: Blob | undefined,
-    parentReplyId?: string,
-    username?: string
-  ) => {
-    const reply: Post = {
-      id: `reply_${Date.now()}`,
-      eventId,
-      text,
+      image,
+      createdAt: Date.now(),
       username: username || "Guest",
-      timestamp: Date.now(),
-      upvotes: [],
+      upvotes: 0,
+      upvotedBy: [],
+      replies: [],
     };
 
-    try {
-      const ok = await db.addReply(postId, reply, image);
-      if (ok) {
-        await loadPosts();
-      } else {
-        throw new Error("Failed to persist reply");
-      }
-    } catch (error) {
-      console.error("Failed to add reply:", error);
-      // fallback: update locally
-      setPosts((currentPosts) =>
-        currentPosts.map((post) => {
-          if (post.id === postId) {
+
+    setPosts(prev => [newPost, ...prev]);
+  };
+
+  const addReply = (postId: string, text: string, image?: string, parentReplyId?: string) => {
+    const newReply: Reply = {
+      id: Date.now().toString(),
+      text,
+      image,
+      createdAt: Date.now(),
+      username,
+      replies: [],
+      upvotes: 0,
+      upvotedBy: [],
+    };
+
+    const addNestedReply = (replies: Reply[]): Reply[] => {
+      return replies.map(reply => {
+        if (reply.id === parentReplyId) {
+          return {
+            ...reply,
+            replies: [newReply, ...reply.replies], // clone new replies array
+          };
+        }
+        if (reply.replies.length > 0) {
+          return {
+            ...reply,
+            replies: addNestedReply(reply.replies), // clone deeper
+          };
+        }
+        return { ...reply }; // clone leaf
+      });
+    };
+
+    setPosts(prev =>
+      prev.map(post => {
+        if (post.id === postId) {
+          if (parentReplyId) {
             return {
               ...post,
-              replies: [...(post.replies || []), reply],
+              replies: addNestedReply(post.replies), // cloned tree
+            };
+          } else {
+            return {
+              ...post,
+              replies: [...post.replies, newReply], // clone new replies array
             };
           }
-          return post;
-        })
-      );
-    }
+        }
+        return { ...post }; // clone other posts
+      })
+    );
+  };
+
+  // 5️ Upvote a post or reply (recursive)
+  const upvotePost = (postId: string, username: string) => {
+    setPosts(prevPosts =>
+      prevPosts.map(post => {
+        const upvoteRecursive = (p: Post | Reply): Post | Reply => {
+          const hasUpvoted = p.upvotedBy.includes(username);
+          if (p.id === postId) {
+            return {
+              ...p,
+              upvotes: hasUpvoted ? p.upvotes - 1 : p.upvotes + 1,
+              upvotedBy: hasUpvoted
+                ? p.upvotedBy.filter(u => u !== username)
+                : [...p.upvotedBy, username],
+            };
+          }
+          if (p.replies.length > 0) {
+            return { ...p, replies: p.replies.map(upvoteRecursive) };
+          }
+          return p;
+        };
+        return upvoteRecursive(post) as Post;
+      })
+    );
   };
 
   return {
     posts,
-    isLoading,
     isConnected,
+    isLoading,
+    username,
     addPost,
     upvotePost,
     addReply,
