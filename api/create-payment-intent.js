@@ -1,3 +1,4 @@
+require("dotenv").config({path: ".env.local"});
 const express = require("express");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -8,7 +9,13 @@ async function handler(req, res) {
   }
 
   try {
-    const { amount = 1000, currency = "sgd", description = "Eventurer purchase" } = req.body || {};
+    const { 
+      amount = 1000,
+      currency = "sgd",
+      description = "Eventurer purchase",
+      receipt_email,
+      metadata = {},
+     } = req.body || {};
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
@@ -28,7 +35,6 @@ module.exports = handler;
 // local dev mode only
 if (require.main === module) {
   // load keys from .env.local if running on localhost
-  require("dotenv").config({ path: ".env.local" }); 
   const app = express();
   app.use(express.json());
   app.post("/api/create-payment-intent", handler);
@@ -38,3 +44,4 @@ if (require.main === module) {
     console.log(`🚀 Local Stripe API running on http://localhost:${PORT}/api/create-payment-intent`);
   });
 }
+

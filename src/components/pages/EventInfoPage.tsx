@@ -59,36 +59,17 @@ export function EventInfoPage({
   // Forum data
   const { posts, addPost, upvotePost } = useEventForum(Number(eventId));
 
-  // Create preview-friendly posts for TopForumPreview:
-  // convert Blob images to object URLs (or pass through string images)
-  const previewUrlsRef = useRef<string[]>([]);
-  const [previewPosts, setPreviewPosts] = useState<any[]>([]);
-
   useEffect(() => {
-    // cleanup previous URLs
-    previewUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
-    previewUrlsRef.current = [];
-
-    const slice = posts.slice(0, 3);
-    const mapped = slice.map((p) => {
-      let imageUrl: string | undefined = undefined;
-      if (p.image instanceof Blob) {
-        imageUrl = URL.createObjectURL(p.image);
-        previewUrlsRef.current.push(imageUrl);
-      } else if (typeof p.image === "string") {
-        imageUrl = p.image;
-      }
-      return { ...p, imageUrl };
-    });
-
-    setPreviewPosts(mapped);
-
-    return () => {
-      previewUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
-      previewUrlsRef.current = [];
-    };
+    console.log('Posts from useEventForum:', posts);
+    console.log('Posts length:', posts.length);
+    console.log('Posts data:', posts.map(p => ({
+      id: p.id,
+      text: p.text?.substring(0, 20),
+      timestamp: p.createdAt,
+      hasImage: !!p.image
+    })));
   }, [posts]);
-
+  
   // Fetch event details
   useEffect(() => {
     async function loadEvent() {
@@ -158,11 +139,11 @@ export function EventInfoPage({
     }
   };
 
-  console.log('Preview posts being passed:', previewPosts.map(p => ({
+  console.log('Preview posts being passed:', posts.map(p => ({
     id: p.id,
-    timestamp: p.timestamp,
-    hasTimestamp: !!p.timestamp,
-    timestampType: typeof p.timestamp
+    timestamp: p.createdAt,
+    hasTimestamp: !!p.createdAt,
+    timestampType: typeof p.createdAt
   })));
 
   return (
@@ -200,7 +181,7 @@ export function EventInfoPage({
             <EventDetails event={event} saves={saves} />
 
             <TopForumPreview
-              posts={previewPosts}
+              posts={posts.slice(0, 3)}
               onViewAll={() => onNavigate("event-forum", { eventId, username: resolvedUsername })}
               onPostClick={(postId) => onNavigate("event-forum", { eventId, postId, username: resolvedUsername })}
               upvotePost={(postId) => upvotePost(postId, resolvedUsername)}
