@@ -745,10 +745,31 @@ export default function HowToGetThere({ event }: { event: any }) {
     );
   };
 
-  // Don't auto-request location on mount - wait for user to click the button
-  // useEffect(() => {
-  //   locateMe();
-  // }, []);
+  // Auto-request location on mount (will only work if user has previously granted permission)
+  useEffect(() => {
+    // Check if geolocation is available
+    if (!navigator.geolocation || !navigator.permissions) {
+      return;
+    }
+
+    // Check permission status without triggering a prompt
+    navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus) => {
+      if (permissionStatus.state === 'granted') {
+        // User has already granted permission, auto-fetch location
+        console.log('[HowToGetThere] Auto-requesting location (permission already granted)');
+        locateMe();
+      } else if (permissionStatus.state === 'prompt') {
+        // Permission not yet determined - don't auto-request, wait for user to click button
+        console.log('[HowToGetThere] Geolocation permission not yet granted - waiting for user action');
+      } else {
+        // Permission denied
+        console.log('[HowToGetThere] Geolocation permission denied');
+      }
+    }).catch((err) => {
+      // Fallback for browsers that don't support permissions API
+      console.warn('[HowToGetThere] Permissions API not supported, will wait for user to click button', err);
+    });
+  }, []);
 
   useEffect(() => {
     if (!youPos || !selectedTransit || transitRouteLoadingKey) return;

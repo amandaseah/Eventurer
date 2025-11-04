@@ -6,6 +6,8 @@ import NewPostForm from "../features/forum/NewPostForm";
 import PostList from "../features/forum/PostList";
 import { useEventForum } from "../../hooks/useEventForum";
 import Footer from "../shared/Footer";
+import { useEffect, useState } from 'react';
+import { fetchEventbriteEventsForMe } from '../../lib/eventbriteService';
 
 interface EventForumPageProps {
   eventId: number;
@@ -16,22 +18,121 @@ interface EventForumPageProps {
 }
 
 export function EventForumPage({ eventId, events, onGoBack, onNavigate, username }: EventForumPageProps) {
-  const event = events.find(e => e.id.toString() === eventId.toString());
+  const [event, setEvent] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const { posts, isConnected, isLoading, addPost, upvotePost, addReply } = useEventForum(eventId);
 
+  // Fetch event details if not in events array
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadEvent() {
+      try {
+        setLoading(true);
+        let eventData = null;
+
+        // If parent already passed in events, use them
+        if (events && events.length > 0) {
+          eventData = events.find(e => e.id.toString() === eventId.toString());
+
+          // If not found in provided events, fetch from Eventbrite
+          if (!eventData) {
+            console.log('[EventForumPage] Event not in props, fetching from Eventbrite...');
+            const allEvents = await fetchEventbriteEventsForMe();
+            eventData = allEvents.find((e: any) => String(e.id) === String(eventId));
+          }
+        } else {
+          // No events provided, fetch from Eventbrite directly
+          console.log('[EventForumPage] No events in props, fetching from Eventbrite...');
+          const allEvents = await fetchEventbriteEventsForMe();
+          eventData = allEvents.find((e: any) => String(e.id) === String(eventId));
+        }
+
+        if (isMounted) {
+          setEvent(eventData || null);
+        }
+      } catch (err) {
+        console.error('Failed to fetch event:', err);
+        if (isMounted) {
+          setEvent(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadEvent();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [eventId]);
+
+  // Show loading state while fetching
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-white via-pink-50/30 to-white flex flex-col">
+        <Header onNavigate={onNavigate} />
+        <div className="flex-1 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            <div className="relative w-16 h-16 mx-auto mb-4">
+              <div className="absolute inset-0 border-4 border-pink-200 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-pink-500 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <p className="text-xl text-gray-700 font-medium">Loading event forum...</p>
+            <p className="text-sm text-gray-500 mt-2">Please wait a moment</p>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   if (!event) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Event not found</h2>
-          <button
-            onClick={() => onNavigate('explore')}
-            className="text-pink-500 hover:underline"
+      <div className="min-h-screen bg-gradient-to-br from-white via-pink-50/30 to-white flex flex-col">
+        <Header onNavigate={onNavigate} />
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center max-w-md my-auto"
           >
-            Return to Explore
-          </button>
+            <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-8">
+              <MessageSquare className="w-12 h-12 text-red-500" />
+            </div>
+            <h1 className="text-6xl font-bold text-gray-900 mb-4">404</h1>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-3">Event Forum Not Found</h2>
+            <p className="text-gray-600 mb-12">
+              The event forum you're looking for doesn't exist or has been removed.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => onNavigate('explore')}
+                className="bg-pink-500 text-white py-3 px-6 rounded-xl font-semibold hover:bg-pink-600 transition-all"
+              >
+                Explore Events
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onGoBack}
+                className="bg-white text-gray-700 py-3 px-6 rounded-xl font-semibold border-2 border-gray-300 hover:bg-gray-50 transition-all"
+              >
+                Go Back
+              </motion.button>
+            </div>
+          </motion.div>
         </div>
+        <Footer onNavigate={onNavigate} />
       </div>
     );
   }

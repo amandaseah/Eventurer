@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { searchFAQ, FAQItem } from '../../data/faqData';
+import { getChatbotResponse } from '../../lib/gemini';
 
 interface Message {
   id: number;
   type: 'user' | 'bot';
   content: string;
-  faqResults?: FAQItem[];
+  isLoading?: boolean;
 }
 
 export function FAQChatbot() {
@@ -16,10 +16,11 @@ export function FAQChatbot() {
     {
       id: 0,
       type: 'bot',
-      content: "Hi! I'm here to help answer your questions. Type your question below and I'll search our FAQ database.",
+      content: "Hi! I'm your Eventurer FAQ assistant. I'm here to help answer any questions you have about using the platform. What would you like to know?",
     },
   ]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -30,8 +31,8 @@ export function FAQChatbot() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: messages.length,
@@ -39,27 +40,43 @@ export function FAQChatbot() {
       content: input,
     };
 
-    const results = searchFAQ(input);
+    const loadingMessage: Message = {
+      id: messages.length + 1,
+      type: 'bot',
+      content: '',
+      isLoading: true,
+    };
 
-    let botMessage: Message;
-
-    if (results.length > 0) {
-      botMessage = {
-        id: messages.length + 1,
-        type: 'bot',
-        content: `I found ${results.length} answer${results.length > 1 ? 's' : ''} that might help:`,
-        faqResults: results,
-      };
-    } else {
-      botMessage = {
-        id: messages.length + 1,
-        type: 'bot',
-        content: "I couldn't find an exact match for your question. Please try rephrasing it, or contact us at eventurer.support@gmail.com for personalized assistance.",
-      };
-    }
-
-    setMessages(prev => [...prev, userMessage, botMessage]);
+    setMessages(prev => [...prev, userMessage, loadingMessage]);
     setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await getChatbotResponse(input);
+
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === loadingMessage.id
+            ? { ...msg, content: response, isLoading: false }
+            : msg
+        )
+      );
+    } catch (error) {
+      console.error('Chatbot error:', error);
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === loadingMessage.id
+            ? {
+                ...msg,
+                content: "Sorry, I'm experiencing technical difficulties. Please try again or contact support at eventurer.support@gmail.com.",
+                isLoading: false
+              }
+            : msg
+        )
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -134,26 +151,16 @@ export function FAQChatbot() {
                           : 'bg-white text-gray-800 border border-gray-200'
                       }`}
                     >
-                      {message.content}
+                      {message.isLoading ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Thinking...</span>
+                        </div>
+                      ) : (
+                        <div className="whitespace-pre-wrap">{message.content}</div>
+                      )}
                     </div>
                   </div>
-
-                  {/* FAQ Results */}
-                  {message.faqResults && message.faqResults.length > 0 && (
-                    <div className="mt-2 space-y-2">
-                      {message.faqResults.map(faq => (
-                        <div
-                          key={faq.id}
-                          className="ml-0 bg-white rounded-xl p-3 border border-gray-200 shadow-sm"
-                        >
-                          <h4 className="font-semibold text-gray-900 text-xs sm:text-sm mb-1">
-                            {faq.question}
-                          </h4>
-                          <p className="text-gray-600 text-xs leading-relaxed">{faq.answer}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               ))}
               <div ref={messagesEndRef} />
@@ -172,11 +179,15 @@ export function FAQChatbot() {
                 />
                 <button
                   onClick={handleSend}
-                  disabled={!input.trim()}
+                  disabled={!input.trim() || isLoading}
                   className="p-2 sm:p-2.5 rounded-xl bg-pink-500 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-pink-600 transition-all"
                   aria-label="Send message"
                 >
-                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                  )}
                 </button>
               </div>
             </div>
