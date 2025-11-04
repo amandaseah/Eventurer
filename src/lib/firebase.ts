@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -54,6 +54,37 @@ export async function signUpWithEmail({ email, password, firstName, lastName, di
 export async function signInWithEmail({ email, password }: { email: string; password: string }) {
   const { signInWithEmailAndPassword } = await import('firebase/auth');
   return signInWithEmailAndPassword(auth, email, password);
+}
+
+export async function signInWithGoogle() {
+  const provider = new GoogleAuthProvider();
+  provider.addScope('profile');
+  provider.addScope('email');
+  
+  const result = await signInWithPopup(auth, provider);
+  const user = result.user;
+  
+  // Extract name parts from Google profile
+  const displayName = user.displayName || '';
+  const nameParts = displayName.split(' ');
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || '';
+  
+  // Create or update user doc in Firestore
+  try {
+    await setDoc(doc(db, 'users', user.uid), {
+      email: user.email,
+      firstName: firstName || null,
+      lastName: lastName || null,
+      displayName: user.displayName || null,
+      photoURL: user.photoURL || null,
+      createdAt: serverTimestamp(),
+    }, { merge: true }); // Use merge to avoid overwriting existing data
+  } catch (e) {
+    console.warn('Failed to write user doc', e);
+  }
+  
+  return user;
 }
 
 export default null;
