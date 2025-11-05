@@ -59,28 +59,30 @@ export function EventExplorePage({
     );
     onRSVPChange(eventId, isRSVPed);
   };
-  // // Load user's preferred view from Firebase
-  // useEffect(() => {
-  //   const loadViewPreference = async () => {
-  //     const user = auth.currentUser;
-  //     if (!user) return;
 
-  //     try {
-  //       const userDoc = await getDoc(doc(db, 'users', user.uid));
-  //       if (userDoc.exists()) {
-  //         const data = userDoc.data();
-  //         const preferredView = data?.preferences?.defaultView;
-  //         if (preferredView === 'grid' || preferredView === 'calendar') {
-  //           setViewMode(preferredView);
-  //         }
-  //       }
-  //     } catch (err) {
-  //       console.warn('Failed to load view preference', err);
-  //     }
-  //   };
+  // Load user's preferred view from Firebase
+  useEffect(() => {
+    const loadViewPreference = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
 
-  //   loadViewPreference();
-  // }, []);
+
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          const preferredView = data?.preferences?.defaultView;
+          if (preferredView === 'grid' || preferredView === 'calendar') {
+            setViewMode(preferredView);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load view preference', err);
+      }
+    };
+
+    loadViewPreference();
+  }, []);
 
   // FIXME: Performance issue - filtering on every render. Move to useMemo
   let allEvents = [...events.filter(e => !e.isPast)];

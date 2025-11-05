@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import Footer from '../shared/Footer';
-import { User, Trash2, Lock, Settings as SettingsIcon, KeyRound, LogOut, ChevronLeft, ChevronRight, HelpCircle, Shield } from 'lucide-react';
+import { User, Trash2, Settings as SettingsIcon, KeyRound, LogOut, ChevronLeft, ChevronRight, HelpCircle, Shield } from 'lucide-react';
 import { BackButton } from '../shared/BackButton';
 import { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../../lib/firebase';
@@ -18,7 +18,6 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [dataSharing, setDataSharing] = useState(true);
   const [defaultView, setDefaultView] = useState<'grid' | 'calendar'>('grid');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -41,7 +40,6 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
           const data = userDoc.data();
           setFirstName(data.firstName || '');
           setLastName(data.lastName || '');
-          setDataSharing(data.preferences?.dataSharing ?? true);
           setDefaultView(data.preferences?.defaultView ?? 'grid');
         }
       } catch (err) {
@@ -118,7 +116,6 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
 
       await setDoc(doc(db, 'users', user.uid), {
         preferences: {
-          dataSharing,
           defaultView,
         },
       }, { merge: true });
@@ -206,7 +203,6 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
   const navItems = [
     { id: 'account', label: 'Account Info', icon: User, type: 'scroll' as const },
     { id: 'password', label: 'Password', icon: KeyRound, type: 'scroll' as const },
-    { id: 'privacy', label: 'Privacy', icon: Lock, type: 'scroll' as const },
     { id: 'preferences', label: 'Preferences', icon: SettingsIcon, type: 'scroll' as const },
     { id: 'help', label: 'Help & Safety', icon: HelpCircle, type: 'scroll' as const },
   ];
@@ -409,44 +405,6 @@ export function SettingsPage({ onNavigate, onGoBack }: SettingsPageProps) {
                   className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-pink-500 text-white rounded-xl sm:rounded-2xl hover:bg-pink-600 transition-all font-semibold"
                 >
                   Update Password
-                </motion.button>
-              </div>
-            </motion.section>
-
-            {/* Privacy */}
-            <motion.section
-              id="privacy"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-md"
-            >
-              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />
-                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold">Privacy</h2>
-              </div>
-
-              <div className="space-y-4">
-                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-                  <div>
-                    <p className="font-medium">Data Sharing</p>
-                    <p className="text-sm text-gray-600">Allow anonymous usage data collection</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={dataSharing}
-                    onChange={(e) => setDataSharing(e.target.checked)}
-                    className="w-5 h-5 rounded border-2 border-gray-300 text-pink-500 focus:ring-2 focus:ring-pink-500 cursor-pointer"
-                  />
-                </label>
-
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleSavePreferences}
-                  className="px-6 py-3 bg-pink-200 text-pink-600 rounded-2xl hover:bg-pink-300 transition-all font-semibold"
-                >
-                  Save Privacy Settings
                 </motion.button>
               </div>
             </motion.section>
