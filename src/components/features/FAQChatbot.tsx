@@ -89,8 +89,9 @@ export function FAQChatbot() {
     const s: any = { ...cornerStyle };
     if (typeof s.top === 'number') s.top = (s.top as number) + offset;
     if (typeof s.bottom === 'number') s.bottom = (s.bottom as number) + offset;
+    console.log(`[FAQChatbot] Applied offset: ${offset}px, corner: ${corner}`, s);
     return s;
-  }, [cornerStyle, offset]);
+  }, [cornerStyle, offset, corner]);
 
   useEffect(() => {
     const id = idRef.current;
