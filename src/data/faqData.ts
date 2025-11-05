@@ -145,12 +145,6 @@ export const faqData: FAQItem[] = [
     keywords: ["bookmarked", "saved", "view", "see", "find", "favorites", "profile"]
   },
   {
-    id: 24,
-    question: "Where can I find events I attended in the past?",
-    answer: "Your Profile page has a 'Past Events' tab that shows all events you RSVP'd to that have already occurred. This is a great way to keep track of your event history.",
-    keywords: ["past", "attended", "history", "previous", "old", "completed", "finished"]
-  },
-  {
     id: 25,
     question: "What's the difference between bookmarking and RSVPing?",
     answer: "Bookmarking saves an event for later viewing - think of it as adding to your 'want to check out' list. RSVPing means you're confirming your attendance and the event will appear in your Upcoming Events. You can do both for the same event!",
@@ -201,7 +195,7 @@ export const faqData: FAQItem[] = [
   {
     id: 33,
     question: "What information is shown on my profile?",
-    answer: "Your profile displays your name, email, join date, and three tabs: Bookmarked events (events you've saved), Upcoming Events (events you've RSVP'd to), and Past Events (events you attended). You can also access Settings from your profile.",
+    answer: "Your profile displays your name, email, join date, and two tabs: Bookmarked events (events you've saved) and Upcoming Events (events you've RSVP'd to). You can also access Settings from your profile.",
     keywords: ["profile", "information", "shows", "display", "contains", "about"]
   },
   {

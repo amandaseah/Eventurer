@@ -45,10 +45,6 @@ const faqs: FAQItem[] = [
     answer: "If an event is cancelled by the organizer, we'll notify you immediately via email. For paid events, refund information will be included in the notification."
   },
   {
-    question: "Can I see events I've attended in the past?",
-    answer: "Yes! All events you've RSVP'd to will appear in the 'Past Events' tab on your profile page once the event date has passed."
-  },
-  {
     question: "How do I change my account settings?",
     answer: "Click on your profile icon in the top navigation bar, then select 'Settings'. From there, you can update your account information, password, notification preferences, and privacy settings."
   },
