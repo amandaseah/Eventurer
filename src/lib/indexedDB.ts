@@ -1,3 +1,9 @@
+/**
+ * @deprecated This IndexedDB implementation was used for local forum storage.
+ * Forum data has been migrated to Firebase Firestore for real-time, cross-device functionality.
+ * This file is kept for potential future local storage needs or migration purposes.
+ */
+
 const DB_NAME = 'EventForumDB';
 const STORE_NAME = 'posts';
 
@@ -39,4 +45,20 @@ export const getFromIndexedDB = async (key: string) => {
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
+};
+
+/**
+ * Clean up old forum data from IndexedDB (optional)
+ * Call this function if you want to remove legacy local forum data
+ */
+export const clearOldForumData = async () => {
+  try {
+    const db = await openDB();
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    await store.clear();
+    console.log('Old forum data cleared from IndexedDB');
+  } catch (error) {
+    console.warn('Failed to clear old forum data:', error);
+  }
 };

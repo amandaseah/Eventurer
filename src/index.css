@@ -3316,4 +3316,54 @@ html {
       rgba(255, 255, 255, 0.32) 100%
     );
   }
+
+  .choice-card-dim {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.38) 0%,
+      rgba(255, 255, 255, 0.24) 45%,
+      rgba(255, 255, 255, 0.36) 100%
+    );
+    pointer-events: none;
+  }
+
+  .choice-card-gradient {
+    position: absolute;
+    inset: 0;
+    display: block;
+    border-radius: inherit;
+    background-size: 320% 320%;
+    opacity: 0.88;
+    filter: blur(6px) saturate(140%);
+    animation: htgtGradientFlow 8s ease-in-out infinite;
+    pointer-events: none;
+    will-change: background-position;
+  }
+
+  .choice-card-gradient-pink {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 205, 229, 0.92) 0%,
+      rgba(255, 219, 236, 0.68) 28%,
+      rgba(255, 255, 255, 0.55) 54%,
+      rgba(249, 193, 228, 0.75) 76%,
+      rgba(255, 222, 239, 0.88) 100%
+    );
+  }
+
+  .choice-card-gradient-neutral {
+    background: linear-gradient(
+      145deg,
+      rgba(231, 233, 240, 0.9) 0%,
+      rgba(223, 226, 233, 0.66) 32%,
+      rgba(255, 255, 255, 0.52) 56%,
+      rgba(215, 218, 226, 0.7) 78%,
+      rgba(238, 240, 245, 0.86) 100%
+    );
+    animation-duration: 9s;
+    animation-direction: reverse;
+  }
 }

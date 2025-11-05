@@ -2,27 +2,7 @@ import { ThumbsUp, MessageCircle } from "lucide-react";
 import { Button } from "../../ui/button";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "motion/react";
-
-interface Reply {
-  id: string;
-  text: string;
-  createdAt: number;
-  username: string;
-  upvotes: number;
-  upvotedBy: string[];
-  replies: Reply[];
-}
-
-interface Post {
-  id: string;
-  text: string;
-  createdAt: number;
-  username: string;
-  upvotes: number;
-  upvotedBy?: string[];
-  replies?: Reply[];
-  image?: string;
-}
+import { Post, Reply } from "../../../lib/forumService";
 
 interface TopForumPreviewProps {
   posts: Post[];
@@ -113,7 +93,7 @@ export default function TopForumPreview({
                   @{post.username}
                 </p>
                 <p className="text-xs text-gray-400">
-                  {formatDistanceToNow(new Date(post.createdAt), {
+                  {formatDistanceToNow(post.createdAt?.toDate?.() || new Date(), {
                     addSuffix: true,
                   })}
                 </p>

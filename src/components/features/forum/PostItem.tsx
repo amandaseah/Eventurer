@@ -3,31 +3,11 @@ import { motion } from "motion/react";
 import { Button } from "../../ui/button";
 import { Textarea } from "../../ui/textarea";
 import { ThumbsUp, Reply, Image as ImageIcon, X } from "lucide-react";
-
-interface ReplyType {
-  id: string;
-  text: string;
-  image?: string;
-  createdAt: number;
-  username: string;
-  replies: ReplyType[];
-  upvotes: number;
-  upvotedBy?: string[];
-}
-
-interface PostType {
-  id: string;
-  text: string;
-  image?: string;
-  username: string;
-  createdAt: number;
-  upvotes: number;
-  upvotedBy?: string[];
-  replies: ReplyType[];
-}
+import { Post, Reply as ReplyType } from "../../../lib/forumService";
+import { Timestamp } from "firebase/firestore";
 
 interface PostItemProps {
-  post: PostType;
+  post: Post;
   username: string;
   depth?: number;
   onUpvote: (id: string) => void;
@@ -68,7 +48,7 @@ export default function PostItem({ post, username, depth = 0, onUpvote, onSubmit
       >
         <div className="flex items-center justify-between mb-2">
           <span className="font-semibold text-pink-500">{post.username}</span>
-          <span className="text-gray-400 text-sm">{new Date(post.createdAt).toLocaleString()}</span>
+          <span className="text-gray-400 text-sm">{post.createdAt?.toDate?.()?.toLocaleString() || 'Just now'}</span>
         </div>
 
         <p className="text-gray-800 mb-4 whitespace-pre-wrap">{post.text}</p>
@@ -177,7 +157,7 @@ export default function PostItem({ post, username, depth = 0, onUpvote, onSubmit
         {post.replies.map(reply => (
           <PostItem
             key={reply.id}
-            post={reply}
+            post={{...reply, eventId: post.eventId} as Post}
             username={username}
             depth={depth + 1}
             onUpvote={onUpvote}

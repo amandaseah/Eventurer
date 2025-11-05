@@ -24,11 +24,17 @@ const TECH_ICONS: Record<string, string> = {
   'TypeScript': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg',
   'Tailwind CSS': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg',
   'Motion': 'https://cdn.worldvectorlogo.com/logos/framer-motion.svg',
+  'Firebase': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg',
+  'Stripe': '/logos/stripe.png',
+  'Google Maps API': '/logos/google-maps.png',
+  'Three.js': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/threejs/threejs-original.svg',
 };
 
 interface MarketingLandingPageProps {
   onExplore?: () => void;
 }
+
+const APPLE_FONT = "'SF Pro Display','SF Pro Text','Helvetica Neue',Helvetica,Arial,sans-serif";
 
 const features = [
   {
@@ -74,17 +80,37 @@ const moods = [
   },
 ];
 
-const techStack = ['React', 'TypeScript', 'Tailwind CSS', 'Motion', 'Shadcn/ui'];
+const techStack = [
+  'React',
+  'TypeScript',
+  'Tailwind CSS',
+  'Motion',
+  'Firebase',
+  'Stripe',
+  'Google Maps API',
+  'Three.js',
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 90, damping: 20, mass: 0.9 },
+  },
+};
 
 export function MarketingLandingPage({ onExplore }: MarketingLandingPageProps) {
   return (
-    <div className="min-h-screen relative isolate bg-white">
-      <AnimatedBackground />
-
-      <div className="relative z-10 flex flex-col">
+    <div
+      className="min-h-screen bg-white text-gray-900"
+      style={{ fontFamily: APPLE_FONT }}
+    >
+      <div className="flex flex-col">
         <Header onExplore={onExplore} />
         <main className="flex-1">
           <HeroSection onExplore={onExplore} />
+          <StepsSection onExplore={onExplore} />
           <FeaturesSection />
           <TechSection />
           <CTASection onExplore={onExplore} />
@@ -95,9 +121,90 @@ export function MarketingLandingPage({ onExplore }: MarketingLandingPageProps) {
   );
 }
 
+function StepsSection({ onExplore }: { onExplore?: () => void }) {
+  const steps = [
+    {
+      icon: <Heart className="h-5 w-5" />,
+      title: 'Set your vibe',
+      description: 'Pick the mood that matches how you feel right now—no overthinking required.',
+    },
+    {
+      icon: <Zap className="h-5 w-5" />,
+      title: 'We shortlist the best fits',
+      description: 'Eventurer instantly surfaces events that line up with your energy and schedule.',
+    },
+    {
+      icon: <Clock className="h-5 w-5" />,
+      title: 'Save it & go',
+      description: 'Bookmark, share, and get directions. You’re out the door in minutes.',
+    },
+  ];
+
+  return (
+    <section className="bg-white px-6 sm:px-8 lg:px-10 pb-14 sm:pb-16 lg:pb-20">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center text-center">
+        <motion.span
+          className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs sm:text-sm font-medium text-gray-600 shadow-sm shadow-pink-100/60"
+          initial={{ opacity: 0, scale: 0.92 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: false, amount: 0.6 }}
+          transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+        >
+          <Sparkles className="h-3.5 w-3.5 text-pink-400" />
+          Three steps to your next plan
+        </motion.span>
+
+        <motion.h2
+          className="mt-6 text-4xl sm:text-5xl md:text-[3.1rem] font-light text-gray-900 tracking-tight"
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.55 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20 }}
+        >
+          Mood in, curated plans out.
+        </motion.h2>
+
+        <motion.p
+          className="mt-4 max-w-2xl text-sm sm:text-base text-gray-600"
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.6 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.12 }}
+        >
+          We strip away the noise. Tell us how you feel and leave with an event you actually want to attend.
+        </motion.p>
+
+        <div className="mt-12 grid w-full gap-6 sm:grid-cols-3">
+          {steps.map((step, index) => (
+            <motion.div
+              key={step.title}
+              className="group rounded-[26px] border border-rose-100/80 bg-white p-6 text-left shadow-[0_18px_36px_rgba(236,72,153,0.07)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_26px_48px_rgba(236,72,153,0.12)]"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.5 }}
+              transition={{ type: 'spring', stiffness: 90, damping: 20, delay: index * 0.08 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 text-rose-500">
+                  {step.icon}
+                </div>
+                <span className="text-sm font-medium text-rose-500">{`0${index + 1}`}</span>
+              </div>
+              <h3 className="mt-5 text-lg font-semibold text-gray-900">{step.title}</h3>
+              <p className="mt-3 text-sm sm:text-base leading-relaxed text-gray-600">
+                {step.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Header({ onExplore }: { onExplore?: () => void }) {
   return (
-    <nav className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <nav className="w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-10">
       <div className="flex items-center justify-between">
         <motion.div
           className="flex items-center gap-3"
@@ -106,7 +213,9 @@ function Header({ onExplore }: { onExplore?: () => void }) {
           transition={{ duration: 0.8 }}
         >
           <img src="/favicon.png" alt="Eventurer" className="h-10 w-10 rounded-2xl" />
-          <span className="text-xl tracking-tight text-gray-900 font-semibold">Eventurer</span>
+          <span className="text-lg sm:text-xl tracking-tight text-gray-900 font-medium">
+            Eventurer
+          </span>
         </motion.div>
 
         <motion.div
@@ -117,7 +226,7 @@ function Header({ onExplore }: { onExplore?: () => void }) {
         >
           <Button
             onClick={() => onExplore?.()}
-            className="h-11 rounded-full bg-gray-900 px-6 text-base text-white shadow-md transition-all duration-200 hover:bg-gray-800"
+            className="h-11 rounded-full bg-gray-900/95 px-6 text-sm sm:text-base text-white shadow-sm transition-all duration-200 hover:bg-black/90 focus-visible:ring-0"
           >
             Get Started
           </Button>
@@ -129,47 +238,52 @@ function Header({ onExplore }: { onExplore?: () => void }) {
 
 function HeroSection({ onExplore }: { onExplore?: () => void }) {
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24 pb-20 sm:pb-24 lg:pb-32">
-      <div className="mx-auto flex max-w-6xl flex-col items-center text-center space-y-8 sm:space-y-10 lg:space-y-12">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          transition={{ duration: 1, delay: 0.2 }}
+    <section className="w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-10 pt-20 sm:pt-24 lg:pt-28 pb-20 sm:pb-24 lg:pb-28">
+      <div className="mx-auto flex max-w-5xl flex-col items-center text-center space-y-8 sm:space-y-10 lg:space-y-12">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.8 }}
           className="w-full"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.2] tracking-tight text-gray-900 px-4">
-            <div className="mb-2">Events That Actually</div>
-            <div className="my-3">
-              <motion.span
-                className="inline-block text-pink-400"
-                animate={{ scale: [1, 1.02, 1] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                Match Your Vibe
-              </motion.span>
-            </div>
+          <h1 className="text-[2.6rem] sm:text-[3.2rem] md:text-[3.6rem] lg:text-[4rem] leading-[1.1] tracking-tight text-gray-900 px-2 font-light">
+            <span className="block mb-2">Mood-matched plans</span>
+            <motion.span
+              className="block font-semibold text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-400 to-rose-500"
+              initial={{ opacity: 0, y: 26 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.85 }}
+              transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.18 }}
+            >
+              for how you're feeling now
+            </motion.span>
           </h1>
         </motion.div>
 
         <motion.p
-          className="max-w-3xl text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-600 px-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4 }}
+          className="max-w-3xl text-base sm:text-lg lg:text-xl leading-relaxed text-gray-600 px-2 font-normal"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.75 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.12 }}
         >
-          Feeling social? We'll show you the best parties. Need to chill? Here are quiet art sessions.
-          Stop scrolling through events that don't fit your mood.
+          Eventurer feels the vibe with you. Set your mood and we surface the experiences that fit
+          this exact moment—no endless scrolling, just instant yes-this energy.
         </motion.p>
 
         <motion.div
           className="flex flex-col items-center justify-center gap-4 sm:flex-row mt-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.6 }}
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.7 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.2 }}
         >
           <Button
             onClick={() => onExplore?.()}
-            className="group flex items-center justify-center gap-2 rounded-xl bg-pink-400 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:bg-pink-500 hover:shadow-xl hover:-translate-y-0.5"
+            className="group flex items-center justify-center gap-2 rounded-full bg-gray-900 px-8 py-3 text-base font-medium text-white shadow-sm transition-all duration-200 hover:bg-black/90 hover:shadow-md"
           >
             <Calendar className="h-5 w-5" />
             Browse Events
@@ -177,20 +291,23 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
         </motion.div>
 
         <motion.div
-          className="mt-8 sm:mt-10 inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 rounded-3xl border border-gray-100 bg-white/60 px-6 sm:px-8 py-4 sm:py-6 shadow-lg backdrop-blur-md max-w-5xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.8 }}
+          className="mt-10 inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 rounded-[40px] border border-gray-200/80 bg-white/70 px-6 sm:px-8 py-4 sm:py-5 shadow-sm backdrop-blur-md max-w-4xl"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.7 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.28 }}
         >
           <span className="mr-2 text-sm sm:text-base text-gray-500">Choose your mood:</span>
           {moods.map((mood, index) => (
             <motion.div
               key={mood.name}
-              className={`${mood.color} flex items-center gap-2 rounded-full px-3 sm:px-5 py-2 sm:py-2.5 transition-all duration-200 hover:shadow-lg text-sm sm:text-base`}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.9 + index * 0.1 }}
-              whileHover={{ y: -4, scale: 1.08 }}
+              className={`${mood.color} flex items-center gap-2 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 transition-all duration-200 hover:shadow-md text-sm sm:text-base font-medium`}
+              initial={{ opacity: 0, scale: 0.85 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: false, amount: 0.7 }}
+              transition={{ type: 'spring', stiffness: 100, damping: 18, delay: 0.32 + index * 0.08 }}
+              whileHover={{ y: -2, scale: 1.03 }}
             >
               <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity, delay: index * 0.5 }}>
                 {mood.icon}
@@ -206,54 +323,62 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
 
 function FeaturesSection() {
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
-      <motion.div
-        className="mb-16 sm:mb-20 text-center"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-      >
+    <section className="bg-white px-6 sm:px-8 lg:px-10 py-16 sm:py-20 lg:py-24">
+      <div className="mx-auto w-full max-w-6xl">
         <motion.div
-          className="mb-6 sm:mb-8 inline-block max-w-4xl"
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl tracking-tight text-gray-900 px-4">
-            How It Works
-          </h2>
-        </motion.div>
-        <motion.p
-          className="mx-auto max-w-2xl text-lg sm:text-xl leading-relaxed text-gray-600 px-4"
-          initial={{ opacity: 0, y: 20 }}
+          className="mb-14 sm:mb-16 text-center"
+          initial={{ opacity: 0, y: 34 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          viewport={{ once: false, amount: 0.55 }}
+          transition={{ type: 'spring', stiffness: 85, damping: 22 }}
         >
-          Three things that make Eventurer different
-        </motion.p>
-      </motion.div>
-
-      <div className="grid gap-8 sm:gap-12 grid-cols-1 lg:grid-cols-3">
-        {features.map((feature, index) => (
-          <motion.div
-            key={feature.title}
-            initial={{ opacity: 0, y: 30 }}
+          <motion.span
+            className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs sm:text-sm font-medium text-gray-600 shadow-sm shadow-pink-100/60"
+            initial={{ opacity: 0, scale: 0.92 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: false, amount: 0.6 }}
+            transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+        >
+            <Sparkles className="h-3.5 w-3.5 text-pink-400" />
+            Designed around how you live
+          </motion.span>
+          <h2 className="mt-5 text-4xl sm:text-5xl md:text-[3.2rem] font-light text-gray-900 tracking-tight">
+            More than a list of events. A personalised planner.
+          </h2>
+          <motion.p
+            className="mx-auto mt-4 max-w-2xl text-base sm:text-lg text-gray-600"
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: index * 0.15 }}
+            viewport={{ once: false, amount: 0.6 }}
+            transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.1 }}
           >
-            <Card className="h-full overflow-hidden rounded-2xl border-2 border-gray-200 bg-white p-8 shadow-sm transition hover:border-pink-300 hover:shadow-md">
-              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-pink-400 text-white">
-                {feature.icon}
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-              <p className="text-base leading-relaxed text-gray-600">{feature.description}</p>
-            </Card>
-          </motion.div>
-        ))}
+            Discover, plan, and share experiences that match your energy today—not last week.
+          </motion.p>
+        </motion.div>
+
+        <div className="grid gap-6 sm:gap-8 lg:grid-cols-3">
+          {features.map((feature, index) => (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.5 }}
+              transition={{ type: 'spring', stiffness: 90, damping: 20, delay: index * 0.08 }}
+            >
+              <Card
+                className="group h-full rounded-[28px] border border-rose-100 bg-white p-6 sm:p-7 shadow-[0_16px_30px_rgba(236,72,153,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_45px_rgba(236,72,153,0.12)]"
+              >
+                <div className="inline-flex items-center justify-center rounded-2xl bg-pink-400 p-3 text-white shadow-sm transition-transform duration-300 group-hover:scale-105">
+                  {feature.icon}
+                </div>
+                <h3 className="mt-6 text-xl font-semibold text-gray-900">{feature.title}</h3>
+                <p className="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed">
+                  {feature.description}
+                </p>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -261,60 +386,58 @@ function FeaturesSection() {
 
 function TechSection() {
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+    <section className="bg-white px-6 sm:px-8 lg:px-10 py-16 sm:py-20">
       <motion.div
         className="mb-12 sm:mb-16 text-center"
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 34 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
+        viewport={{ once: false, amount: 0.55 }}
+        transition={{ type: 'spring', stiffness: 85, damping: 22 }}
       >
-        <motion.div
-          className="mb-6 sm:mb-8 inline-block"
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl tracking-tight text-gray-900 px-4">
-            Built with{' '}
-            <span className="text-pink-400">
-              Modern Tech
-            </span>
-          </h2>
-        </motion.div>
+        <h2 className="text-4xl sm:text-5xl md:text-[3.2rem] font-light text-gray-900 tracking-tight">
+          Built with tools we trust every day.
+        </h2>
         <motion.p
-          className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-600 sm:text-xl px-4"
-          initial={{ opacity: 0, y: 20 }}
+          className="mx-auto mt-4 max-w-3xl text-base sm:text-lg text-gray-600"
+          initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          viewport={{ once: false, amount: 0.6 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.1 }}
         >
-          Powered by cutting-edge frameworks and libraries for a seamless, lightning-fast experience.
+          From realtime Firebase sync to motion-driven UI, the stack behind Eventurer makes the
+          experience feel instant and responsive.
         </motion.p>
       </motion.div>
 
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-5">
+      <div className="mx-auto grid max-w-5xl grid-cols-2 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {techStack.map((tech, index) => (
           <motion.div
             key={tech}
-            className="group relative"
+            className="group"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
+            viewport={{ once: false, amount: 0.5 }}
+            transition={{ type: 'spring', stiffness: 95, damping: 18, delay: index * 0.08 }}
           >
-            <div className="relative rounded-3xl border border-pink-200 bg-white/70 p-4 sm:p-6 lg:p-8 transition-all duration-300 hover:-translate-y-2 hover:border-pink-300 hover:shadow-xl backdrop-blur-sm">
-              <div className="text-center">
-                <div className="mb-3 sm:mb-4 flex justify-center">
-                  <img
-                    src={TECH_ICONS[tech] || 'https://ui.shadcn.com/apple-touch-icon.png'}
-                    alt={tech}
-                    className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain"
-                  />
-                </div>
-                <div className="text-sm sm:text-base text-gray-900 font-medium">{tech}</div>
+            <div className="rounded-[24px] border border-rose-100 bg-white p-5 shadow-[0_16px_32px_rgba(236,72,153,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_48px_rgba(236,72,153,0.12)]">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50">
+                <img
+                  src={TECH_ICONS[tech] || 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg'}
+                  alt={tech}
+                  className="h-10 w-10 object-contain"
+                />
               </div>
+              <h3 className="mt-4 text-base font-semibold text-gray-900">{tech}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                {tech === 'React' && 'Component-driven UI with hooks, suspense, and fast hydration.'}
+                {tech === 'TypeScript' && 'End-to-end typing for safer data flows and API calls.'}
+                {tech === 'Tailwind CSS' && 'Utility classes that keep the design system consistent.'}
+                {tech === 'Motion' && 'Framer Motion powers the subtle springs and scroll reveals.'}
+                {tech === 'Firebase' && 'Auth + Firestore sync profiles, RSVPs, and mood data.'}
+                {tech === 'Stripe' && 'Ready for paid events with secure payment intents.'}
+                {tech === 'Google Maps API' && 'Transit routing, nearby stops, and rich map embeds.'}
+                {tech === 'Three.js' && 'Immersive 3D landing moments via react-three-fiber.'}
+              </p>
             </div>
           </motion.div>
         ))}
@@ -325,40 +448,38 @@ function TechSection() {
 
 function CTASection({ onExplore }: MarketingLandingPageProps) {
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+    <section className="bg-white px-6 sm:px-8 lg:px-10 py-20 sm:py-24">
       <motion.div
-        className="relative overflow-hidden rounded-2xl bg-pink-400 px-6 sm:px-8 lg:px-16 py-16 sm:py-20 text-center text-white shadow-xl"
-        initial={{ opacity: 0, y: 30 }}
+        className="mx-auto flex w-full max-w-4xl flex-col items-center text-center"
+        initial={{ opacity: 0, y: 32 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
+        viewport={{ once: false, amount: 0.55 }}
+        transition={{ type: 'spring', stiffness: 85, damping: 22 }}
       >
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight px-4">
-            Ready to Find
-            <br />
-            Your Next Event?
-          </h2>
+        <h2 className="text-3xl sm:text-4xl md:text-[2.7rem] font-semibold tracking-tight px-2 text-gray-900">
+          Ready to find your next event?
+        </h2>
 
-          <p className="mx-auto mt-4 sm:mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-white/90 px-4">
-            Stop scrolling through events that don't match your mood. Start here.
-          </p>
+        <p className="mt-4 max-w-2xl text-sm sm:text-base text-gray-600 px-2">
+          Set your mood, get a shortlist, and go. Eventurer curates the experiences worth your time.
+        </p>
 
-          <div className="mt-8 sm:mt-10 flex items-center justify-center">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                onClick={() => onExplore?.()}
-                className="flex items-center justify-center gap-2 rounded-xl bg-white px-8 sm:px-10 py-4 sm:py-6 text-base sm:text-lg font-semibold text-pink-400 shadow-lg hover:bg-gray-50 hover:shadow-xl"
-              >
-                <Calendar className="h-5 w-5" />
-                Browse Events
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </motion.div>
-          </div>
-
-          <CTAStats />
+        <motion.div
+          className="mt-8 sm:mt-10"
+          whileHover={{ scale: 1.015 }}
+          whileTap={{ scale: 0.99 }}
+        >
+          <Button
+            onClick={() => onExplore?.()}
+            className="group flex items-center justify-center gap-2 rounded-full bg-gray-900 px-8 sm:px-10 py-3.5 text-sm sm:text-base font-medium text-white shadow-sm transition-colors hover:bg-black/85"
+          >
+            <Calendar className="h-5 w-5 transition-transform group-hover:-translate-y-0.5" />
+            Browse Events
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+          </Button>
         </motion.div>
+
+        <CTAStats />
       </motion.div>
     </section>
   );
@@ -373,23 +494,23 @@ function CTAStats() {
 
   return (
     <motion.div
-      className="mx-auto mt-12 sm:mt-16 grid max-w-4xl grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
+      className="mx-auto mt-12 sm:mt-14 grid max-w-4xl grid-cols-3 gap-4 sm:gap-6"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: 0.4 }}
+      viewport={{ once: false, amount: 0.6 }}
+      transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.25 }}
     >
       {stats.map((stat, index) => (
         <motion.div
           key={stat.label}
           className="text-center"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
+          viewport={{ once: false, amount: 0.6 }}
+          transition={{ type: 'spring', stiffness: 95, damping: 18, delay: 0.3 + index * 0.08 }}
         >
-          <div className="text-2xl sm:text-3xl lg:text-4xl text-white font-bold">{stat.value}</div>
-          <div className="mt-1 sm:mt-2 text-xs sm:text-sm lg:text-base text-white/80">{stat.label}</div>
+          <div className="text-2xl sm:text-3xl text-gray-900 font-medium tracking-tight">{stat.value}</div>
+          <div className="mt-1 text-xs sm:text-sm text-gray-500">{stat.label}</div>
         </motion.div>
       ))}
     </motion.div>
@@ -399,59 +520,36 @@ function CTAStats() {
 function AnimatedBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#fff7fb] via-[#ffeef6] to-[#fffdfd]" />
+
       <motion.div
-        className="absolute -top-40 -left-40 h-[800px] w-[800px] rounded-full opacity-70"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(167, 139, 250, 0.4) 0%, rgba(196, 181, 253, 0.3) 50%, transparent 70%)',
-        }}
-        animate={{ x: [0, 200, 0], y: [0, 150, 0], scale: [1, 1.4, 1] }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute -top-32 -left-24 h-[520px] w-[520px] rounded-full bg-rose-200/25 blur-3xl"
+        animate={{ x: [0, 60, -20], y: [0, 40, -30], scale: [1, 1.1, 0.95] }}
+        transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
       />
+
       <motion.div
-        className="absolute top-20 -right-60 h-[700px] w-[700px] rounded-full opacity-70"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(244, 114, 182, 0.35) 0%, rgba(251, 207, 232, 0.25) 50%, transparent 70%)',
-        }}
-        animate={{ x: [0, -150, 0], y: [0, 200, 0], scale: [1, 1.3, 1] }}
-        transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute top-12 right-[-15%] h-[600px] w-[600px] rounded-full bg-pink-200/30 blur-[120px]"
+        animate={{ x: [0, -70, 20], y: [0, 50, -40], scale: [1.05, 0.95, 1.08] }}
+        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 1.6 }}
       />
+
       <motion.div
-        className="absolute top-1/2 left-1/3 h-[600px] w-[600px] rounded-full opacity-60"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(216, 180, 254, 0.4) 0%, rgba(233, 213, 255, 0.3) 50%, transparent 70%)',
-        }}
-        animate={{ x: [0, -120, 0], y: [0, 120, 0], scale: [1, 1.2, 1] }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute bottom-[-20%] left-1/4 h-[700px] w-[700px] rounded-full bg-rose-300/20 blur-[140px]"
+        animate={{ x: [0, 50, -40], y: [0, -60, 30], scale: [1, 1.12, 0.98] }}
+        transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
       />
+
       <motion.div
-        className="absolute bottom-0 right-1/4 h-[750px] w-[750px] rounded-full opacity-60"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(244, 114, 182, 0.4) 0%, rgba(251, 207, 232, 0.3) 50%, transparent 70%)',
-        }}
-        animate={{ x: [0, 150, 0], y: [0, -150, 0], scale: [1, 1.35, 1] }}
-        transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute top-1/3 right-1/3 h-[340px] w-[340px] rounded-full bg-white/40 blur-[90px]"
+        animate={{ opacity: [0.4, 0.65, 0.4], scale: [1, 1.1, 0.96] }}
+        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
       />
+
       <motion.div
-        className="absolute top-1/4 right-1/4 h-[400px] w-[400px] rounded-full opacity-50"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(192, 132, 252, 0.3) 0%, rgba(216, 180, 254, 0.2) 50%, transparent 70%)',
-        }}
-        animate={{ x: [0, 100, 0], y: [0, -100, 0], scale: [1, 1.2, 1] }}
-        transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <motion.div
-        className="absolute bottom-1/3 left-1/4 h-[450px] w-[450px] rounded-full opacity-50"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, rgba(244, 114, 182, 0.2) 50%, transparent 70%)',
-        }}
-        animate={{ x: [0, -80, 0], y: [0, 80, 0], scale: [1, 1.15, 1] }}
-        transition={{ duration: 17, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute bottom-1/4 left-[15%] h-[280px] w-[280px] rounded-full bg-[#ffd5e6]/35 blur-[80px]"
+        animate={{ opacity: [0.3, 0.55, 0.3], scale: [1, 1.08, 0.94] }}
+        transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
       />
     </div>
   );
