@@ -24,6 +24,10 @@ const TECH_ICONS: Record<string, string> = {
   'TypeScript': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg',
   'Tailwind CSS': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg',
   'Motion': 'https://cdn.worldvectorlogo.com/logos/framer-motion.svg',
+  'Firebase': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg',
+  'Stripe': '/logos/stripe.png',
+  'Google Maps API': '/logos/google-maps.png',
+  'Three.js': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/threejs/threejs-original.svg',
 };
 
 interface MarketingLandingPageProps {
@@ -76,11 +80,24 @@ const moods = [
   },
 ];
 
-const techStack = ['React', 'TypeScript', 'Tailwind CSS', 'Motion', 'Shadcn/ui'];
+const techStack = [
+  'React',
+  'TypeScript',
+  'Tailwind CSS',
+  'Motion',
+  'Firebase',
+  'Stripe',
+  'Google Maps API',
+  'Three.js',
+];
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } },
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 90, damping: 20, mass: 0.9 },
+  },
 };
 
 export function MarketingLandingPage({ onExplore }: MarketingLandingPageProps) {
@@ -155,9 +172,15 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
         >
           <h1 className="text-[2.6rem] sm:text-[3.2rem] md:text-[3.6rem] lg:text-[4rem] leading-[1.1] tracking-tight text-gray-900 px-2 font-light">
             <span className="block mb-2">Mood-matched plans</span>
-            <span className="block font-semibold text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-400 to-rose-500">
+            <motion.span
+              className="block font-semibold text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-400 to-rose-500"
+              initial={{ opacity: 0, y: 26 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.85 }}
+              transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.18 }}
+            >
               for how you're feeling now
-            </span>
+            </motion.span>
           </h1>
         </motion.div>
 
@@ -167,7 +190,7 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.75 }}
-          style={{ transitionDelay: '0.12s' }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.12 }}
         >
           Eventurer feels the vibe with you. Set your mood and we surface the experiences that fit
           this exact moment—no endless scrolling, just instant yes-this energy.
@@ -179,7 +202,7 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.7 }}
-          style={{ transitionDelay: '0.2s' }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.2 }}
         >
           <Button
             onClick={() => onExplore?.()}
@@ -196,7 +219,7 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.7 }}
-          style={{ transitionDelay: '0.28s' }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.28 }}
         >
           <span className="mr-2 text-sm sm:text-base text-gray-500">Choose your mood:</span>
           {moods.map((mood, index) => (
@@ -206,7 +229,7 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
               initial={{ opacity: 0, scale: 0.85 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: false, amount: 0.7 }}
-              transition={{ duration: 0.5, delay: 0.35 + index * 0.08, ease: 'easeOut' }}
+              transition={{ type: 'spring', stiffness: 100, damping: 18, delay: 0.32 + index * 0.08 }}
               whileHover={{ y: -2, scale: 1.03 }}
             >
               <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity, delay: index * 0.5 }}>
@@ -228,30 +251,30 @@ function FeaturesSection() {
       <div className="relative w-full max-w-6xl mx-auto">
         <motion.div
           className="mb-14 sm:mb-16 text-center"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 34 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.6 }}
-          transition={{ duration: 0.6 }}
+          viewport={{ once: false, amount: 0.55 }}
+          transition={{ type: 'spring', stiffness: 85, damping: 22 }}
         >
           <motion.span
             className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs sm:text-sm font-medium text-gray-600 shadow-sm shadow-pink-100/60"
             initial={{ opacity: 0, scale: 0.92 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: false, amount: 0.6 }}
-            transition={{ duration: 0.6 }}
+            transition={{ type: 'spring', stiffness: 120, damping: 18 }}
         >
             <Sparkles className="h-3.5 w-3.5 text-pink-400" />
             Designed around how you live
           </motion.span>
-          <h2 className="mt-5 text-3xl sm:text-4xl md:text-[2.7rem] font-light text-gray-900 tracking-tight">
+          <h2 className="mt-5 text-4xl sm:text-5xl md:text-[3.2rem] font-light text-gray-900 tracking-tight">
             More than a list of events. A personalised planner.
           </h2>
           <motion.p
             className="mx-auto mt-4 max-w-2xl text-base sm:text-lg text-gray-600"
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.6 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.1 }}
           >
             Discover, plan, and share experiences that match your energy today—not last week.
           </motion.p>
@@ -264,12 +287,19 @@ function FeaturesSection() {
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.5 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ type: 'spring', stiffness: 90, damping: 20, delay: index * 0.08 }}
             >
               <Card
-                className="group h-full rounded-3xl border border-white/40 bg-white/80 p-6 sm:p-7 shadow-[0_20px_45px_rgba(244,114,182,0.12)] transition-all duration-300 hover:border-white hover:shadow-[0_26px_60px_rgba(244,114,182,0.18)] hover:-translate-y-1.5"
-                style={{ backdropFilter: 'blur(20px)' }}
+                className="group relative h-full rounded-[28px] border border-white/18 bg-white/12 p-6 sm:p-7 shadow-[0_32px_72px_rgba(15,23,42,0.14)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_44px_96px_rgba(15,23,42,0.2)] overflow-hidden"
+                style={{
+                  backdropFilter: 'blur(30px)',
+                  backgroundImage: 'linear-gradient(150deg, rgba(255,255,255,0.65), rgba(244,244,255,0.28))',
+                }}
               >
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{ background: 'radial-gradient(120% 120% at 25% 18%, rgba(244,114,182,0.18), transparent 65%)' }}
+                />
                 <div className="inline-flex items-center justify-center rounded-2xl bg-pink-400 p-3 text-white shadow-sm transition-transform duration-300 group-hover:scale-105">
                   {feature.icon}
                 </div>
@@ -291,20 +321,20 @@ function TechSection() {
     <section className="w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-10 py-16 sm:py-20">
       <motion.div
         className="mb-12 sm:mb-16 text-center"
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 34 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.6 }}
-        transition={{ duration: 0.6 }}
+        viewport={{ once: false, amount: 0.55 }}
+        transition={{ type: 'spring', stiffness: 85, damping: 22 }}
       >
-        <h2 className="text-3xl sm:text-4xl md:text-[2.7rem] font-light text-gray-900 tracking-tight">
+        <h2 className="text-4xl sm:text-5xl md:text-[3.2rem] font-light text-gray-900 tracking-tight">
           Built with tools we trust every day.
         </h2>
         <motion.p
           className="mx-auto mt-4 max-w-3xl text-base sm:text-lg text-gray-600"
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.6 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.1 }}
         >
           From realtime Firebase sync to motion-driven UI, the stack behind Eventurer makes the
           experience feel instant and responsive.
@@ -319,13 +349,23 @@ function TechSection() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.5 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
+            transition={{ type: 'spring', stiffness: 95, damping: 18, delay: index * 0.08 }}
           >
-            <div className="relative rounded-2xl border border-gray-200 bg-white/70 p-4 sm:p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-gray-300 hover:shadow-lg backdrop-blur-sm">
-              <div className="text-center">
+            <div
+              className="relative rounded-[26px] border border-white/18 bg-white/12 p-4 sm:p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_32px_82px_rgba(15,23,42,0.2)] backdrop-blur-[32px] overflow-hidden"
+              style={{
+                backgroundImage: 'linear-gradient(155deg, rgba(255,255,255,0.6), rgba(244,248,255,0.32))',
+                boxShadow: '0 26px 74px rgba(15,23,42,0.16)',
+              }}
+            >
+              <div
+                className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ background: 'radial-gradient(115% 115% at 22% 18%, rgba(244,114,182,0.2), transparent 62%)' }}
+              />
+              <div className="relative text-center">
                 <div className="mb-3 sm:mb-4 flex justify-center">
                   <img
-                    src={TECH_ICONS[tech] || 'https://ui.shadcn.com/apple-touch-icon.png'}
+                    src={TECH_ICONS[tech] || 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg'}
                     alt={tech}
                     className="w-12 h-12 sm:w-14 sm:h-14 object-contain"
                   />
@@ -345,10 +385,10 @@ function CTASection({ onExplore }: MarketingLandingPageProps) {
     <section className="w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-10 py-20 sm:py-24">
       <motion.div
         className="relative overflow-hidden rounded-[36px] border border-white/50 bg-white/85 px-6 sm:px-10 py-14 sm:py-16 shadow-[0_30px_70px_rgba(15,15,18,0.12)] backdrop-blur-2xl"
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 32 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.6 }}
-        transition={{ duration: 0.6 }}
+        viewport={{ once: false, amount: 0.55 }}
+        transition={{ type: 'spring', stiffness: 85, damping: 22 }}
       >
         <motion.div className="pointer-events-none absolute inset-0">
           <motion.div
@@ -365,10 +405,10 @@ function CTASection({ onExplore }: MarketingLandingPageProps) {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.6 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.15 }}
         >
           <h2 className="text-3xl sm:text-4xl md:text-[2.7rem] font-semibold tracking-tight px-2 max-w-3xl mx-auto text-center text-gray-900">
             Ready to find your next event?
@@ -411,7 +451,7 @@ function CTAStats() {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, amount: 0.6 }}
-      transition={{ duration: 0.6, delay: 0.4 }}
+      transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.25 }}
     >
       {stats.map((stat, index) => (
         <motion.div
@@ -420,7 +460,7 @@ function CTAStats() {
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.6 }}
-          transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
+          transition={{ type: 'spring', stiffness: 95, damping: 18, delay: 0.3 + index * 0.08 }}
         >
           <div className="text-2xl sm:text-3xl text-gray-900 font-medium tracking-tight">{stat.value}</div>
           <div className="mt-1 text-xs sm:text-sm text-gray-500">{stat.label}</div>
