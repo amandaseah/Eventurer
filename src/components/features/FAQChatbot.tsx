@@ -3,7 +3,7 @@ import { bringToFront } from '../../directives/draggable';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue } from 'motion/react';
 import { getChatbotResponse } from '../../lib/gemini';
-import { registerFloating, unregisterFloating, updateFloatingCorner } from '../../lib/floatingRegistry';
+import { registerFloating, unregisterFloating, updateFloatingCorner, subscribeOffset, unsubscribeOffset, getOffsetFor } from '../../lib/floatingRegistry';
 
 interface Message {
   id: number;
@@ -72,6 +72,9 @@ export function FAQChatbot() {
   const y = useMotionValue(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const idRef = useRef('faq-chatbot');
+  const [offset, setOffset] = useState(0);
+
+  
 
   useEffect(() => {
     const handleResize = () => setSpacing(getSpacing());
@@ -82,12 +85,24 @@ export function FAQChatbot() {
   const cornerStyle = useMemo(() => getCornerStyle(corner, spacing), [corner, spacing]);
   const isLeftCorner = corner.endsWith('left');
 
+  const appliedCornerStyle = useMemo(() => {
+    const s: any = { ...cornerStyle };
+    if (typeof s.top === 'number') s.top = (s.top as number) + offset;
+    if (typeof s.bottom === 'number') s.bottom = (s.bottom as number) + offset;
+    return s;
+  }, [cornerStyle, offset]);
+
   useEffect(() => {
     const id = idRef.current;
     const el = containerRef.current;
     if (!el) return;
-    registerFloating(id, el, corner);
-    return () => unregisterFloating(id);
+    registerFloating(id, el, corner, 2); // Higher priority (top of stack)
+    subscribeOffset(id, setOffset);
+    setOffset(getOffsetFor(id));
+    return () => {
+      unsubscribeOffset(id);
+      unregisterFloating(id);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -162,13 +177,13 @@ export function FAQChatbot() {
     <>
       <motion.div
     ref={containerRef}
-    className={`fixed z-40 flex flex-col-reverse gap-3 sm:gap-4 ${isLeftCorner ? 'items-start' : 'items-end'}`}
+      className={`fixed z-40 flex flex-col-reverse gap-3 sm:gap-4 ${isLeftCorner ? 'items-start' : 'items-end'}`}
         drag
         dragMomentum={false}
         dragElastic={0.2}
         dragListener={true}
-    onPointerDown={() => bringToFront(containerRef.current)}
-    style={{ ...cornerStyle, x, y }}
+  onPointerDown={() => bringToFront(containerRef.current)}
+  style={{ ...appliedCornerStyle, x, y }}
         onDragEnd={(_, info) => {
           const newCorner = determineCorner(info.point.x, info.point.y);
           setCorner(newCorner);

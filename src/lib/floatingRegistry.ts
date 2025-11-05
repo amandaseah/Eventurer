@@ -2,7 +2,7 @@ type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 const GAP = 12; // px gap between stacked widgets
 
-type Entry = { id: string; el: HTMLElement };
+type Entry = { id: string; el: HTMLElement; priority: number };
 
 const registry: Record<Corner, Entry[]> = {
   'top-left': [],
@@ -13,41 +13,29 @@ const registry: Record<Corner, Entry[]> = {
 
 let resizeObserverAttached = false;
 
-function getComputedPos(el: HTMLElement, corner: Corner) {
-  const style = getComputedStyle(el);
-  if (corner.startsWith('top')) {
-    return parseFloat(style.top || '0') || 0;
-  }
-  return parseFloat(style.bottom || '0') || 0;
-}
-
-function setPos(el: HTMLElement, corner: Corner, value: number) {
-  if (corner.startsWith('top')) {
-    el.style.top = `${value}px`;
-  } else {
-    el.style.bottom = `${value}px`;
-  }
-}
+// offsets are stored (px) per id; subscribers are notified when offsets change
+const offsets: Record<string, number> = {};
+const subscribers: Record<string, (offset: number) => void> = {};
 
 function layoutCorner(corner: Corner) {
   const list = registry[corner];
-  // compute offsets sequentially using the element heights
+  // Sort by priority (higher priority = rendered on top, so lower in the stack for top/bottom corners)
+  list.sort((a, b) => a.priority - b.priority);
+  
   let cumulative = 0;
 
   for (let i = 0; i < list.length; i++) {
     const entry = list[i];
     const el = entry.el;
-
-    // read current computed pos and previous applied offset from dataset
     const computed = getComputedStyle(el);
-    const prevOffset = parseFloat(el.dataset.floatingOffset || '0') || 0;
-    const basePos = (corner.startsWith('top')
+    // base position: read the inline style value (if present) or computed
+    const basePos = corner.startsWith('top')
       ? parseFloat(computed.top || '0') || 0
-      : parseFloat(computed.bottom || '0') || 0) - prevOffset;
+      : parseFloat(computed.bottom || '0') || 0;
 
     const newOffset = cumulative;
-    setPos(el, corner, basePos + newOffset);
-    el.dataset.floatingOffset = String(newOffset);
+    offsets[entry.id] = newOffset;
+    if (subscribers[entry.id]) subscribers[entry.id](newOffset);
 
     // increment cumulative by element height + gap
     const height = el.offsetHeight || (parseFloat(computed.height || '0') || 0);
@@ -59,11 +47,10 @@ function relayoutAll() {
   (Object.keys(registry) as Corner[]).forEach(corner => layoutCorner(corner));
 }
 
-export function registerFloating(id: string, el: HTMLElement, corner: Corner) {
-  // ensure element is present and not already registered
+export function registerFloating(id: string, el: HTMLElement, corner: Corner, priority: number = 0) {
   const list = registry[corner];
   if (list.find(e => e.id === id)) return;
-  list.push({ id, el });
+  list.push({ id, el, priority });
   layoutCorner(corner);
 
   if (!resizeObserverAttached) {
@@ -73,32 +60,20 @@ export function registerFloating(id: string, el: HTMLElement, corner: Corner) {
 }
 
 export function unregisterFloating(id: string) {
-  // remove from any corner and restore its base position
   (Object.keys(registry) as Corner[]).forEach(corner => {
     const list = registry[corner];
     const idx = list.findIndex(e => e.id === id);
     if (idx !== -1) {
-      const entry = list[idx];
-      const el = entry.el;
-      const computed = getComputedStyle(el);
-      const prevOffset = parseFloat(el.dataset.floatingOffset || '0') || 0;
-      // restore base pos by subtracting previously applied offset
-      if (corner.startsWith('top')) {
-        const cur = parseFloat(computed.top || '0') || 0;
-        el.style.top = `${cur - prevOffset}px`;
-      } else {
-        const cur = parseFloat(computed.bottom || '0') || 0;
-        el.style.bottom = `${cur - prevOffset}px`;
-      }
-      delete el.dataset.floatingOffset;
       list.splice(idx, 1);
+      delete offsets[id];
+      if (subscribers[id]) subscribers[id](0);
+      delete subscribers[id];
       layoutCorner(corner);
     }
   });
 }
 
 export function updateFloatingCorner(id: string, newCorner: Corner) {
-  // find entry and move to new corner
   let found: Entry | null = null;
   let fromCorner: Corner | null = null;
   (Object.keys(registry) as Corner[]).forEach(corner => {
@@ -114,9 +89,22 @@ export function updateFloatingCorner(id: string, newCorner: Corner) {
   if (!found) return;
 
   registry[newCorner].push(found);
-  // relayout both affected corners
   if (fromCorner) layoutCorner(fromCorner);
   layoutCorner(newCorner);
+}
+
+export function getOffsetFor(id: string) {
+  return offsets[id] || 0;
+}
+
+export function subscribeOffset(id: string, cb: (offset: number) => void) {
+  subscribers[id] = cb;
+  // call immediately with current offset
+  cb(offsets[id] || 0);
+}
+
+export function unsubscribeOffset(id: string) {
+  delete subscribers[id];
 }
 
 export function getRegistrySnapshot() {

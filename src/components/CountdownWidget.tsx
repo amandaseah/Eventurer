@@ -3,7 +3,7 @@ import { bringToFront } from '../directives/draggable';
 import { X, Calendar } from 'lucide-react';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { formatDateObjectToDDMMYYYY } from '../lib/dateUtils';
-import { registerFloating, unregisterFloating, updateFloatingCorner } from '../lib/floatingRegistry';
+import { registerFloating, unregisterFloating, updateFloatingCorner, subscribeOffset, unsubscribeOffset, getOffsetFor } from '../lib/floatingRegistry';
 
 interface EventData {
   id: number;
@@ -106,6 +106,7 @@ export function CountdownWidget({
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const idRef = useRef('countdown-widget');
+  const [offset, setOffset] = useState(0);
 
   useEffect(() => {
     const handleResize = () => setSpacing(getSpacing());
@@ -114,13 +115,26 @@ export function CountdownWidget({
   }, []);
 
   const cornerStyle = useMemo(() => getCornerStyle(corner, spacing), [corner, spacing]);
+  
+  const appliedCornerStyle = useMemo(() => {
+    const s: any = { ...cornerStyle };
+    if (typeof s.top === 'number') s.top = (s.top as number) + offset;
+    if (typeof s.bottom === 'number') s.bottom = (s.bottom as number) + offset;
+    return s;
+  }, [cornerStyle, offset]);
 
   useEffect(() => {
     const id = idRef.current;
     const el = widgetRef.current;
     if (!el) return;
-    registerFloating(id, el, corner);
-    return () => unregisterFloating(id);
+    registerFloating(id, el, corner, 1); // Lower priority (bottom of stack)
+    subscribeOffset(id, setOffset);
+    // initialize offset from registry
+    setOffset(getOffsetFor(id));
+    return () => {
+      unsubscribeOffset(id);
+      unregisterFloating(id);
+    };
     // register once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -228,7 +242,7 @@ export function CountdownWidget({
       dragElastic={0.2}
       dragListener={!isExpanded}
   onPointerDown={() => bringToFront(widgetRef.current)}
-  style={{ ...cornerStyle, x, y, position: 'fixed', zIndex: 40 }}
+  style={{ ...appliedCornerStyle, x, y, position: 'fixed', zIndex: 40 }}
       onDragEnd={(_, info) => {
         const newCorner = determineCorner(info.point.x, info.point.y);
         setCorner(newCorner);
