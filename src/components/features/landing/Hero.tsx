@@ -78,7 +78,7 @@ export default function Hero({ onStart }: { onStart: () => void }) {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="sm:text-sm md:text-2xl lg:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed"
           >
-            Take a quick 5-question quiz and we'll show you events that actually match how you're feeling.
+            Take a quick 3-question quiz and we'll show you events that actually match how you're feeling.
           </motion.p>
 
           {/* Quiz button */}
