@@ -61,7 +61,7 @@ export async function addForumPost(
   const postData = {
     eventId,
     text,
-    image: image || null,
+    ...(image && { image }), // Only include image if it exists
     createdAt: serverTimestamp(),
     username,
     userId: user.uid,
@@ -84,6 +84,8 @@ export async function addReplyToPost(
   image?: string,
   parentReplyId?: string
 ): Promise<void> {
+  console.log('addReplyToPost called with:', { postId, text, username, image, parentReplyId });
+  
   const user = auth.currentUser;
   if (!user) throw new Error('User must be authenticated to reply');
 
@@ -96,7 +98,7 @@ export async function addReplyToPost(
 
   const newReply: Omit<Reply, 'id'> = {
     text,
-    image: image || undefined,
+    ...(image && { image }), // Only include image if it exists
     createdAt: Timestamp.now(),
     username,
     userId: user.uid,
@@ -104,6 +106,8 @@ export async function addReplyToPost(
     upvotedBy: [],
     replies: []
   };
+
+  console.log('Created reply object:', newReply);
 
   const postData = postDoc.data() as Post;
   const updatedReplies = [...postData.replies];

@@ -17,8 +17,8 @@ export default function PostList({ posts, username, onUpvote, onAddReply }: Post
           post={post}
           username={username}
           onUpvote={onUpvote}
-          onSubmitReply={(text, image, parentReplyId) =>
-            onAddReply(post.id, text, image, parentReplyId)
+          onSubmitReply={(postId, text, image, parentReplyId) =>
+            onAddReply(postId, text, image, parentReplyId)
           }
         />
       ))}

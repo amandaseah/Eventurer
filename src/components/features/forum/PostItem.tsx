@@ -10,11 +10,12 @@ interface PostItemProps {
   post: Post;
   username: string;
   depth?: number;
+  rootPostId?: string; // ID of the main post (for nested replies)
   onUpvote: (id: string) => void;
-  onSubmitReply: (text: string, image?: string, replyToId?: string) => void;
+  onSubmitReply: (postId: string, text: string, image?: string, parentReplyId?: string) => void;
 }
 
-export default function PostItem({ post, username, depth = 0, onUpvote, onSubmitReply }: PostItemProps) {
+export default function PostItem({ post, username, depth = 0, rootPostId, onUpvote, onSubmitReply }: PostItemProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [replyImage, setReplyImage] = useState<string | null>(null);
@@ -31,8 +32,12 @@ export default function PostItem({ post, username, depth = 0, onUpvote, onSubmit
   const handleReply = () => {
     if (!replyText.trim() && !replyImage) return;
 
-    // Pass replyText, image, and optionally parentReplyId
-    onSubmitReply(replyText, replyImage || undefined, depth > 0 ? post.id : undefined);
+    // Use rootPostId if available (for nested replies), otherwise use current post ID
+    const targetPostId = rootPostId || post.id;
+    // If this is a nested reply (depth > 0), pass current post ID as parentReplyId
+    const parentReplyId = depth > 0 ? post.id : undefined;
+    
+    onSubmitReply(targetPostId, replyText, replyImage || undefined, parentReplyId);
 
     setReplyText("");
     setReplyImage(null);
@@ -160,6 +165,7 @@ export default function PostItem({ post, username, depth = 0, onUpvote, onSubmit
             post={{...reply, eventId: post.eventId} as Post}
             username={username}
             depth={depth + 1}
+            rootPostId={rootPostId || post.id}
             onUpvote={onUpvote}
             onSubmitReply={onSubmitReply}
           />
