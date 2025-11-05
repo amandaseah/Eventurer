@@ -1,70 +1,218 @@
-# Eventurer
-Eventurer is a web app that helps people discover events in Singapore and plan how to get there.  
+# Eventurer  ✨
+Eventurer is a mood-based web app that helps people discover events in Singapore, book tickets, and plan how to get there. Supports secure Stripe payments for paid events. Deployed on `https://eventurer-zeta.vercel.app/`
 
-## Features
-- Interactive quiz to ascertain user mood, and recommend corresponding events
-- View event details (time, location, description)
-- Google Maps API integration to plan route & get directions to the event
-- Filter events by category, date, location, popularity etc
-- RSVP for events or bookmark/save them for later
-- Interact with other event-goers through event-specific community forums
+## Features 🆒
+🎮 Interactive quiz to ascertain user mood and recommend events accordingly  
+📖 View detailed event info (time, location, description)  
+📍 Google Maps API integration to plan routes and get directions  
+🔎 Filter events by category, date, price, popularity, and more  
+🔖 RSVP to events or bookmark/save them for later  
+🗯️ Event-specific discussion forums for users to interact  
+💰 Stripe payment gateway for paid event checkout, with generated invoices  
 
-## Tech Stack
-- Frontend: Typescript, React, TailwindCSS
-- Build Tool: Vite
-- Deployment: Vercel
-- Backend/APIs: Motion, Firebase, Google Maps, EventBrite
+## Tech Stack  💻
+- **Frontend:** TypeScript, React, TailwindCSS, Vite  
+- **Backend/Runtime:** Node.js (Express for local Stripe server), Vercel serverless functions  
+- **APIs/Services:** Firebase (Auth + Firestore), Stripe Payments, Google Maps, EventBrite  
+- **Build & Deployment:** Vite + Vercel  
 
-## Prerequisites
-- npm
+## Prerequisites ❗
+- Node.js (v18 or higher)
+- npm (comes with Node.js)
+- Stripe test & live API keys
+- Firebase project credentials
+- Google Maps API key
+- EventBrite API token
 
-## Installation
-1. Clone the repo ```bash
-   git clone https://github.com/amandaseah/Eventurer.git```
-2. Navigate into the project folder `cd Eventurer`
-3. Install dependencies `npm install`
-4. Run server `npm run dev`
+## Installation ⬇️
 
-## Usage
-1. Create a new account
-2. Complete the interactive quiz
-3. Sign up for events!
-
-## Details
-Deployment url: `https://eventurer-zeta.vercel.app/ `
-   
-## Repository Structure
+**1. Clone the repository**
 ```
-root
-├── public/                # static assets (not processed by Vite)
+bash git clone https://github.com/amandaseah/Eventurer.git
+cd Eventurer
+```
+**2. Install dependencies**
+```
+npm install
+```
+**3. Set up environment variables**
+```
+cp .env.example .env.local
+```
+**4. Add your API keys** into `.env.local`
+
+```
+# firebase api keys
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_measurement_id
+
+# eventbrite api key
+VITE_EVENTBRITE_API_TOKEN=your_eventbrite_api_token
+
+# google maps api key
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+
+# stripe api key
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+
+# gemini api key
+VITE_GEMINI_API_KEY=your_gemini_api_key
+```
+## Running Eventurer Locally 🏃
+**Terminal 1 - Stripe backend**
+```
+node api/create-payment-intent.js
+```
+**Terminal 2 - React app**
+```
+  npm run dev
+```
+- Frontend available at `http://localhost:3000`
+- Two terminals needed for local deployment, as Stripe server (`create-payment-intent.js`) runs on Node.js locally, while the front is served by Vite.
+
+## Usage 🎲
+1. Sign up or log in using your email
+2. Complete the mood quiz to get tailored event suggestions
+3. Browse events, bookmark, RSVP, and pay for ticketed events
+4. View event pages to access community forums and Google Maps directions
+
+## Repo Structure 📂
+```
+Eventurer
+├── api/
+│   └── create-payment-intent.js          # Stripe backend handler (local + Vercel)
+│
+├── public/                               # Static assets
 │   ├── favicon.png
 │   ├── final-optimized.glb
-│   └── gmaps-smoke.html   # google maps test page
+│   └── gmaps-smoke.html
 │
-├── src/                   # main source code
-│   ├── components/        # UI building blocks
-│   │   ├── common/        # shared components (buttons, inputs, etc)
-│   │   ├── features/      # feature-specific components
-│   │   ├── pages/         # page-level view
-│   │   ├── shared/        # reusable logic & components across pages
-│   │   └── ui/            # visual components (cards, dropdowns, etc)
-│   ├── guidelines/      
-│   ├── hooks/             # react hooks
-│   ├── lib/               # helper libraries (API config, backend logic)
-│   ├── models/            
-│   ├── styles/            # tailwind & global CSS
-│   ├── types/          
-│   ├── App.tsx            # root component
-│   ├── main.tsx           # app entry point
-│   └── index.css          # global CSS entry
+├── src/
+│   ├── components/
+│   │   ├── common/                       # Shared UI components
+│   │   ├── features/
+│   │   │   ├── event/
+│   │   │   │   ├── EventCalendarView.tsx
+│   │   │   │   ├── EventCard.tsx
+│   │   │   │   └── EventListView.tsx
+│   │   │   ├── eventInfo/
+│   │   │   │   ├── EventActions.tsx
+│   │   │   │   └── EventDetails.tsx
+│   │   │   ├── explore/
+│   │   │   │   └── FiltersPanel.tsx
+│   │   │   ├── forum/
+│   │   │   │   ├── api.ts
+│   │   │   │   ├── Composer.tsx
+│   │   │   │   ├── NewPostForm.tsx
+│   │   │   │   ├── PostItem.tsx
+│   │   │   │   ├── PostList.tsx
+│   │   │   │   └── TopForumPreview.tsx
+│   │   │   ├── landing/
+│   │   │   │   ├── FeaturedEvents.tsx
+│   │   │   │   ├── Hero.tsx
+│   │   │   │   ├── MoodQuiz.tsx
+│   │   │   │   └── landing3D/
+│   │   │   │       └── ThreeLanding.tsx
+│   │   │   ├── map/
+│   │   │   │   ├── HowToGetThere.tsx
+│   │   │   │   ├── map.css
+│   │   │   │   └── Map.tsx
+│   │   │   ├── payments/
+│   │   │   │   ├── PaymentForm.tsx
+│   │   │   │   └── StripePaymentFormWrapper.tsx
+│   │   │   ├── profile/
+│   │   │   │   ├── AccountPanel.tsx
+│   │   │   │   ├── EventsGrid.tsx
+│   │   │   │   ├── ProfileHeader.tsx
+│   │   │   │   ├── ProfileStats.tsx
+│   │   │   │   └── SettingsPanel.tsx
+│   │   │   ├── recommendation/
+│   │   │   │   └── RecommendationCard.tsx
+│   │   │   └── signup/
+│   │   │       ├── LoginForm.tsx
+│   │   │       ├── SignupForm.tsx
+│   │   │       └── FAQChatbot.tsx
+│   │   ├── pages/
+│   │   │   ├── ChoicePage.tsx
+│   │   │   ├── EventExplorePage.tsx
+│   │   │   ├── EventForumPage.tsx
+│   │   │   ├── EventInfoPage.tsx
+│   │   │   ├── FAQPage.tsx
+│   │   │   ├── HomePreview.tsx
+│   │   │   ├── LandingPage.tsx
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── MarketingLandingPage.tsx
+│   │   │   ├── MoodResultsPage.tsx
+│   │   │   ├── ProfilePage.tsx
+│   │   │   ├── SafetyGuidelinesPage.tsx
+│   │   │   ├── SettingsPage.tsx
+│   │   │   └── SignupPage.tsx
+│   │   ├── shared/
+│   │   │   ├── CountdownWidget.tsx
+│   │   │   └── Header.tsx
+│   │   └── ui/                           # Reusable UI (inputs, buttons)
+│   │
+│   ├── data/
+│   ├── guidelines/
+│   ├── hooks/
+│   ├── lib/
+│   │   ├── apiClient.ts
+│   │   ├── authErrorMessages.ts
+│   │   ├── dateUtils.ts
+│   │   ├── eventbriteService.ts
+│   │   ├── eventCategoriser.ts
+│   │   ├── firebase.ts
+│   │   ├── indexedDB.ts
+│   │   ├── loadGoogleMaps.ts
+│   │   ├── mockData.ts
+│   │   ├── onemapPublic.ts
+│   │   ├── routing.ts
+│   │   └── types.ts
+│   ├── models/
+│   ├── styles/
+│   ├── types/
+│   ├── App.tsx
+│   ├── index.css
+│   └── main.tsx
 │
-├── .env.example           
-├── .env.local              # local environment variables (ignored by git)
-├── cors.json               # CORS configuration
-├── vercel.json             # vercel deployment config
-├── package.json            # project metadata & dependencies
-├── vite.config.ts          # vite config
-├── tailwind.config.js      # tailwind setup
-├── tsconfig.json           # typeScript configuration
-└── README.md              
+├── .env.example
+├── .env.local
+├── .gitignore
+├── cors.json
+├── index.html
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── README.md
+├── tailwind.config.js
+├── tsconfig.json
+├── vercel.json
+├── vite-env.d.ts
+└── vite.config.ts
 ```
+
+## Key Pages & Routes 🗺️
+**Public Routes**
+- `/` - landing page with mood quiz and featured events
+- `/login` - user login
+- `/signups` - user registration
+- `/faq` - frequently asked questions
+
+**Protected Routes**
+- `/home` - main dashboard after login
+- `/explore` - browse and filter events
+- `/event/:id` - event details page (with stripe checkout, map
+- `/forum/:id` - event-specific discussion forum
+- `/profile` - user profile and bookmarked, RSVP'd and past events
+- `/settings` - user settings
+
+## Notes 📔
+- `.env.local` must remain in `.gitignore` for security
+- Stripe test cards (eg `4242 4242 4242 4242 12/34 123`) can be used in deployment
+- Live keys must be used in production
+- Always redeploy to Vercel after updating environment variables
