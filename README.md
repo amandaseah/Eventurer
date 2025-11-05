@@ -1,5 +1,5 @@
 # Eventurer  ✨
-Eventurer is a web app that helps people discover events in Singapore, book tickets, and plan how to get there. Now supports secure Stripe payments for paid events.
+Eventurer is a mood-based web app that helps people discover events in Singapore, book tickets, and plan how to get there. Supports secure Stripe payments for paid events. Deployed on `https://eventurer-zeta.vercel.app/`
 
 ## Features 🆒
 🎮 Interactive quiz to ascertain user mood and recommend events accordingly  
@@ -63,7 +63,6 @@ STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 # gemini api key
 VITE_GEMINI_API_KEY=your_gemini_api_key
 ```
-
 ## Running Eventurer Locally 🏃
 **Terminal 1 - Stripe backend**
 ```
