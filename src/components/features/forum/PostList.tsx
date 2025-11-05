@@ -4,7 +4,7 @@ interface PostListProps {
   eventId: number;
   posts: any[];
   username: string;
-  onUpvote: (postId: string) => void;
+  onUpvote: (postId: string, replyId?: string) => void;
   onAddReply: (postId: string, text: string, image?: string, parentReplyId?: string) => void;
 }
 

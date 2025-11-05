@@ -21,7 +21,6 @@ import { db, auth } from './firebase';
 export interface Reply {
   id: string;
   text: string;
-  image?: string;
   createdAt: Timestamp;
   username: string;
   userId?: string;
@@ -84,7 +83,7 @@ export async function addReplyToPost(
   image?: string,
   parentReplyId?: string
 ): Promise<void> {
-  console.log('addReplyToPost called with:', { postId, text, username, image, parentReplyId });
+  console.log('addReplyToPost called with:', { postId, text, username, parentReplyId });
   
   const user = auth.currentUser;
   if (!user) throw new Error('User must be authenticated to reply');
@@ -98,7 +97,6 @@ export async function addReplyToPost(
 
   const newReply: Omit<Reply, 'id'> = {
     text,
-    ...(image && { image }), // Only include image if it exists
     createdAt: Timestamp.now(),
     username,
     userId: user.uid,
