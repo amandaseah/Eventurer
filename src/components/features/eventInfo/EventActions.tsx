@@ -14,7 +14,7 @@ import {
 import { Bookmark } from "lucide-react";
 import { formatDateToDDMMYYYY } from "../../../lib/dateUtils"; // changed from "@/lib/dateUtils"
 import { useState } from "react";
-import StripePaymentFormWrapper from "../payments/StripePaymentFormWrapper";
+import StripePaymentFormWrapper from "../payments/PaymentForm";
 
 type EventShape = {
   title: string;
@@ -76,7 +76,7 @@ const amountInCents = isNaN(numericPrice) ? 0 : Math.round(numericPrice * 100);
                 : "bg-pink-200 text-pink-600 hover:bg-pink-300 border border-pink-300 shadow-sm hover:shadow-md"
             }`}
           >
-            {isRSVPed ? "✓ RSVP'd" : "RSVP to Event"}
+            {isRSVPed ? "✓ RSVP'd" : "RSVP"}
           </motion.button>
         </AlertDialogTrigger>
 
@@ -86,39 +86,40 @@ const amountInCents = isNaN(numericPrice) ? 0 : Math.round(numericPrice * 100);
               {isRSVPed ? "Cancel RSVP" : "Confirm RSVP"}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {/* optional: dynamic price/free message */}
+              {isRSVPed 
+                ? `Are you sure you want to cancel your RSVP for "${event.title}"?`
+                : `Are you sure you want to RSVP for "${event.title}"?`
+              }
+              {!isRSVPed && price !== "Free" && price !== "$0" && (
+                <span className="block mt-2 text-sm font-medium">
+                  This is a paid event ({price}). You’ll be asked to complete payment next.
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
-
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction asChild>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  const numericPrice = parseFloat(String(price).replace(/[^0-9.]/g, ""));
-                  const isPaidEvent = !isNaN(numericPrice) && numericPrice > 0;
+            <AlertDialogAction
+              onClick={(e: any) => {
+                e.preventDefault();
+                const numericPrice = parseFloat(String(price).replace(/[^0-9.]/g, ""));
+                const isPaidEvent = !isNaN(numericPrice) && numericPrice > 0;
 
-                  setOpenDialog?.(false);
+                setOpenDialog?.(false);
 
-                  if (isRSVPed) {
-                    // if already RSVP'ed, user is canceling
-                    onConfirmRSVP(); 
+                if (isRSVPed) {
+                  onConfirmRSVP();
+                } else {
+                  if (isPaidEvent) {
+                    setTimeout(() => setShowPaymentModal(true), 50);
                   } else {
-                    // if not RSVP'ed yet, user is confirming RSVP
-                    if (isPaidEvent) {
-                      // Only open payment modal for paid events
-                      setTimeout(() => setShowPaymentModal(true), 50);
-                    } else {
-                      // free event, just confirm directly
-                      onConfirmRSVP();
-                    }
+                    onConfirmRSVP();
                   }
-                }}
-                className="bg-pink-200 text-pink-600 hover:bg-pink-300 focus:ring-pink-200 focus:ring-offset-2 w-full py-2 rounded-md"
-              >
-                {isRSVPed ? "Cancel RSVP" : "Confirm RSVP"}
-              </button>
+                }
+              }}
+              className="bg-pink-200 text-pink-600 hover:bg-pink-300 focus:ring-pink-200 focus:ring-offset-2"
+            >
+              {isRSVPed ? "Cancel RSVP" : "Confirm RSVP"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -153,6 +154,7 @@ const amountInCents = isNaN(numericPrice) ? 0 : Math.round(numericPrice * 100);
 
           <StripePaymentFormWrapper
             amount={amountInCents}  // make sure amountInCents is computed above
+            eventTitle={event?.title}
             onSuccess={() => {
               setShowPaymentModal(false);
               setIsPaid(true);
