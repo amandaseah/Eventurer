@@ -1,7 +1,9 @@
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useMotionValue } from 'motion/react';
+import { bringToFront } from '../directives/draggable';
 import { X, Calendar } from 'lucide-react';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { formatDateObjectToDDMMYYYY } from '../lib/dateUtils';
+import { registerFloating, unregisterFloating, updateFloatingCorner, subscribeOffset, unsubscribeOffset, getOffsetFor } from '../lib/floatingRegistry';
 
 interface EventData {
   id: number;
@@ -49,14 +51,97 @@ const sourceChipClasses: Record<EventSource, string> = {
 
 const pluraliseDays = (days: number) => (days === 1 ? 'day' : 'days');
 
+type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+
+const getSpacing = () => {
+  if (typeof window === 'undefined') return 16;
+  return window.innerWidth >= 640 ? 24 : 16;
+};
+
+const getTopOffset = () => {
+  if (typeof window === 'undefined') return 72;
+  return window.innerWidth >= 640 ? 96 : 72;
+};
+
+const getCornerStyle = (corner: Corner, spacing: number) => {
+  const style: Record<'top' | 'bottom' | 'left' | 'right', number | 'auto'> = {
+    top: 'auto',
+    bottom: 'auto',
+    left: 'auto',
+    right: 'auto',
+  };
+
+  if (corner.startsWith('top')) {
+    style.top = getTopOffset() + spacing;
+  } else {
+    style.bottom = spacing;
+  }
+
+  if (corner.endsWith('left')) {
+    style.left = spacing;
+  } else {
+    style.right = spacing;
+  }
+
+  return style;
+};
+
+const determineCorner = (pointX: number, pointY: number): Corner => {
+  if (typeof window === 'undefined') return 'bottom-right';
+  const horizontal = pointX < window.innerWidth / 2 ? 'left' : 'right';
+  const vertical = pointY < window.innerHeight / 2 ? 'top' : 'bottom';
+  return `${vertical}-${horizontal}` as Corner;
+};
+
 export function CountdownWidget({
   bookmarkedEvents,
   rsvpedEvents,
-  fallbackEvents,
+  fallbackEvents: _fallbackEvents,
   onEventClick,
 }: CountdownWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const widgetRef = useRef<HTMLDivElement>(null);
+  const [corner, setCorner] = useState<Corner>('bottom-right');
+  const [spacing, setSpacing] = useState(() => getSpacing());
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const idRef = useRef('countdown-widget');
+  const [offset, setOffset] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => setSpacing(getSpacing());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const cornerStyle = useMemo(() => getCornerStyle(corner, spacing), [corner, spacing]);
+  
+  const appliedCornerStyle = useMemo(() => {
+    const s: any = { ...cornerStyle };
+    if (typeof s.top === 'number') s.top = (s.top as number) + offset;
+    if (typeof s.bottom === 'number') s.bottom = (s.bottom as number) + offset;
+    return s;
+  }, [cornerStyle, offset]);
+
+  useEffect(() => {
+    const id = idRef.current;
+    const el = widgetRef.current;
+    if (!el) return;
+    registerFloating(id, el, corner, 1); // Lower priority (bottom of stack)
+    subscribeOffset(id, setOffset);
+    // initialize offset from registry
+    setOffset(getOffsetFor(id));
+    return () => {
+      unsubscribeOffset(id);
+      unregisterFloating(id);
+    };
+    // register once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    updateFloatingCorner(idRef.current, corner);
+  }, [corner]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -112,15 +197,20 @@ export function CountdownWidget({
   const visibleEvents = useMemo(() => {
     const eventMap = new Map<number, CountdownEvent & { sources: EventSource[] }>();
 
-    // Process bookmarked events
-    normalizeEvents(bookmarkedEvents, 'bookmarked').forEach(event => {
+    const normalizedBookmarked = normalizeEvents(bookmarkedEvents, 'bookmarked');
+    const normalizedRsvped = normalizeEvents(rsvpedEvents, 'rsvped');
+
+    if (normalizedBookmarked.length === 0 && normalizedRsvped.length === 0) {
+      return [];
+    }
+
+    normalizedBookmarked.forEach(event => {
       if (!eventMap.has(event.id)) {
         eventMap.set(event.id, { ...event, sources: ['bookmarked'] });
       }
     });
 
-    // Process RSVPed events and merge sources if already bookmarked
-    normalizeEvents(rsvpedEvents, 'rsvped').forEach(event => {
+    normalizedRsvped.forEach(event => {
       const existing = eventMap.get(event.id);
       if (existing) {
         existing.sources.push('rsvped');
@@ -129,22 +219,13 @@ export function CountdownWidget({
       }
     });
 
-    // If user has no saved events, fall back to general upcoming events
-    if (eventMap.size === 0) {
-      normalizeEvents(fallbackEvents, 'general').forEach(event => {
-        if (!eventMap.has(event.id)) {
-          eventMap.set(event.id, { ...event, sources: ['general'] });
-        }
-      });
-    }
-
     // Convert to array and sort by date
     const combined = Array.from(eventMap.values()).sort(
       (a, b) => a.eventDate.getTime() - b.eventDate.getTime()
     );
 
     return combined.slice(0, MAX_DISPLAYED_EVENTS);
-  }, [bookmarkedEvents, rsvpedEvents, fallbackEvents]);
+  }, [bookmarkedEvents, rsvpedEvents]);
 
   if (visibleEvents.length === 0) return null;
 
@@ -154,9 +235,20 @@ export function CountdownWidget({
   return (
     <motion.div
       ref={widgetRef}
-      initial={{ opacity: 0, x: 100 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-40"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      drag
+      dragMomentum={false}
+      dragElastic={0.2}
+      dragListener={!isExpanded}
+  onPointerDown={() => bringToFront(widgetRef.current)}
+  style={{ ...appliedCornerStyle, x, y, position: 'fixed', zIndex: 40 }}
+      onDragEnd={(_, info) => {
+        const newCorner = determineCorner(info.point.x, info.point.y);
+        setCorner(newCorner);
+        x.set(0);
+        y.set(0);
+      }}
     >
       <AnimatePresence>
         {isExpanded ? (
