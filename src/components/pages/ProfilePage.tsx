@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Bookmark, CheckCircle, History } from 'lucide-react';
+import { Bookmark, CheckCircle } from 'lucide-react';
 import { BackButton } from '../shared/BackButton';
 
 interface ProfilePageProps {
@@ -62,7 +62,6 @@ export function ProfilePage({
   // Filter events based on bookmarked and RSVP'd IDs
   const bookmarkedEvents = events.filter(e => bookmarkedEventIds.includes(e.id) && !e.isPast);
   const rsvpedEvents = events.filter(e => rsvpedEventIds.includes(e.id) && !e.isPast);
-  const pastEvents = events.filter(e => rsvpedEventIds.includes(e.id) && e.isPast);
 
   const handleSignOut = async () => {
     try {
@@ -169,13 +168,12 @@ export function ProfilePage({
           <ProfileStats
             bookmarkedCount={bookmarkedEvents.length}
             upcomingCount={rsvpedEvents.length}
-            pastCount={pastEvents.length}
           />
         </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-3 w-full mb-6 sm:mb-10 bg-white border border-gray-100 rounded-3xl !p-1.5 sm:!p-2 shadow-sm !h-auto gap-1 sm:!gap-1.5">
+            <TabsList className="grid grid-cols-2 w-full mb-6 sm:mb-10 bg-white border border-gray-100 rounded-3xl !p-1.5 sm:!p-2 shadow-sm !h-auto gap-1 sm:!gap-1.5">
               <TabsTrigger
                 value="bookmarked"
                 className="!rounded-2xl data-[state=active]:bg-pink-50 data-[state=active]:shadow-sm data-[state=active]:text-pink-600 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium text-gray-600"
@@ -191,14 +189,6 @@ export function ProfilePage({
               >
                 <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                 <span className="truncate">Upcoming</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="past"
-                className="!rounded-2xl data-[state=active]:bg-slate-50 data-[state=active]:shadow-sm data-[state=active]:text-slate-600 !text-[11px] sm:!text-sm !flex !items-center !justify-center !min-h-0 !border-0 !font-medium text-gray-600"
-                style={{ padding: '0.5rem', height: '40px', display: 'flex', gap: '0.375rem', alignItems: 'center' }}
-              >
-                <History className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                <span className="truncate">Past</span>
               </TabsTrigger>
             </TabsList>
 
@@ -265,38 +255,6 @@ export function ProfilePage({
                     <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
                     <p className="text-sm sm:text-xl text-gray-500">No upcoming events</p>
                   </div>
-              )}
-            </motion.div>
-          </TabsContent>
-
-          {/* Past Events */}
-          <TabsContent value="past">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white border border-gray-100 rounded-3xl p-5 sm:p-8 shadow-sm"
-            >
-              <div className="mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Past Events</h2>
-                <p className="text-xs sm:text-base text-gray-600">Events you've already attended</p>
-              </div>
-
-              {pastEvents.length > 0 ? (
-                <EventsGrid
-                  events={[...pastEvents].sort(
-                    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-                  )}
-                  onEventClick={(id) => onNavigate("event-info", { eventId: id })}
-                  bookmarkedEventIds={bookmarkedEventIds}
-                  rsvpedEventIds={rsvpedEventIds}
-                  onBookmarkChange={onBookmarkChange}
-                  onRSVPChange={onRSVPChange}
-                />
-              ) : (
-                <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center border border-dashed border-gray-200">
-                  <History className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
-                  <p className="text-sm sm:text-xl text-gray-500">No past events yet</p>
-                </div>
               )}
             </motion.div>
           </TabsContent>
