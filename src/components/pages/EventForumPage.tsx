@@ -194,7 +194,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
                 posts={posts}
                 username={username}
                 onAddReply={(postId, text, image, parentReplyId) => addReply(postId, text, image, parentReplyId)}
-                onUpvote={(postId) => upvotePost(postId, username)}
+                onUpvote={(postId, replyId) => upvotePost(postId, replyId, username)}
               />
 
             </motion.div>

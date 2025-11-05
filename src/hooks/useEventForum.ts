@@ -82,7 +82,7 @@ export function useEventForum(eventId: number) {
   };
 
   // Upvote a post or reply
-  const upvotePost = async (postId: string, customUsername?: string, replyId?: string) => {
+  const upvotePost = async (postId: string, replyId?: string, customUsername?: string) => {
     try {
       const displayName = customUsername || username;
       await upvoteForumPost(postId, displayName, replyId);

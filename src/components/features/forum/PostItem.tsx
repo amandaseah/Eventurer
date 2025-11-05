@@ -1,8 +1,8 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import { Button } from "../../ui/button";
 import { Textarea } from "../../ui/textarea";
-import { ThumbsUp, Reply, Image as ImageIcon, X } from "lucide-react";
+import { ThumbsUp, Reply } from "lucide-react";
 import { Post, Reply as ReplyType } from "../../../lib/forumService";
 import { Timestamp } from "firebase/firestore";
 
@@ -11,37 +11,37 @@ interface PostItemProps {
   username: string;
   depth?: number;
   rootPostId?: string; // ID of the main post (for nested replies)
-  onUpvote: (id: string) => void;
+  onUpvote: (postId: string, replyId?: string) => void;
   onSubmitReply: (postId: string, text: string, image?: string, parentReplyId?: string) => void;
 }
 
 export default function PostItem({ post, username, depth = 0, rootPostId, onUpvote, onSubmitReply }: PostItemProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
-  const [replyImage, setReplyImage] = useState<string | null>(null);
-  const replyFileRef = useRef<HTMLInputElement>(null);
-
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onloadend = () => setReplyImage(reader.result as string);
-    reader.readAsDataURL(f);
-  };
 
   const handleReply = () => {
-    if (!replyText.trim() && !replyImage) return;
+    if (!replyText.trim()) return;
 
     // Use rootPostId if available (for nested replies), otherwise use current post ID
     const targetPostId = rootPostId || post.id;
     // If this is a nested reply (depth > 0), pass current post ID as parentReplyId
     const parentReplyId = depth > 0 ? post.id : undefined;
     
-    onSubmitReply(targetPostId, replyText, replyImage || undefined, parentReplyId);
+    onSubmitReply(targetPostId, replyText, undefined, parentReplyId);
 
     setReplyText("");
-    setReplyImage(null);
     setIsReplying(false);
+  };
+
+  const handleUpvote = () => {
+    if (depth > 0) {
+      // This is a reply, pass both post ID and reply ID
+      const targetPostId = rootPostId || post.id;
+      onUpvote(targetPostId, post.id);
+    } else {
+      // This is a main post
+      onUpvote(post.id);
+    }
   };
 
   return (
@@ -58,8 +58,8 @@ export default function PostItem({ post, username, depth = 0, rootPostId, onUpvo
 
         <p className="text-gray-800 mb-4 whitespace-pre-wrap">{post.text}</p>
 
-        {/* Display image if present */}
-        {post.image && (
+        {/* Display image if present and this is a main post (not a reply) */}
+        {post.image && depth === 0 && (
           <>
             <div className="mb-4 flex justify-center">
               <img 
@@ -73,7 +73,7 @@ export default function PostItem({ post, username, depth = 0, rootPostId, onUpvo
 
         <div className="flex items-center gap-4 mb-2">
           <button
-            onClick={() => onUpvote(post.id)}
+            onClick={handleUpvote}
             className={`flex items-center gap-1 transition-colors ${
               post.upvotedBy?.includes(username) ? "text-pink-600" : "text-gray-500 hover:text-pink-500"
             }`}
@@ -100,43 +100,10 @@ export default function PostItem({ post, username, depth = 0, rootPostId, onUpvo
               className="mb-3 rounded-2xl bg-white"
             />
 
-            {/* Image preview */}
-            {replyImage && (
-              <div className="relative mb-3 rounded-2xl overflow-hidden">
-                <img 
-                  src={replyImage} 
-                  alt="Reply preview" 
-                  className="w-full h-full object-cover rounded-2xl" 
-                />
-                <button
-                  onClick={() => setReplyImage(null)}
-                  className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-
             <div className="flex gap-2">
-              <input
-                ref={replyFileRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageSelect}
-                className="hidden"
-              />
-              <Button 
-                onClick={() => replyFileRef.current?.click()} 
-                variant="outline" 
-                size="sm"
-                className="rounded-full"
-              >
-                <ImageIcon className="w-4 h-4 mr-1" />
-                Image
-              </Button>
               <Button
                 onClick={handleReply}
-                disabled={!replyText.trim() && !replyImage}
+                disabled={!replyText.trim()}
                 className="rounded-xl bg-pink-400 hover:bg-pink-500 hover:shadow-lg font-semibold"
                 size="sm"
               >
@@ -146,7 +113,6 @@ export default function PostItem({ post, username, depth = 0, rootPostId, onUpvo
                 onClick={() => {
                   setIsReplying(false);
                   setReplyText("");
-                  setReplyImage(null);
                 }}
                 variant="outline" 
                 size="sm"
