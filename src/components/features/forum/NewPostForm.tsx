@@ -44,11 +44,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
           <img 
             src={image} 
             alt="Upload preview" 
-<<<<<<< HEAD
-            className="w-full h-full object-cover rounded-2xl" 
-=======
             className="w-full h-full sm:max-h-64 object-contain rounded-xl sm:rounded-2xl bg-gray-50" 
->>>>>>> dev
           />
           <button
             onClick={() => setImage(null)}

@@ -130,11 +130,7 @@ export default function TopForumPreview({
                   <img 
                     src={post.image} 
                     alt="Post attachment" 
-<<<<<<< HEAD
-                    className="rounded-xl h-96 w-96 object-cover"
-=======
                     className="rounded-xl h-96 w-96 object-cover border border-gray-200 shadow-sm"
->>>>>>> dev
                   />
                 </div>
               )}

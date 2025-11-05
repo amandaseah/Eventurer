@@ -25,21 +25,6 @@ interface EventInfoPageProps {
   username: string;
 }
 
-<<<<<<< HEAD
-export function EventInfoPage({eventId, onNavigate, onGoBack, bookmarkedEventIds, rsvpedEventIds, onBookmarkChange, onRSVPChange, username}: EventInfoPageProps) {
-  
-  //console.log("EventInfoPage loaded with username:", username);
-  
-  const event = events.find((e) => e.id === eventId);
-  const [isBookmarked, setIsBookmarked] = useState(
-    bookmarkedEventIds.includes(eventId)
-  );
-  const [isRSVPed, setIsRSVPed] = useState(rsvpedEventIds.includes(eventId));
-  const [showRSVPDialog, setShowRSVPDialog] = useState(false);
-  const [saves, setSaves] = useState(event?.saves || 0);
-
-  const { posts, addPost, upvotePost } = useEventForum(eventId); // fetch all posts
-=======
 export function EventInfoPage({
   eventId,
   events,
@@ -61,7 +46,6 @@ export function EventInfoPage({
   useEffect(() => {
     console.log("[EventInfoPage] resolved username:", resolvedUsername);
   }, [resolvedUsername]);
->>>>>>> dev
 
   const [event, setEvent] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
@@ -281,18 +265,6 @@ export function EventInfoPage({
           <div className="lg:col-span-2 space-y-8">
             <EventDetails event={event} saves={saves} />
 
-<<<<<<< HEAD
-            {/* Top 3 Forum Posts */}
-            <div>
-              <TopForumPreview
-                posts={posts.slice(0, 3)}
-                onViewAll={() => onNavigate("event-forum", { eventId, username })}
-                onPostClick={(postId) => onNavigate("event-forum", { eventId, postId, username })}
-                upvotePost={(postId) => upvotePost(postId, username)} 
-                username={username}
-              />
-            </div>
-=======
             <TopForumPreview
               posts={posts.slice(0, 3)}
               onViewAll={() => onNavigate("event-forum", { eventId, username: resolvedUsername })}
@@ -300,7 +272,6 @@ export function EventInfoPage({
               upvotePost={(postId) => upvotePost(postId, resolvedUsername)}
               username={resolvedUsername}
             />
->>>>>>> dev
 
             <HowToGetThere event={event} />
           </div>
@@ -318,14 +289,10 @@ export function EventInfoPage({
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-<<<<<<< HEAD
-              onClick={() => onNavigate("event-forum", { eventId, username })}
-=======
               onClick={() => {
                 console.log("Navigating to forum with:", eventId, resolvedUsername);
                 onNavigate("event-forum", { eventId, username: resolvedUsername });
               }}
->>>>>>> dev
               className="w-full bg-white rounded-3xl p-6 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
             >
               <MessageSquare className="w-5 h-5 text-pink-500" />
