@@ -103,18 +103,14 @@ const fadeUp = {
 export function MarketingLandingPage({ onExplore }: MarketingLandingPageProps) {
   return (
     <div
-      className="min-h-screen relative isolate text-gray-900"
-      style={{
-        fontFamily: APPLE_FONT,
-        background: 'linear-gradient(180deg, #fff7fb 0%, #ffeef6 55%, #ffffff 100%)',
-      }}
+      className="min-h-screen bg-white text-gray-900"
+      style={{ fontFamily: APPLE_FONT }}
     >
-      <AnimatedBackground />
-
-      <div className="relative z-10 flex flex-col">
+      <div className="flex flex-col">
         <Header onExplore={onExplore} />
         <main className="flex-1">
           <HeroSection onExplore={onExplore} />
+          <StepsSection onExplore={onExplore} />
           <FeaturesSection />
           <TechSection />
           <CTASection onExplore={onExplore} />
@@ -122,6 +118,87 @@ export function MarketingLandingPage({ onExplore }: MarketingLandingPageProps) {
         <Footer onNavigate={() => onExplore?.()} />
       </div>
     </div>
+  );
+}
+
+function StepsSection({ onExplore }: { onExplore?: () => void }) {
+  const steps = [
+    {
+      icon: <Heart className="h-5 w-5" />,
+      title: 'Set your vibe',
+      description: 'Pick the mood that matches how you feel right now—no overthinking required.',
+    },
+    {
+      icon: <Zap className="h-5 w-5" />,
+      title: 'We shortlist the best fits',
+      description: 'Eventurer instantly surfaces events that line up with your energy and schedule.',
+    },
+    {
+      icon: <Clock className="h-5 w-5" />,
+      title: 'Save it & go',
+      description: 'Bookmark, share, and get directions. You’re out the door in minutes.',
+    },
+  ];
+
+  return (
+    <section className="bg-white px-6 sm:px-8 lg:px-10 pb-14 sm:pb-16 lg:pb-20">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center text-center">
+        <motion.span
+          className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs sm:text-sm font-medium text-gray-600 shadow-sm shadow-pink-100/60"
+          initial={{ opacity: 0, scale: 0.92 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: false, amount: 0.6 }}
+          transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+        >
+          <Sparkles className="h-3.5 w-3.5 text-pink-400" />
+          Three steps to your next plan
+        </motion.span>
+
+        <motion.h2
+          className="mt-6 text-4xl sm:text-5xl md:text-[3.1rem] font-light text-gray-900 tracking-tight"
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.55 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20 }}
+        >
+          Mood in, curated plans out.
+        </motion.h2>
+
+        <motion.p
+          className="mt-4 max-w-2xl text-sm sm:text-base text-gray-600"
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.6 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.12 }}
+        >
+          We strip away the noise. Tell us how you feel and leave with an event you actually want to attend.
+        </motion.p>
+
+        <div className="mt-12 grid w-full gap-6 sm:grid-cols-3">
+          {steps.map((step, index) => (
+            <motion.div
+              key={step.title}
+              className="group rounded-[26px] border border-rose-100/80 bg-white p-6 text-left shadow-[0_18px_36px_rgba(236,72,153,0.07)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_26px_48px_rgba(236,72,153,0.12)]"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.5 }}
+              transition={{ type: 'spring', stiffness: 90, damping: 20, delay: index * 0.08 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 text-rose-500">
+                  {step.icon}
+                </div>
+                <span className="text-sm font-medium text-rose-500">{`0${index + 1}`}</span>
+              </div>
+              <h3 className="mt-5 text-lg font-semibold text-gray-900">{step.title}</h3>
+              <p className="mt-3 text-sm sm:text-base leading-relaxed text-gray-600">
+                {step.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -246,9 +323,8 @@ function HeroSection({ onExplore }: { onExplore?: () => void }) {
 
 function FeaturesSection() {
   return (
-    <section className="relative px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white via-rose-50/60 to-white pointer-events-none" />
-      <div className="relative w-full max-w-6xl mx-auto">
+    <section className="bg-white px-6 sm:px-8 lg:px-10 py-16 sm:py-20 lg:py-24">
+      <div className="mx-auto w-full max-w-6xl">
         <motion.div
           className="mb-14 sm:mb-16 text-center"
           initial={{ opacity: 0, y: 34 }}
@@ -290,16 +366,8 @@ function FeaturesSection() {
               transition={{ type: 'spring', stiffness: 90, damping: 20, delay: index * 0.08 }}
             >
               <Card
-                className="group relative h-full rounded-[28px] border border-white/18 bg-white/12 p-6 sm:p-7 shadow-[0_32px_72px_rgba(15,23,42,0.14)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_44px_96px_rgba(15,23,42,0.2)] overflow-hidden"
-                style={{
-                  backdropFilter: 'blur(30px)',
-                  backgroundImage: 'linear-gradient(150deg, rgba(255,255,255,0.65), rgba(244,244,255,0.28))',
-                }}
+                className="group h-full rounded-[28px] border border-rose-100 bg-white p-6 sm:p-7 shadow-[0_16px_30px_rgba(236,72,153,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_45px_rgba(236,72,153,0.12)]"
               >
-                <div
-                  className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: 'radial-gradient(120% 120% at 25% 18%, rgba(244,114,182,0.18), transparent 65%)' }}
-                />
                 <div className="inline-flex items-center justify-center rounded-2xl bg-pink-400 p-3 text-white shadow-sm transition-transform duration-300 group-hover:scale-105">
                   {feature.icon}
                 </div>
@@ -318,7 +386,7 @@ function FeaturesSection() {
 
 function TechSection() {
   return (
-    <section className="w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-10 py-16 sm:py-20">
+    <section className="bg-white px-6 sm:px-8 lg:px-10 py-16 sm:py-20">
       <motion.div
         className="mb-12 sm:mb-16 text-center"
         initial={{ opacity: 0, y: 34 }}
@@ -341,37 +409,35 @@ function TechSection() {
         </motion.p>
       </motion.div>
 
-      <div className="mx-auto grid max-w-5xl grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-5">
+      <div className="mx-auto grid max-w-5xl grid-cols-2 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {techStack.map((tech, index) => (
           <motion.div
             key={tech}
-            className="group relative"
+            className="group"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.5 }}
             transition={{ type: 'spring', stiffness: 95, damping: 18, delay: index * 0.08 }}
           >
-            <div
-              className="relative rounded-[26px] border border-white/18 bg-white/12 p-4 sm:p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_32px_82px_rgba(15,23,42,0.2)] backdrop-blur-[32px] overflow-hidden"
-              style={{
-                backgroundImage: 'linear-gradient(155deg, rgba(255,255,255,0.6), rgba(244,248,255,0.32))',
-                boxShadow: '0 26px 74px rgba(15,23,42,0.16)',
-              }}
-            >
-              <div
-                className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ background: 'radial-gradient(115% 115% at 22% 18%, rgba(244,114,182,0.2), transparent 62%)' }}
-              />
-              <div className="relative text-center">
-                <div className="mb-3 sm:mb-4 flex justify-center">
-                  <img
-                    src={TECH_ICONS[tech] || 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg'}
-                    alt={tech}
-                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain"
-                  />
-                </div>
-                <div className="text-sm sm:text-base text-gray-900 font-medium">{tech}</div>
+            <div className="rounded-[24px] border border-rose-100 bg-white p-5 shadow-[0_16px_32px_rgba(236,72,153,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_48px_rgba(236,72,153,0.12)]">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50">
+                <img
+                  src={TECH_ICONS[tech] || 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg'}
+                  alt={tech}
+                  className="h-10 w-10 object-contain"
+                />
               </div>
+              <h3 className="mt-4 text-base font-semibold text-gray-900">{tech}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                {tech === 'React' && 'Component-driven UI with hooks, suspense, and fast hydration.'}
+                {tech === 'TypeScript' && 'End-to-end typing for safer data flows and API calls.'}
+                {tech === 'Tailwind CSS' && 'Utility classes that keep the design system consistent.'}
+                {tech === 'Motion' && 'Framer Motion powers the subtle springs and scroll reveals.'}
+                {tech === 'Firebase' && 'Auth + Firestore sync profiles, RSVPs, and mood data.'}
+                {tech === 'Stripe' && 'Ready for paid events with secure payment intents.'}
+                {tech === 'Google Maps API' && 'Transit routing, nearby stops, and rich map embeds.'}
+                {tech === 'Three.js' && 'Immersive 3D landing moments via react-three-fiber.'}
+              </p>
             </div>
           </motion.div>
         ))}
@@ -382,57 +448,38 @@ function TechSection() {
 
 function CTASection({ onExplore }: MarketingLandingPageProps) {
   return (
-    <section className="w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-10 py-20 sm:py-24">
+    <section className="bg-white px-6 sm:px-8 lg:px-10 py-20 sm:py-24">
       <motion.div
-        className="relative overflow-hidden rounded-[36px] border border-white/50 bg-white/85 px-6 sm:px-10 py-14 sm:py-16 shadow-[0_30px_70px_rgba(15,15,18,0.12)] backdrop-blur-2xl"
+        className="mx-auto flex w-full max-w-4xl flex-col items-center text-center"
         initial={{ opacity: 0, y: 32 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false, amount: 0.55 }}
         transition={{ type: 'spring', stiffness: 85, damping: 22 }}
       >
-        <motion.div className="pointer-events-none absolute inset-0">
-          <motion.div
-            className="absolute -top-28 -right-12 h-56 w-56 rounded-full bg-rose-200/30 blur-3xl"
-            animate={{ scale: [1, 1.1, 0.95], opacity: [0.18, 0.32, 0.18] }}
-            transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute bottom-[-18%] left-[12%] h-72 w-72 rounded-full bg-fuchsia-200/20 blur-[120px]"
-            animate={{ scale: [1, 1.08, 0.98], opacity: [0.1, 0.22, 0.1] }}
-            transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
-          />
-          <div className="absolute inset-0 rounded-[36px] border border-white/30" />
-        </motion.div>
+        <h2 className="text-3xl sm:text-4xl md:text-[2.7rem] font-semibold tracking-tight px-2 text-gray-900">
+          Ready to find your next event?
+        </h2>
+
+        <p className="mt-4 max-w-2xl text-sm sm:text-base text-gray-600 px-2">
+          Set your mood, get a shortlist, and go. Eventurer curates the experiences worth your time.
+        </p>
 
         <motion.div
-          initial={{ opacity: 0, y: 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.6 }}
-          transition={{ type: 'spring', stiffness: 90, damping: 20, delay: 0.15 }}
+          className="mt-8 sm:mt-10"
+          whileHover={{ scale: 1.015 }}
+          whileTap={{ scale: 0.99 }}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-[2.7rem] font-semibold tracking-tight px-2 max-w-3xl mx-auto text-center text-gray-900">
-            Ready to find your next event?
-          </h2>
-
-          <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-gray-600 px-2">
-            Set your mood, get a shortlist, and go. Eventurer curates the experiences worth your time.
-          </p>
-
-          <div className="mt-8 sm:mt-10 flex items-center justify-center">
-            <motion.div whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.99 }}>
-              <Button
-                onClick={() => onExplore?.()}
-                className="group flex items-center justify-center gap-2 rounded-full bg-gray-900 px-8 sm:px-10 py-3.5 text-sm sm:text-base font-medium text-white shadow-[0_14px_32px_rgba(17,17,20,0.2)] transition-colors hover:bg-black/85"
-              >
-                <Calendar className="h-5 w-5 transition-transform group-hover:-translate-y-0.5" />
-                Browse Events
-                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
-              </Button>
-            </motion.div>
-          </div>
-
-          <CTAStats />
+          <Button
+            onClick={() => onExplore?.()}
+            className="group flex items-center justify-center gap-2 rounded-full bg-gray-900 px-8 sm:px-10 py-3.5 text-sm sm:text-base font-medium text-white shadow-sm transition-colors hover:bg-black/85"
+          >
+            <Calendar className="h-5 w-5 transition-transform group-hover:-translate-y-0.5" />
+            Browse Events
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+          </Button>
         </motion.div>
+
+        <CTAStats />
       </motion.div>
     </section>
   );
