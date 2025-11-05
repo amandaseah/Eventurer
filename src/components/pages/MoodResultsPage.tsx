@@ -2,13 +2,23 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
-import { events, moods } from '../../lib/mockData';
-import { SlidersHorizontal, ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
+// import { moods } from '../../lib/mockData';
+import { categorizeEvent } from '../../lib/eventCategoriser';
+import { SlidersHorizontal, Calendar as CalendarIcon } from 'lucide-react';
+import { BackButton } from '../shared/BackButton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Calendar } from '../ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Button } from '../ui/button';
 import { formatDateObjectToDDMMYYYY } from '../../lib/dateUtils';
+
+const MOOD_DISPLAY: Record<string, { emoji: string; color: string; name: string }> = {
+  chill:       { emoji: "🌿", color: "#7BD389", name: "Chill & Relax" },
+  active:      { emoji: "⚡", color: "#FFB84D", name: "Active" },
+  social:      { emoji: "🎉", color: "#FF6B6B", name: "Social" },
+  educational: { emoji: "📚", color: "#6B9EFF", name: "Educational" },
+};
+
 
 
 
@@ -24,19 +34,33 @@ interface MoodResultsPageProps {
 
 export function MoodResultsPage({
   mood,
+  events,
   onNavigate,
   bookmarkedEventIds,
   rsvpedEventIds,
   onBookmarkChange,
   onRSVPChange,
- }: MoodResultsPageProps) {
+}: MoodResultsPageProps & { events: any[] }) {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [priceFilter, setPriceFilter] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
 
-  const moodData = moods.find(m => m.id === mood);
-  let filteredEvents = events.filter(e => e.mood === mood && !e.isPast);
+  const moodData = MOOD_DISPLAY[mood];
+  // auto-categorise events
+  const categorized = events.map((e) => {
+    if (e.mood && e.category) return e; // already transformed by eventbriteService
+    const { mood: eventMood, category } = categorizeEvent(
+      e.title || e.name?.text || "",          // title string if transformed, else raw
+      e.description || e.description?.text || "", // description string if transformed, else raw
+      e.category?.name || e.category          // category string if transformed, else raw name
+    );
+    return { ...e, mood: eventMood, category };
+  });
+
+  // Filter events matching quiz mood
+  let filteredEvents = categorized.filter(e => e.mood === mood && !e.isPast);
+
 
   // Apply category filter
   if (categoryFilter !== 'all') {
@@ -82,58 +106,49 @@ export function MoodResultsPage({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Header currentPage="mood-results" onNavigate={onNavigate} />
 
-      <div className="container mx-auto px-6 py-12">
-        {/* Back Button - Fixed */}
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          whileHover={{ x: -4 }}
-          onClick={() => onNavigate('landing')}
-          className="fixed top-24 left-6 z-50 flex items-center gap-2 text-purple-600 hover:text-purple-700 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Quiz</span>
-        </motion.button>
-
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
+        {/* Back Button - Sticky */}
+        <BackButton onClick={() => onNavigate('landing')} label="Back to Quiz" />
         {/* Mood Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12 ml-44"
+          className="text-center mb-10 sm:mb-16 mt-6 sm:mt-8"
         >
           <motion.div
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="text-7xl mb-4"
+            className="text-5xl sm:text-6xl lg:text-7xl mb-4 sm:mb-6"
           >
             {moodData?.emoji}
           </motion.div>
-          <h1 className="text-4xl mb-2">You're feeling: <span style={{ color: moodData?.color }}>{moodData?.name}</span></h1>
-          <p className="text-gray-600">Here are events that match your mood</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 text-gray-900 px-4">
+            You're feeling: <span style={{ color: moodData?.color }}>{moodData?.name}</span>
+          </h1>
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto px-4">
+            Here are events that match your mood perfectly
+          </p>
         </motion.div>
-
-        
-        
 
         {/* Filters */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-3xl p-6 shadow-md mb-8"
+          className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-lg mb-8 sm:mb-12 border border-gray-100"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <SlidersHorizontal className="w-5 h-5 text-purple-400" />
-            <h3>Filter & Sort Events</h3>
+          <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+            <SlidersHorizontal className="w-5 h-5 sm:w-6 sm:h-6 text-pink-500" />
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Filter & Sort Events</h3>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm mb-2 text-gray-700">Category</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">Category</label>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="rounded-2xl">
+                <SelectTrigger className="rounded-2xl h-12 border-gray-200 focus:border-pink-600 focus:ring-pink-600">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -145,10 +160,10 @@ export function MoodResultsPage({
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <label className="block text-sm mb-2 text-gray-700">Price</label>
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">Price</label>
               <Select value={priceFilter} onValueChange={setPriceFilter}>
-                <SelectTrigger className="rounded-2xl">
+                <SelectTrigger className="rounded-2xl h-12 border-gray-200 focus:border-pink-600 focus:ring-pink-600">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -158,13 +173,13 @@ export function MoodResultsPage({
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <label className="block text-sm mb-2 text-gray-700">Date</label>
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">Date</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full rounded-2xl justify-start text-left font-normal"
+                    className="w-full h-12 rounded-2xl justify-start text-left font-normal border-gray-200 focus:border-pink-600 focus:ring-pink-600"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateFilter ? formatDateObjectToDDMMYYYY(dateFilter) : <span>Pick a date</span>}
@@ -191,10 +206,10 @@ export function MoodResultsPage({
                 </PopoverContent>
               </Popover>
             </div>
-            <div>
-              <label className="block text-sm mb-2 text-gray-700">Sort By</label>
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">Sort By</label>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="rounded-2xl">
+                <SelectTrigger className="rounded-2xl h-12 border-gray-200 focus:border-pink-600 focus:ring-pink-600">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -211,26 +226,51 @@ export function MoodResultsPage({
         </motion.div>
 
         {/* Events Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event, idx) => (
-            <motion.div
-              key={event.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-            >
-              <EventCard event={event} onEventClick={(id) => onNavigate('event-info', { eventId: id })} />
-            </motion.div>
-          ))}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              {filteredEvents.length} Event{filteredEvents.length !== 1 ? 's' : ''} Found
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
+            {filteredEvents.map((event, idx) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="w-full"
+              >
+                <EventCard 
+                  event={event} 
+                  onEventClick={(id) => onNavigate('event-info', { eventId: id })}
+                  isBookmarkedInitially={bookmarkedEventIds.includes(event.id)}
+                  isRSVPedInitially={rsvpedEventIds.includes(event.id)}
+                  onBookmarkChange={onBookmarkChange}
+                  onRSVPChange={onRSVPChange}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
 
         {filteredEvents.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-16"
+            className="text-center py-20"
           >
-            <p className="text-xl text-gray-500">No events match your filters. Try adjusting them!</p>
+            <div className="text-6xl mb-6">🔍</div>
+            <h3 className="text-2xl font-semibold text-gray-900 mb-4">No events found</h3>
+            <p className="text-lg text-gray-500 max-w-md mx-auto">
+              No events match your current filters. Try adjusting your search criteria to find more events!
+            </p>
           </motion.div>
         )}
       </div>

@@ -1,37 +1,61 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
+import { signInWithEmail } from '../../../lib/firebase';
+import { friendlyAuthError } from '../../../lib/authErrorMessages';
+import GoogleSignInButton from './GoogleSignInButton';
 
 interface LoginFormProps {
   onNavigate: (page: string) => void;
 }
 
 export default function LoginForm({ onNavigate }: LoginFormProps) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (!email) return setError('Please enter your email');
+    if (!password) return setError('Please enter your password');
+
+    setLoading(true);
+    try {
+      await signInWithEmail({ email, password });
+      // after successful login, navigate to landing
+      onNavigate('landing');
+    } catch (err: any) {
+      setError(friendlyAuthError(err, 'Unable to sign in'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <motion.form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onNavigate('landing');
-      }}
-      className="space-y-5"
-    >
+    <motion.form onSubmit={handleSubmit} className="space-y-5">
       <motion.div
         initial={{ x: -20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
         <Label htmlFor="email" className="block text-sm mb-2 text-gray-700">
-          Email or Username
+          Email
         </Label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
             id="email"
-            type="text"
+            type="email"
             placeholder="Enter your email"
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
         </div>
       </motion.div>
@@ -48,25 +72,84 @@ export default function LoginForm({ onNavigate }: LoginFormProps) {
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
             id="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Enter your password"
-            className="pl-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="pl-11 pr-11 h-12 rounded-2xl bg-gray-50 border-gray-200 focus:border-pink-500 focus:ring-pink-500"
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? (
+              <EyeOff className="w-5 h-5" />
+            ) : (
+              <Eye className="w-5 h-5" />
+            )}
+          </button>
         </div>
       </motion.div>
+
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.18 }}
+          role="alert"
+          aria-live="assertive"
+          className="flex items-start gap-3 p-3 rounded-lg border border-pink-200 bg-pink-50"
+        >
+          <div className="flex-shrink-0 mt-0.5">
+            <AlertTriangle className="w-5 h-5 text-pink-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-pink-500">Sign in failed</p>
+            <p className="text-sm text-pink-500">{error}</p>
+          </div>
+        </motion.div>
+      )}
 
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <Button
-          type="submit"
-          className="w-full h-12 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-300 hover:shadow-xl transition-all"
-        >
-          Login
+        <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl bg-pink-400 hover:bg-pink-500 hover:shadow-lg transition-all font-semibold">
+          {loading ? 'Signing in...' : 'Login'}
         </Button>
       </motion.div>
+
+      {/* Divider */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="relative"
+      >
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="bg-white px-4 text-gray-500">or</span>
+        </div>
+      </motion.div>
+
+      {/* Google Sign-In Button */}
+      <GoogleSignInButton onNavigate={onNavigate} text="Sign in with Google" />
+
+      <div className="text-center mt-3 text-sm text-gray-500">
+        Don't have an account?{' '}
+        <button
+          type="button"
+          onClick={() => onNavigate('signup')}
+          className="text-pink-500 hover:underline font-medium"
+        >
+          Sign up here!
+        </button>
+      </div>
     </motion.form>
   );
 }

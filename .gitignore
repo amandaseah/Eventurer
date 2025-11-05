@@ -3,6 +3,7 @@ dist
 .vite
 pnpm-lock.yaml
 yarn.lock
+.env.local
 
 .DS_Store
 
@@ -10,14 +11,19 @@ yarn.lock
 !.vscode/extensions.json
 !.vscode/settings.json
 
-# Environment variables
+# env files
 .env
 .env.local
-.env.production
-backend/.env
-backend/.env.local
+.env
 
-# Logs
-*.log
-npm-debug.log*
-backend/*.log
+build/
+*.glb
+public/*.glb
+
+# Large 3D assets
+public/*.glb
+*.glb
+/build
+public/*.glb
+!public/final-optimized.glb
+.env.local

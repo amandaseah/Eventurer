@@ -1,22 +1,60 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Calendar, Bookmark } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
-import { formatDateToDDMMYYYY } from '../lib/dateUtils';
+import { X, Calendar } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { formatDateObjectToDDMMYYYY } from '../lib/dateUtils';
 
-interface Event {
+interface EventData {
   id: number;
   title: string;
-  date: string;
-  imageUrl: string;
+  date?: string;
+  imageUrl?: string;
+  start?: {
+    local?: string;
+    utc?: string;
+  };
+  startDate?: string;
 }
 
 interface CountdownWidgetProps {
-  bookmarkedEvents: Event[];
-  upcomingEvents: Event[];
+  bookmarkedEvents: EventData[];
+  rsvpedEvents: EventData[];
+  fallbackEvents: EventData[];
   onEventClick: (id: number) => void;
 }
 
-export function CountdownWidget({ bookmarkedEvents, upcomingEvents, onEventClick }: CountdownWidgetProps) {
+type EventSource = 'bookmarked' | 'rsvped' | 'general';
+
+interface CountdownEvent extends EventData {
+  source: EventSource;
+  sources: EventSource[];
+  countdownDays: number;
+  eventDate: Date;
+}
+
+const MAX_DISPLAYED_EVENTS = 5;
+const IMAGE_PLACEHOLDER =
+  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=80';
+
+const sourceLabels: Record<EventSource, string> = {
+  bookmarked: 'Bookmarked',
+  rsvped: "RSVP'd",
+  general: '',
+};
+
+const sourceChipClasses: Record<EventSource, string> = {
+  bookmarked: 'bg-pink-100 text-pink-500 border border-pink-200',
+  rsvped: 'bg-pink-200 text-pink-500 border border-pink-200',
+  general: 'bg-gray-100 text-gray-600 border border-gray-200',
+};
+
+const pluraliseDays = (days: number) => (days === 1 ? 'day' : 'days');
+
+export function CountdownWidget({
+  bookmarkedEvents,
+  rsvpedEvents,
+  fallbackEvents,
+  onEventClick,
+}: CountdownWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const widgetRef = useRef<HTMLDivElement>(null);
 
@@ -36,32 +74,89 @@ export function CountdownWidget({ bookmarkedEvents, upcomingEvents, onEventClick
     };
   }, [isExpanded]);
 
-  const getCountdown = (dateStr: string) => {
-    const eventDate = new Date(dateStr);
-    const today = new Date();
-    const diffTime = eventDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+  const parseEventDate = (event: EventData) => {
+    const rawDate = event?.date || event?.start?.local || event?.start?.utc || event?.startDate;
+    if (!rawDate) return null;
+    const parsed = new Date(rawDate);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
   };
 
-  const allEvents = [
-    ...bookmarkedEvents.map(e => ({ ...e, type: 'bookmarked' as const })),
-    ...upcomingEvents.map(e => ({ ...e, type: 'upcoming' as const }))
-  ];
+  const calculateCountdown = (eventDate: Date) => {
+    const today = new Date();
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const startOfEvent = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+    const diffMs = startOfEvent.getTime() - startOfToday.getTime();
+    if (diffMs < 0) return null;
+    return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  };
 
-  // Remove duplicates
-  const uniqueEvents = allEvents.filter((event, index, self) =>
-    index === self.findIndex((e) => e.id === event.id)
-  ).slice(0, 5);
+  const normalizeEvents = (events: EventData[], source: EventSource): CountdownEvent[] => {
+    return events.reduce<CountdownEvent[]>((acc, event) => {
+      const eventDate = parseEventDate(event);
+      if (!eventDate) return acc;
+      const countdownDays = calculateCountdown(eventDate);
+      if (countdownDays === null) return acc;
+      acc.push({
+        ...event,
+        source,
+        sources: [source],
+        eventDate,
+        countdownDays,
+      });
+      return acc;
+    }, []);
+  };
 
-  if (uniqueEvents.length === 0) return null;
+  // Show events from bookmarked or rsvped lists only
+  // For events that are in both lists, we'll track both sources
+  const visibleEvents = useMemo(() => {
+    const eventMap = new Map<number, CountdownEvent & { sources: EventSource[] }>();
+
+    // Process bookmarked events
+    normalizeEvents(bookmarkedEvents, 'bookmarked').forEach(event => {
+      if (!eventMap.has(event.id)) {
+        eventMap.set(event.id, { ...event, sources: ['bookmarked'] });
+      }
+    });
+
+    // Process RSVPed events and merge sources if already bookmarked
+    normalizeEvents(rsvpedEvents, 'rsvped').forEach(event => {
+      const existing = eventMap.get(event.id);
+      if (existing) {
+        existing.sources.push('rsvped');
+      } else {
+        eventMap.set(event.id, { ...event, sources: ['rsvped'] });
+      }
+    });
+
+    // If user has no saved events, fall back to general upcoming events
+    if (eventMap.size === 0) {
+      normalizeEvents(fallbackEvents, 'general').forEach(event => {
+        if (!eventMap.has(event.id)) {
+          eventMap.set(event.id, { ...event, sources: ['general'] });
+        }
+      });
+    }
+
+    // Convert to array and sort by date
+    const combined = Array.from(eventMap.values()).sort(
+      (a, b) => a.eventDate.getTime() - b.eventDate.getTime()
+    );
+
+    return combined.slice(0, MAX_DISPLAYED_EVENTS);
+  }, [bookmarkedEvents, rsvpedEvents, fallbackEvents]);
+
+  if (visibleEvents.length === 0) return null;
+
+  const nextEvent = visibleEvents[0];
+  const additionalEventCount = Math.max(0, visibleEvents.length - 1);
 
   return (
     <motion.div
       ref={widgetRef}
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
-      className="fixed bottom-6 right-6 z-40"
+      className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-40"
     >
       <AnimatePresence>
         {isExpanded ? (
@@ -69,12 +164,15 @@ export function CountdownWidget({ bookmarkedEvents, upcomingEvents, onEventClick
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-white rounded-3xl shadow-2xl w-80 max-h-96 overflow-hidden flex flex-col"
+            className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl w-72 sm:w-80 max-h-[28rem] overflow-hidden flex flex-col border border-white/50"
+            style={{
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.5)',
+            }}
           >
-            <div className="flex items-center justify-between p-6 pb-4 sticky top-0 bg-white z-10 border-b border-gray-100">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-purple-600" />
-                <h3 className="text-lg">Event Countdown</h3>
+            <div className="flex items-center justify-between px-5 py-4 sticky top-0 bg-white/60 backdrop-blur-md z-10 border-b border-white/30">
+              <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                <Calendar className="w-4 h-4 text-purple-600" />
+                Event countdowns
               </div>
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -86,37 +184,57 @@ export function CountdownWidget({ bookmarkedEvents, upcomingEvents, onEventClick
               </motion.button>
             </div>
             
-            <div className="overflow-y-auto p-6 pt-3">
+            <div className="overflow-y-auto px-5 py-4 pt-3">
               <div className="space-y-3">
-                {uniqueEvents.map((event) => {
-                  const countdown = getCountdown(event.date);
+                {visibleEvents.map((event) => {
                   return (
                     <motion.div
                       key={event.id}
                       whileHover={{ x: 4 }}
-                      onClick={() => onEventClick(event.id)}
-                      className="p-3 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl cursor-pointer hover:shadow-md transition-all border border-purple-100"
+                      onClick={() => {
+                        onEventClick(event.id);
+                        setIsExpanded(false);
+                      }}
+                      className="p-3 bg-white/50 backdrop-blur-sm rounded-2xl cursor-pointer hover:shadow-md hover:bg-white/70 transition-all border border-white/40"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
-                          <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
+                        <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                          <img
+                            src={event.imageUrl || IMAGE_PLACEHOLDER}
+                            alt={event.title}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium line-clamp-1">{event.title}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            {event.type === 'bookmarked' && (
-                              <Bookmark className="w-3 h-3 text-pink-500" fill="currentColor" />
+                          <p className="text-sm font-medium text-gray-800 line-clamp-2 leading-tight">{event.title}</p>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            {event.sources.includes('bookmarked') && (
+                              <span
+                                className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${sourceChipClasses['bookmarked']}`}
+                              >
+                                {sourceLabels['bookmarked']}
+                              </span>
                             )}
-                            <p className="text-xs text-gray-600">{formatDateToDDMMYYYY(event.date)}</p>
+                            {event.sources.includes('rsvped') && (
+                              <span
+                                className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${sourceChipClasses['rsvped']}`}
+                              >
+                                {sourceLabels['rsvped']}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <motion.div
-                          animate={{ scale: [1, 1.05, 1] }}
+                          animate={{ scale: [1, 1.03, 1] }}
                           transition={{ duration: 2, repeat: Infinity }}
-                          className="text-center bg-white rounded-xl p-2 min-w-[60px]"
+                          className="bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2 min-w-[72px] flex flex-col items-center justify-center flex-none"
                         >
-                          <div className="text-2xl text-purple-600">{countdown}</div>
-                          <div className="text-xs text-gray-500">days</div>
+                          <div className="text-2xl font-semibold text-pink-500 leading-none">
+                            {event.countdownDays}
+                          </div>
+                          <div className="text-xs text-gray-500 leading-none mt-1">
+                            {pluraliseDays(event.countdownDays)}
+                          </div>
                         </motion.div>
                       </div>
                     </motion.div>
@@ -133,12 +251,53 @@ export function CountdownWidget({ bookmarkedEvents, upcomingEvents, onEventClick
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsExpanded(true)}
-            className="bg-gradient-to-br from-purple-500 to-pink-400 text-white rounded-full p-4 shadow-2xl flex items-center gap-2"
+            className="relative bg-pink-400/80 backdrop-blur-md text-white rounded-2xl shadow-lg border border-white/30"
+            style={{
+              boxShadow: '0 8px 32px 0 rgba(236, 72, 153, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)',
+            }}
           >
-            <Calendar className="w-6 h-6" />
-            <div className="flex items-center gap-1">
-              <span className="text-2xl">{getCountdown(uniqueEvents[0].date)}</span>
-              <span className="text-sm">days</span>
+            {/* Mobile: Compact version */}
+            <div className="sm:hidden flex items-center gap-2 px-3 py-2">
+              <Calendar className="w-3.5 h-3.5 opacity-90" />
+              <div className="flex items-baseline gap-1 leading-none">
+                <span className="text-xl font-semibold">{nextEvent.countdownDays}</span>
+                <span className="text-xs uppercase tracking-wide">{pluraliseDays(nextEvent.countdownDays)}</span>
+              </div>
+              {additionalEventCount > 0 && (
+                <div className="bg-white text-pink-500 rounded-full px-1.5 py-[1px] text-[10px] font-medium">
+                  +{additionalEventCount}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop: Full version */}
+            <div className="hidden sm:flex flex-col items-center gap-1 px-4 py-3 min-w-[128px]">
+              <Calendar className="w-4 h-4 opacity-90" />
+              <div className="flex items-baseline gap-1 leading-none">
+                <span className="text-2xl font-semibold">{nextEvent.countdownDays}</span>
+                <span className="text-sm uppercase tracking-wide">{pluraliseDays(nextEvent.countdownDays)}</span>
+              </div>
+              <div className="flex gap-1 mt-1 flex-wrap justify-center">
+                {nextEvent.sources.includes('bookmarked') && (
+                  <span
+                    className={`text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses['bookmarked']}`}
+                  >
+                    {sourceLabels['bookmarked']}
+                  </span>
+                )}
+                {nextEvent.sources.includes('rsvped') && (
+                  <span
+                    className={`text-[10px] uppercase tracking-[0.2em] opacity-95 px-2 py-0.5 rounded-full ${sourceChipClasses['rsvped']}`}
+                  >
+                    {sourceLabels['rsvped']}
+                  </span>
+                )}
+              </div>
+              {additionalEventCount > 0 && (
+                <div className="absolute -top-2 -right-2 bg-white text-pink-500 rounded-full px-2 py-[2px] text-xs font-medium shadow-lg border border-pink-200">
+                  +{additionalEventCount}
+                </div>
+              )}
             </div>
           </motion.button>
         )}

@@ -20,7 +20,7 @@ export default function FiltersPanel({
   return (
     <div className="bg-white rounded-3xl p-6 shadow-md mb-8">
       <div className="flex items-center gap-3 mb-4">
-        <SlidersHorizontal className="w-5 h-5 text-purple-400" />
+        <SlidersHorizontal className="w-5 h-5 text-pink-500" />
         <h3 className="font-semibold">{title}</h3>
       </div>
 
