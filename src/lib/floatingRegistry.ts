@@ -19,6 +19,8 @@ const subscribers: Record<string, (offset: number) => void> = {};
 
 function layoutCorner(corner: Corner) {
   const list = registry[corner];
+  console.log(`[FloatingRegistry] Laying out corner ${corner}, ${list.length} widgets:`, list.map(e => `${e.id}(p:${e.priority})`));
+  
   // Sort by priority (higher priority = rendered on top, so lower in the stack for top/bottom corners)
   list.sort((a, b) => a.priority - b.priority);
   
@@ -34,6 +36,8 @@ function layoutCorner(corner: Corner) {
       : parseFloat(computed.bottom || '0') || 0;
 
     const newOffset = cumulative;
+    console.log(`[FloatingRegistry] ${entry.id}: offset=${newOffset}px, height=${el.offsetHeight}px`);
+    
     offsets[entry.id] = newOffset;
     if (subscribers[entry.id]) subscribers[entry.id](newOffset);
 
@@ -48,10 +52,15 @@ function relayoutAll() {
 }
 
 export function registerFloating(id: string, el: HTMLElement, corner: Corner, priority: number = 0) {
+  console.log(`[FloatingRegistry] Registering ${id} in ${corner} with priority ${priority}`);
   const list = registry[corner];
   if (list.find(e => e.id === id)) return;
   list.push({ id, el, priority });
-  layoutCorner(corner);
+  
+  // Small delay to ensure element is fully rendered before measuring
+  setTimeout(() => {
+    layoutCorner(corner);
+  }, 10);
 
   if (!resizeObserverAttached) {
     window.addEventListener('resize', relayoutAll);
@@ -89,8 +98,12 @@ export function updateFloatingCorner(id: string, newCorner: Corner) {
   if (!found) return;
 
   registry[newCorner].push(found);
-  if (fromCorner) layoutCorner(fromCorner);
-  layoutCorner(newCorner);
+  
+  // Small delay to ensure element position is updated before measuring
+  setTimeout(() => {
+    if (fromCorner) layoutCorner(fromCorner);
+    layoutCorner(newCorner);
+  }, 10);
 }
 
 export function getOffsetFor(id: string) {
@@ -105,6 +118,11 @@ export function subscribeOffset(id: string, cb: (offset: number) => void) {
 
 export function unsubscribeOffset(id: string) {
   delete subscribers[id];
+}
+
+export function triggerRelayout(corner: Corner) {
+  console.log(`[FloatingRegistry] Triggering manual relayout for ${corner}`);
+  layoutCorner(corner);
 }
 
 export function getRegistrySnapshot() {

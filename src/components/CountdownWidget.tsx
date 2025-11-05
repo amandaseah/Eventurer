@@ -3,7 +3,7 @@ import { bringToFront } from '../directives/draggable';
 import { X, Calendar } from 'lucide-react';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { formatDateObjectToDDMMYYYY } from '../lib/dateUtils';
-import { registerFloating, unregisterFloating, updateFloatingCorner, subscribeOffset, unsubscribeOffset, getOffsetFor } from '../lib/floatingRegistry';
+import { registerFloating, unregisterFloating, updateFloatingCorner, subscribeOffset, unsubscribeOffset, getOffsetFor, triggerRelayout } from '../lib/floatingRegistry';
 
 interface EventData {
   id: number;
@@ -120,8 +120,9 @@ export function CountdownWidget({
     const s: any = { ...cornerStyle };
     if (typeof s.top === 'number') s.top = (s.top as number) + offset;
     if (typeof s.bottom === 'number') s.bottom = (s.bottom as number) + offset;
+    console.log(`[CountdownWidget] Applied offset: ${offset}px, corner: ${corner}`, s);
     return s;
-  }, [cornerStyle, offset]);
+  }, [cornerStyle, offset, corner]);
 
   useEffect(() => {
     const id = idRef.current;
@@ -227,22 +228,39 @@ export function CountdownWidget({
     return combined.slice(0, MAX_DISPLAYED_EVENTS);
   }, [bookmarkedEvents, rsvpedEvents]);
 
-  if (visibleEvents.length === 0) return null;
+  // Trigger relayout when visibility changes (events appear/disappear)
+  useEffect(() => {
+    // Add a small delay to ensure the DOM has updated
+    const timer = setTimeout(() => {
+      triggerRelayout(corner);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [visibleEvents.length, corner]);
+
+  console.log(`[CountdownWidget] visibleEvents.length: ${visibleEvents.length}`, visibleEvents);
 
   const nextEvent = visibleEvents[0];
   const additionalEventCount = Math.max(0, visibleEvents.length - 1);
+  const hasEvents = visibleEvents.length > 0;
 
   return (
     <motion.div
       ref={widgetRef}
       initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
+      animate={{ opacity: hasEvents ? 1 : 0, scale: hasEvents ? 1 : 0.95 }}
       drag
       dragMomentum={false}
       dragElastic={0.2}
-      dragListener={!isExpanded}
-  onPointerDown={() => bringToFront(widgetRef.current)}
-  style={{ ...appliedCornerStyle, x, y, position: 'fixed', zIndex: 40 }}
+      dragListener={!isExpanded && hasEvents}
+      onPointerDown={() => hasEvents && bringToFront(widgetRef.current)}
+      style={{
+        ...appliedCornerStyle,
+        x,
+        y,
+        position: 'fixed',
+        zIndex: 40,
+        pointerEvents: hasEvents ? 'auto' : 'none'
+      }}
       onDragEnd={(_, info) => {
         const newCorner = determineCorner(info.point.x, info.point.y);
         setCorner(newCorner);
@@ -251,7 +269,7 @@ export function CountdownWidget({
       }}
     >
       <AnimatePresence>
-        {isExpanded ? (
+        {hasEvents && isExpanded ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -335,7 +353,7 @@ export function CountdownWidget({
               </div>
             </div>
           </motion.div>
-        ) : (
+        ) : hasEvents ? (
           <motion.button
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -392,7 +410,7 @@ export function CountdownWidget({
               )}
             </div>
           </motion.button>
-        )}
+        ) : null}
       </AnimatePresence>
     </motion.div>
   );
