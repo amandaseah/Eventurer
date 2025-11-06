@@ -6,7 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import EventsGrid from "../features/profile/EventsGrid";
 import Footer from "../shared/Footer";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
@@ -39,6 +39,7 @@ export function ProfilePage({
   onUsernameChange,
 }: ProfilePageProps & { events: any[] }) {
   const [activeTab, setActiveTab] = useState('bookmarked');
+  const tabsRef = useRef<HTMLDivElement>(null);
 
   // Local user display state (prefers ints from auth/db but editable locally)
   const [userName, setUserName] = useState<string>(currentUser?.displayName || `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() || 'Alex Chen');
@@ -121,6 +122,14 @@ export function ProfilePage({
     if (username) setLocalUsername(username);
   }, [username]);
 
+  const handleTabChange = (tab: 'bookmarked' | 'upcoming') => {
+    setActiveTab(tab);
+    // Scroll to tabs section smoothly
+    setTimeout(() => {
+      tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-white via-[#faf7ff] to-white">
       <style>{`
@@ -168,11 +177,12 @@ export function ProfilePage({
           <ProfileStats
             bookmarkedCount={bookmarkedEvents.length}
             upcomingCount={rsvpedEvents.length}
+            onTabChange={handleTabChange}
           />
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs ref={tabsRef} value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-2 w-full mb-6 sm:mb-10 bg-white border border-gray-100 rounded-3xl !p-1.5 sm:!p-2 shadow-sm !h-auto gap-1 sm:!gap-1.5">
               <TabsTrigger
                 value="bookmarked"

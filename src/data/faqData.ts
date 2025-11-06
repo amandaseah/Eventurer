@@ -251,6 +251,12 @@ export const faqData: FAQItem[] = [
     question: "What does the FAQ chatbot do?",
     answer: "The FAQ chatbot is your instant help assistant! Click the pink chat button at the bottom right of your screen and type any question. It searches our FAQ database using smart keyword matching to find relevant answers quickly. Instead of scrolling through all FAQs, just ask your question naturally and get instant answers.",
     keywords: ["chatbot", "faq", "assistant", "help", "bot", "chat", "questions", "answers", "support"]
+  },
+  {
+    id: 43,
+    question: "What happens when I un-RSVP from a paid event?",
+    answer: "If you un-RSVP from an event you've already paid for, refund details will be automatically sent to your email within 3 business days. The refund will be processed using your original payment method. Please check your email (including spam/junk folders) for the refund confirmation and timeline. If you don't receive the email within 3 days, contact our support team at eventurer.support@gmail.com.",
+    keywords: ["refund", "un-rsvp", "cancel", "paid", "payment", "money back", "unrsvp", "remove", "paid event", "ticket", "return"]
   }
 ];
 
