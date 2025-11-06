@@ -38,14 +38,12 @@ export function EventInfoPage({
   onRSVPChange,
   username,
 }: EventInfoPageProps) {
-  // resolve username with fallback chain: props > sessionStorage > localStorage > "Guest"
   const resolvedUsername =
     username ||
     (typeof sessionStorage !== "undefined" && sessionStorage.getItem("username")) ||
     (typeof localStorage !== "undefined" && localStorage.getItem("username")) ||
     "Guest";
 
-  // local state for event data and loading/error states
   const [event, setEvent] = useState<AppEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +59,6 @@ export function EventInfoPage({
   // hook to fetch forum posts and provide upvote functionality
   const { posts, upvotePost } = useEventForum(Number(eventId));
 
-  // fetch event details on mount or when eventId changes
   useEffect(() => {
     async function loadEvent() {
       try {
@@ -102,7 +99,6 @@ export function EventInfoPage({
     );
   }
 
-  // error state: display error message if event fetch failed or event not found
   if (error || !event) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-600">
@@ -132,7 +128,6 @@ export function EventInfoPage({
     }
   };
 
-  // main event info page render
   return (
     <div className="min-h-screen">
       <Header onNavigate={onNavigate} />
@@ -140,7 +135,6 @@ export function EventInfoPage({
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl">
         <BackButton onClick={onGoBack} />
 
-        {/* hero section with event image and title overlay */}
         <motion.div
           className="relative overflow-hidden rounded-3xl mb-8 h-64 sm:h-96"
           initial={{ opacity: 0, y: 20 }}

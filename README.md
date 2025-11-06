@@ -216,3 +216,36 @@ Eventurer
 - Stripe test cards (eg `4242 4242 4242 4242 12/34 123`) can be used in deployment
 - Live keys must be used in production
 - Always redeploy to Vercel after updating environment variables
+
+## AI/LLM Dependencies 🤖
+
+This project relies on AI/LLM services for specific features. The following components require AI/LLM functionality:
+
+### **Primary AI Dependencies:**
+1. **FAQ Chatbot** (`src/components/features/FAQChatbot.tsx`)
+   - Uses Google Gemini AI API for conversational responses
+   - Provides intelligent answers to user questions about the platform
+   - Environment variable: `VITE_GEMINI_API_KEY`
+
+2. **FAQ Response Generation** (`src/lib/gemini.ts`)
+   - Core AI service integration with Google Gemini
+   - Processes user queries and generates contextual responses
+   - Includes FAQ data matching and response formatting
+
+3. **FAQ Data Processing** (`src/data/faqData.ts`)
+   - Contains AI-powered question matching logic
+   - Provides similarity scoring for relevant FAQ retrieval
+
+
+### **Fallback Behavior:**
+If AI services are unavailable:
+- FAQ chatbot displays error message and directs users to email support
+- Event categorization falls back to basic keyword matching
+- Core app functionality (event browsing, booking, payments) remains fully operational
+
+### **Required API Keys:**
+```env
+VITE_GEMINI_API_KEY=your_gemini_api_key
+```
+
+**Note:** The AI features enhance user experience but are not critical to core functionality. The app can operate without AI services, though with reduced interactive capabilities in the FAQ section.

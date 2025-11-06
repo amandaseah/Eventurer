@@ -710,7 +710,6 @@ export default function HowToGetThere({ event }: { event: any }) {
     setGeoPending(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        console.log('[HowToGetThere] Location success:', pos.coords);
         setYouPos({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setGeoPending(false);
       },
@@ -755,15 +754,11 @@ export default function HowToGetThere({ event }: { event: any }) {
     // Check permission status without triggering a prompt
     navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus) => {
       if (permissionStatus.state === 'granted') {
-        // User has already granted permission, auto-fetch location
-        console.log('[HowToGetThere] Auto-requesting location (permission already granted)');
         locateMe();
       } else if (permissionStatus.state === 'prompt') {
-        // Permission not yet determined - don't auto-request, wait for user to click button
-        console.log('[HowToGetThere] Geolocation permission not yet granted - waiting for user action');
+        // Wait for user to click button
       } else {
         // Permission denied
-        console.log('[HowToGetThere] Geolocation permission denied');
       }
     }).catch((err) => {
       // Fallback for browsers that don't support permissions API

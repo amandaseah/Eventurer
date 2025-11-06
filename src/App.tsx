@@ -109,14 +109,9 @@ function ShellApp() {
   };
 
   useEffect(() => {
-    // Preload Google Maps so the first visit to event details feels instant.
-    loadGoogleMapsScript().catch(() => {
-      // Failed to preload Google Maps
-    });
+    loadGoogleMapsScript().catch(() => {});
   }, []);
 
-
-  // eventbrite events fetch!
   const [fetchedEvents, setFetchedEvents] = useState<AppEvent[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
 

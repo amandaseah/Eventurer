@@ -19,14 +19,11 @@ interface EventForumPageProps {
 }
 
 export function EventForumPage({ eventId, events, onGoBack, onNavigate, username }: EventForumPageProps) {
-  // Local state to store the specific event details
   const [event, setEvent] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Custom hook that manages real-time forum data via websocket connection
   const { posts, isConnected, isLoading, addPost, upvotePost, addReply } = useEventForum(eventId);
 
-  // Fetch event details if not in events array
   useEffect(() => {
     let isMounted = true;
 
@@ -41,13 +38,10 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
 
           // If not found in provided events, fetch from Eventbrite
           if (!eventData) {
-            console.log('[EventForumPage] Event not in props, fetching from Eventbrite...');
             const allEvents = await fetchEventbriteEventsForMe();
             eventData = allEvents.find((e: any) => String(e.id) === String(eventId));
           }
         } else {
-          // No events provided, fetch from Eventbrite directly
-          console.log('[EventForumPage] No events in props, fetching from Eventbrite...');
           const allEvents = await fetchEventbriteEventsForMe();
           eventData = allEvents.find((e: any) => String(e.id) === String(eventId));
         }
@@ -150,10 +144,8 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
       <Header onNavigate={onNavigate} />
 
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
-        {/* Back Button - Sticky */}
         <BackButton onClick={onGoBack} label="Back to Event" />
 
-        {/* Event header section with title, stats, and connection status */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8">
           <div className="flex items-start justify-between">
             <div>
