@@ -11,11 +11,12 @@ import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { Bookmark, CheckCircle } from 'lucide-react';
 import { BackButton } from '../shared/BackButton';
+import type { Event } from '../../types/event';
 
 interface ProfilePageProps {
   onNavigate: (page: string, data?: any) => void;
   onGoBack: () => void;
-  events: any[];
+  events: Event[];
   bookmarkedEventIds: number[];
   rsvpedEventIds: number[];
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
@@ -36,7 +37,7 @@ export function ProfilePage({
   currentUser,
   username,
   onUsernameChange,
-}: ProfilePageProps & { events: any[] }) {
+}: ProfilePageProps) {
   const [activeSection, setActiveSection] = useState<'bookmarked' | 'upcoming' | null>('bookmarked');
 
   // Local user display state (prefers ints from auth/db but editable locally)

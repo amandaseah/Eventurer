@@ -8,10 +8,8 @@ const API_TOKEN = import.meta.env.VITE_EVENTBRITE_API_TOKEN;
 export async function sanityCheckMe() {
   try {
     const { data } = await eventbriteApi.get('/users/me/');
-    console.log('[EB] /users/me OK:', data);
     return data;
   } catch (e: any) {
-    console.error('[EB] /users/me FAILED:', e.response?.status, e.response?.data || e.message);
     throw e;
   }
 }
@@ -63,15 +61,8 @@ export async function fetchEventbriteEvents(
 ): Promise<TransformedEvent[]> {
   try {
     const token = localStorage.getItem("eventbrite_token") || import.meta.env.VITE_EVENTBRITE_API_TOKEN;
-    console.log('[EB] Token check:', { 
-      hasLocalStorage: !!localStorage.getItem("eventbrite_token"),
-      hasEnvToken: !!import.meta.env.VITE_EVENTBRITE_API_TOKEN,
-      tokenLength: token?.length || 0,
-      tokenPreview: token ? token.substring(0, 10) + '...' : 'none'
-    });
-    
+
     if (!token || token === 'your_eventbrite_api_token_here') {
-      console.warn('VITE_EVENTBRITE_API_TOKEN is missing or not configured. Please add your actual Eventbrite API token to .env.local');
       return [];
     }
     
@@ -85,57 +76,26 @@ export async function fetchEventbriteEvents(
     };
 
     const { data } = await eventbriteApi.get('/events/search/', { params });
-    console.log('[EB] /events/search response:', data);
 
     const events = data.events || [];
-    return events.map((event: EventbriteEvent) => 
+    return events.map((event: EventbriteEvent) =>
       transformEventbriteEvent(event)
     );
   } catch (error: any) {
-    console.error('Error fetching Eventbrite events:', error.response?.data || error.message);
     return [];
   }
 }
-
-// export async function fetchEventbriteEvents(
-//   location = 'Singapore',
-//   radius = '25km'
-// ): Promise<TransformedEvent[]> {
-//   try {
-//     const params = {
-//       'location.address': location,
-//       'location.within': radius,
-//       expand: 'venue,ticket_availability,category',
-//       status: 'live',
-//       order_by: 'start_asc',
-//     };
-
-//     // make GET request with axios client
-//     const { data } = await eventbriteApi.get('/events/search/', { params });
-//     console.log('[service] raw /events/search response:', data);
-
-//     const events = data.events || [];
-//     return events.map((event: EventbriteEvent) =>
-//       transformEventbriteEvent(event)
-//     );
-//   } catch (error: any) {
-//     console.error('Error fetching Eventbrite events:', error.response?.data || error.message);
-//     return [];
-//   }
-// }
 
 export async function fetchEventbriteEventsForMe(): Promise<TransformedEvent[]> {
   try {
     // identification (the authenticated user)
     const { data: me } = await eventbriteApi.get("/users/me/");
-    console.log("[EB] /users/me OK:", me);
 
     // get organisation ID(s)
     const { data: orgData } = await eventbriteApi.get(`/users/${me.id}/organizations/`);
     const orgs = orgData.organizations || [];
 
     if (orgs.length === 0) {
-      console.warn("[EB] No organizations found for this user.");
       return [];
     }
 
@@ -155,10 +115,8 @@ export async function fetchEventbriteEventsForMe(): Promise<TransformedEvent[]> 
       allEvents.push(...events.map(transformEventbriteEvent));
     }
 
-    console.log(`[EB] Total events fetched: ${allEvents.length}`);
     return allEvents;
   } catch (err: any) {
-    console.error("[EB] fetchEventbriteEventsForMe failed:", err.response?.data || err.message);
     return [];
   }
 }
@@ -211,4 +169,3 @@ function transformEventbriteEvent(event: EventbriteEvent): TransformedEvent {
     eventbriteUrl: event.url,
   };
 }
-console.log('[EB] using token?', Boolean(import.meta.env.VITE_EVENTBRITE_API_TOKEN || localStorage.getItem('eventbrite_token')));

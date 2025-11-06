@@ -15,7 +15,7 @@ import { toast } from "sonner";
 
 interface EventInfoPageProps {
   eventId: string | number;
-  events?: any[];
+  events?: Event[];
   onNavigate: (page: string, data?: any) => void;
   onGoBack: () => void;
   bookmarkedEventIds: number[];
@@ -42,7 +42,7 @@ export function EventInfoPage({
     (typeof localStorage !== "undefined" && localStorage.getItem("username")) ||
     "Guest";
 
-  const [event, setEvent] = useState<any | null>(null);
+  const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

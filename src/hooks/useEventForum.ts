@@ -64,7 +64,6 @@ export function useEventForum(eventId: number) {
       await addForumPost(eventId, text, displayName, image);
       // Posts will be updated automatically via the real-time listener
     } catch (error) {
-      console.error("Failed to add post:", error);
       setIsConnected(false);
     }
   };
@@ -72,11 +71,9 @@ export function useEventForum(eventId: number) {
   // Add a reply to a post
   const addReply = async (postId: string, text: string, image?: string, parentReplyId?: string) => {
     try {
-      console.log('Adding reply:', { postId, text, image, parentReplyId, username });
       await addReplyToPost(postId, text, username, image, parentReplyId);
       // Posts will be updated automatically via the real-time listener
     } catch (error) {
-      console.error("Failed to add reply:", error);
       setIsConnected(false);
     }
   };
@@ -88,7 +85,6 @@ export function useEventForum(eventId: number) {
       await upvoteForumPost(postId, displayName, replyId);
       // Posts will be updated automatically via the real-time listener
     } catch (error) {
-      console.error("Failed to upvote:", error);
       setIsConnected(false);
     }
   };

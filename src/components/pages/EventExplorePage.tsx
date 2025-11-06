@@ -1,7 +1,7 @@
 import RecommendationPanel from "../features/recommendation/RecommendationPanel";
 import FiltersPanel from "../features/explore/FiltersPanel";
 import Footer from "../shared/Footer";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
@@ -10,13 +10,11 @@ import { Grid3x3, Calendar as CalendarIcon, Star } from 'lucide-react';
 import { BackButton } from '../shared/BackButton';
 import { auth, db } from '../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-
-
-
+import type { Event } from '../../types/event';
 
 interface EventExplorePageProps {
   onNavigate: (page: string, data?: any) => void;
-  events: any[];
+  events: Event[];
   bookmarkedEventIds: number[];
   rsvpedEventIds: number[];
   onBookmarkChange: (eventId: number, isBookmarked: boolean) => void;
@@ -84,52 +82,51 @@ export function EventExplorePage({
     loadViewPreference();
   }, []);
 
-  // FIXME: Performance issue - filtering on every render. Move to useMemo
-  let allEvents = [...events.filter(e => !e.isPast)];
+  const allEvents = useMemo(() => {
+    let filtered = events.filter(e => !e.isPast);
 
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(e => e.category === categoryFilter);
+    }
 
-  if (categoryFilter !== 'all') {
-    allEvents = allEvents.filter(e => e.category === categoryFilter);
-  }
+    if (priceFilter === 'free') {
+      filtered = filtered.filter(e => e.price === 'Free');
+    } else if (priceFilter === 'paid') {
+      filtered = filtered.filter(e => e.price !== 'Free');
+    }
 
-  if (priceFilter === 'free') {
-    allEvents = allEvents.filter(e => e.price === 'Free');
-  } else if (priceFilter === 'paid') {
-    allEvents = allEvents.filter(e => e.price !== 'Free');
-  }
+    if (dateFilter) {
+      filtered = filtered.filter(e => {
+        const eventDate = new Date(e.date);
+        return eventDate.toDateString() === dateFilter.toDateString();
+      });
+    }
 
-  if (dateFilter) {
-    allEvents = allEvents.filter(e => {
-      const eventDate = new Date(e.date);
-      return eventDate.toDateString() === dateFilter.toDateString();
-    });
-  }
+    // Sort events
+    if (sortBy === 'popular') {
+      filtered.sort((a, b) => b.saves - a.saves);
+    } else if (sortBy === 'date') {
+      filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    } else if (sortBy === 'newest') {
+      filtered.sort((a, b) => b.id - a.id);
+    } else if (sortBy === 'nearby') {
+      filtered.sort(() => Math.random() - 0.5);
+    } else if (sortBy === 'price-low') {
+      filtered.sort((a, b) => {
+        const priceA = a.price === 'Free' ? 0 : parseInt(a.price.replace('$', ''));
+        const priceB = b.price === 'Free' ? 0 : parseInt(b.price.replace('$', ''));
+        return priceA - priceB;
+      });
+    } else if (sortBy === 'price-high') {
+      filtered.sort((a, b) => {
+        const priceA = a.price === 'Free' ? 0 : parseInt(a.price.replace('$', ''));
+        const priceB = b.price === 'Free' ? 0 : parseInt(b.price.replace('$', ''));
+        return priceB - priceA;
+      });
+    }
 
-  // Sort events
-  if (sortBy === 'popular') {
-    allEvents = allEvents.sort((a, b) => b.saves - a.saves);
-  } else if (sortBy === 'date') {
-    allEvents = allEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  } else if (sortBy === 'newest') {
-    // In a real app, events would have a created_at timestamp
-    allEvents = allEvents.sort((a, b) => b.id - a.id);
-  } else if (sortBy === 'nearby') {
-    // In a real app, this would use geolocation
-    // For now, just shuffle to simulate
-    allEvents = allEvents.sort(() => Math.random() - 0.5);
-  } else if (sortBy === 'price-low') {
-    allEvents = allEvents.sort((a, b) => {
-      const priceA = a.price === 'Free' ? 0 : parseInt(a.price.replace('$', ''));
-      const priceB = b.price === 'Free' ? 0 : parseInt(b.price.replace('$', ''));
-      return priceA - priceB;
-    });
-  } else if (sortBy === 'price-high') {
-    allEvents = allEvents.sort((a, b) => {
-      const priceA = a.price === 'Free' ? 0 : parseInt(a.price.replace('$', ''));
-      const priceB = b.price === 'Free' ? 0 : parseInt(b.price.replace('$', ''));
-      return priceB - priceA;
-    });
-  }
+    return filtered;
+  }, [events, categoryFilter, priceFilter, dateFilter, sortBy]);
 
   const skeletonItems = Array.from({ length: 6 }, (_, i) => i);
 

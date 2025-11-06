@@ -6,9 +6,10 @@ import { formatDateToDDMMYYYY } from '../../../lib/dateUtils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../ui/alert-dialog';
 import { toast } from 'sonner';
 import StripePaymentFormWrapper from "../payments/PaymentForm";
+import type { Event } from '../../../types/event';
 
 interface EventCardProps {
-  event: any;
+  event: Event;
   onEventClick: (id: number) => void;
   isBookmarkedInitially?: boolean;
   isRSVPedInitially?: boolean;
