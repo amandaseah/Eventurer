@@ -514,11 +514,14 @@ function EventForumRoute({
 
 // ---- Router wrapper ----
 export default function App() {
+  // Check if we're in an iframe and should go directly to app
+  const isInIframe = window !== window.parent || new URLSearchParams(window.location.search).has('iframe');
+  
   return (
     <BrowserRouter>
       <Routes>
         {/* Marketing landing as entry point */}
-        <Route path="/" element={<MarketingScreen />} />
+        <Route path="/" element={isInIframe ? <Navigate to="/app" replace /> : <MarketingScreen />} />
         {/* Choice page for users to select experience */}
         <Route path="/choice" element={<ChoiceScreen />} />
         {/* 3D landing experience */}

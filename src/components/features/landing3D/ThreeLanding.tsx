@@ -250,7 +250,7 @@ function DeskWithMonitor({
             </div>
             <iframe
               title='Eventurer'
-              src='/app'
+              src='./index.html?iframe=true'
               loading='eager'
               onLoad={() => setIframeLoaded(true)}
               style={{
@@ -810,7 +810,7 @@ export default function ThreeLanding() {
             background: '#000',
           }}
         >
-          <iframe title='Eventurer Monitor' src='/app' style={{ width: '100%', height: '100%', border: 'none' }} />
+          <iframe title='Eventurer Monitor' src='./index.html?iframe=true' style={{ width: '100%', height: '100%', border: 'none' }} />
         </div>
       </div>
       
