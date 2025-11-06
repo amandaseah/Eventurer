@@ -4,11 +4,17 @@ import { Bookmark, CheckCircle } from 'lucide-react';
 interface ProfileStatsProps {
   bookmarkedCount: number;
   upcomingCount: number;
+  onBookmarkedClick?: () => void;
+  onUpcomingClick?: () => void;
+  activeSection?: 'bookmarked' | 'upcoming' | null;
 }
 
 export default function ProfileStats({
   bookmarkedCount,
   upcomingCount,
+  onBookmarkedClick,
+  onUpcomingClick,
+  activeSection,
 }: ProfileStatsProps) {
   const stats = [
     {
@@ -16,20 +22,24 @@ export default function ProfileStats({
       value: bookmarkedCount,
       icon: Bookmark,
       color: 'pink',
-      bgColor: 'bg-pink-50',
-      borderColor: 'border-pink-200',
+      bgColor: activeSection === 'bookmarked' ? 'bg-pink-100' : 'bg-pink-50',
+      borderColor: activeSection === 'bookmarked' ? 'border-pink-300' : 'border-pink-200',
       iconColor: 'text-pink-500',
       textColor: 'text-pink-600',
+      onClick: onBookmarkedClick,
+      isActive: activeSection === 'bookmarked',
     },
     {
       label: 'Upcoming',
       value: upcomingCount,
       icon: CheckCircle,
       color: 'green',
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200',
+      bgColor: activeSection === 'upcoming' ? 'bg-green-100' : 'bg-green-50',
+      borderColor: activeSection === 'upcoming' ? 'border-green-300' : 'border-green-200',
       iconColor: 'text-green-500',
       textColor: 'text-green-600',
+      onClick: onUpcomingClick,
+      isActive: activeSection === 'upcoming',
     },
   ];
 
@@ -40,7 +50,16 @@ export default function ProfileStats({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
-          className={`${stat.bgColor} border ${stat.borderColor} rounded-2xl p-5 sm:p-6 text-center`}
+          className={`${stat.bgColor} border ${stat.borderColor} rounded-2xl p-5 sm:p-6 text-center cursor-pointer hover:shadow-md transition-all duration-200 ${
+            stat.isActive ? 'ring-2 ring-offset-2' : ''
+          } ${
+            stat.isActive && stat.color === 'pink' ? 'ring-pink-400' : ''
+          } ${
+            stat.isActive && stat.color === 'green' ? 'ring-green-400' : ''
+          }`}
+          onClick={stat.onClick}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
           <div className="flex flex-col items-center gap-2">
             <stat.icon className={`w-8 h-8 ${stat.iconColor}`} />
