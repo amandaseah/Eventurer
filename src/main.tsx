@@ -21,6 +21,6 @@ L.Icon.Default.mergeOptions({
 
 // React entry
 import { createRoot } from 'react-dom/client';
-import App from './App';   // ← no .tsx at the end
+import App from './App';  
 
 createRoot(document.getElementById('root')!).render(<App />);

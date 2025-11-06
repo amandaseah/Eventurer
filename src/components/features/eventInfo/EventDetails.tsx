@@ -15,6 +15,7 @@ export default function EventDetails({
     ? new Date(event.date)
     : null;
 
+    // formate date and time
   const formattedDate = startDate
     ? `${formatDateToDDMMYYYY(startDate.toISOString())} at ${startDate.toLocaleTimeString([], {
         hour: "2-digit",
@@ -22,6 +23,7 @@ export default function EventDetails({
       })}`
     : "Date not available";
 
+    // format place/address
   const location =
     event.venue?.name ||
     event.venue?.address?.localized_address_display ||

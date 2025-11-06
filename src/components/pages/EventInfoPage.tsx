@@ -14,7 +14,7 @@ import Footer from "../shared/Footer";
 import { toast } from "sonner";
 import type { Event as AppEvent } from "../../types/event";
 
-// Props interface defining all required data and callbacks for the event info page
+// props interface defining all required data and callbacks for the event info page
 interface EventInfoPageProps {
   eventId: string | number;
   events?: AppEvent[];
@@ -38,30 +38,30 @@ export function EventInfoPage({
   onRSVPChange,
   username,
 }: EventInfoPageProps) {
-  // Resolve username with fallback chain: props → sessionStorage → localStorage → "Guest"
+  // resolve username with fallback chain: props > sessionStorage > localStorage > "Guest"
   const resolvedUsername =
     username ||
     (typeof sessionStorage !== "undefined" && sessionStorage.getItem("username")) ||
     (typeof localStorage !== "undefined" && localStorage.getItem("username")) ||
     "Guest";
 
-  // Local state for event data and loading/error states
+  // local state for event data and loading/error states
   const [event, setEvent] = useState<AppEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Local state for bookmark and RSVP status, initialized from parent's arrays
+  // local state for bookmark and RSVP status, initialized from parent's arrays
   const [isBookmarked, setIsBookmarked] = useState(bookmarkedEventIds.includes(Number(eventId)));
   const [isRSVPed, setIsRSVPed] = useState(rsvpedEventIds.includes(Number(eventId)));
   const [saves, setSaves] = useState(0);
 
-  // This controls the Confirm RSVP dialog inside EventActions
+  // this controls the Confirm RSVP dialog inside EventActions
   const [openDialog, setOpenDialog] = useState(false);
 
-  // Hook to fetch forum posts and provide upvote functionality
+  // hook to fetch forum posts and provide upvote functionality
   const { posts, upvotePost } = useEventForum(Number(eventId));
 
-  // Fetch event details on mount or when eventId changes
+  // fetch event details on mount or when eventId changes
   useEffect(() => {
     async function loadEvent() {
       try {
@@ -70,13 +70,13 @@ export function EventInfoPage({
 
         let eventData = events?.find((e) => String(e.id) === String(eventId));
 
-        // If not found in props, fetch from Eventbrite API
+        // if not found in props, fetch from Eventbrite API
         if (!eventData) {
           const allEvents = await fetchEventbriteEventsForMe();
           eventData = allEvents.find((e: any) => String(e.id) === String(eventId));
         }
 
-        // Handle event not found scenario
+        // handle event not found scenario
         if (!eventData) {
           setError("Event not found");
         } else {
@@ -102,7 +102,7 @@ export function EventInfoPage({
     );
   }
 
-  // Error state: Display error message if event fetch failed or event not found
+  // error state: display error message if event fetch failed or event not found
   if (error || !event) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-600">
@@ -111,7 +111,7 @@ export function EventInfoPage({
     );
   }
 
-  // Toggle bookmark status and update saves count accordingly
+  // toggle bookmark status and update saves count accordingly
   const handleBookmark = () => {
     const newBookmarked = !isBookmarked;
     setIsBookmarked(newBookmarked);
@@ -119,7 +119,7 @@ export function EventInfoPage({
     onBookmarkChange(Number(eventId), newBookmarked);
   };
 
-  // This is now simple — payment logic is handled INSIDE EventActions
+  // payment logic is handled INSIDE EventActions
   const confirmRSVP = () => {
     if (isRSVPed) {
       setIsRSVPed(false);
@@ -132,7 +132,7 @@ export function EventInfoPage({
     }
   };
 
-  // Main event info page render
+  // main event info page render
   return (
     <div className="min-h-screen">
       <Header onNavigate={onNavigate} />
@@ -140,7 +140,7 @@ export function EventInfoPage({
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl">
         <BackButton onClick={onGoBack} />
 
-        {/* Hero section with event image and title overlay */}
+        {/* hero section with event image and title overlay */}
         <motion.div
           className="relative overflow-hidden rounded-3xl mb-8 h-64 sm:h-96"
           initial={{ opacity: 0, y: 20 }}

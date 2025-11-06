@@ -72,11 +72,11 @@ const confirmRSVP = () => {
   }
 
   if (isPaidEvent) {
-    // 🟢 Open Stripe payment modal
+    // Open stripe payment modal
     setPaymentAmount(Math.round(numericPrice * 100));
     setShowPaymentModal(true);
   } else {
-    // 🟢 Free event — directly confirm
+    // Free event so can directly confirm
     setIsRSVPed(true);
     onRSVPChange?.(event.id, true);
     toast.success('RSVP confirmed! See you at the event!');

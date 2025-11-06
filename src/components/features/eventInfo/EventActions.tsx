@@ -1,4 +1,3 @@
-// src/features/eventInfo/EventActions.tsx
 import { motion } from "motion/react";
 import {
   AlertDialog,
@@ -10,9 +9,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../../ui/alert-dialog"; // changed from "@/components/ui/alert-dialog"
+} from "../../ui/alert-dialog"; 
 import { Bookmark } from "lucide-react";
-import { formatDateToDDMMYYYY } from "../../../lib/dateUtils"; // changed from "@/lib/dateUtils"
+import { formatDateToDDMMYYYY } from "../../../lib/dateUtils";
 import { useState } from "react";
 import StripePaymentFormWrapper from "../payments/PaymentForm";
 
@@ -26,7 +25,7 @@ export default function EventActions({
   isRSVPed,
   isBookmarked,
   price,
-  event,                // ✅ accept event prop
+  event,                // accept event prop
   onConfirmRSVP,
   onToggleBookmark,
   openDialog,
@@ -35,7 +34,7 @@ export default function EventActions({
   isRSVPed: boolean;
   isBookmarked: boolean;
   price: string;
-  event: EventShape;     // ✅ typed (only the fields we need)
+  event: EventShape;     // typed (only the fields we need)
   onConfirmRSVP: () => void;
   onToggleBookmark: () => void;
   openDialog?: boolean;
@@ -51,7 +50,7 @@ const amountInCents = isNaN(numericPrice) ? 0 : Math.round(numericPrice * 100);
   return (
   <>
     <div className="bg-white rounded-3xl p-6 shadow-md">
-      {/* Price and deadline block */}
+      {/* price and deadline block */}
       <div className="text-center mb-6">
         <div className="text-3xl font-bold text-gray-900">
           {price}
@@ -83,6 +82,7 @@ const amountInCents = isNaN(numericPrice) ? 0 : Math.round(numericPrice * 100);
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
+              {/* make sure to toggle between cancel events and confirm events button */}
               {isRSVPed ? "Cancel RSVP" : "Confirm RSVP"}
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -141,7 +141,7 @@ const amountInCents = isNaN(numericPrice) ? 0 : Math.round(numericPrice * 100);
       </motion.button>
     </div>
 
-    {/* Payment modal lives OUTSIDE the main card */}
+    {/* payment modal lives OUTSIDE the main card */}
     {showPaymentModal && (
       <AlertDialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
         <AlertDialogContent>
