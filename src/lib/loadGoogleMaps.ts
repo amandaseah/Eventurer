@@ -59,21 +59,16 @@ export const loadGoogleMapsScript = (): Promise<void> => {
             if (!window.google || !window.google.maps) {
               throw new Error('Google Maps loaded but window.google.maps missing. Check API key, referrers, billing.');
             }
-        
-            console.log('[GMAPS] script onload, google=', !!window.google, 'maps=', !!window.google?.maps);
-        
+
             if (window.google && window.google.maps) {
               try {
                 // New accounts (modern loader)
                 if (typeof window.google.maps.importLibrary === 'function') {
                   await window.google.maps.importLibrary('maps');
                   await window.google.maps.importLibrary('places');
-                  console.log('[GMAPS] Loaded via importLibrary');
-                } else {
-                  console.log('[GMAPS] Using legacy loader (no importLibrary)');
                 }
               } catch (e) {
-                console.warn('[GMAPS] importLibrary failed, continuing with legacy mode:', e);
+                // importLibrary failed, continuing with legacy mode
               }
             }
         

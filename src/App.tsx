@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import type { Event } from './types/event';
 import { LoginPage } from './components/pages/LoginPage';
 import { SignupPage } from './components/pages/SignupPage';
 import { LandingPage } from './components/pages/LandingPage';
@@ -78,7 +79,7 @@ function ShellApp() {
             setUsername(user.displayName || "User");
           }
         } catch (err) {
-          console.warn('Failed to load user event data', err);
+          // Failed to load user event data
         }
       } else {
         // User signed out, clear data
@@ -102,20 +103,20 @@ function ShellApp() {
         rsvpedEventIds: rsvps,
       }, { merge: true });
     } catch (err) {
-      console.error('Failed to save user event data', err);
+      // Failed to save user event data
     }
   };
 
   useEffect(() => {
     // Preload Google Maps so the first visit to event details feels instant.
-    loadGoogleMapsScript().catch((error) => {
-      console.warn('[ShellApp] Failed to preload Google Maps script:', error);
+    loadGoogleMapsScript().catch(() => {
+      // Failed to preload Google Maps
     });
   }, []);
   
 
   // eventbrite events fetch!
-  const [fetchedEvents, setFetchedEvents] = useState<any[]>([]);
+  const [fetchedEvents, setFetchedEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
 
 
@@ -129,20 +130,14 @@ function ShellApp() {
         
         // If no public events found, try user's events as fallback
         if (data.length === 0) {
-          console.log('[App] No public events found, trying user events...');
           try {
             await sanityCheckMe();
             data = await fetchEventbriteEventsForMe();
           } catch (userErr) {
-            console.warn('[App] User events also failed:', userErr);
+            // User events also failed, continue with empty array
           }
         }
-        
-        // If still no events, show error message
-        if (data.length === 0) {
-          console.error('[App] No Eventbrite events found. Please check your API token configuration.');
-        }
-        const enriched = data.map((e: any) => {
+        const enriched = data.map((e: Event) => {
           const { mood, category } = categorizeEvent(
             e.title || e.name?.text || e.name || "",
             e.description || e.description?.text || "",
@@ -152,7 +147,7 @@ function ShellApp() {
         });
         if (mounted) setFetchedEvents(enriched);
       } catch (err) {
-        console.error("[App] failed fetching events:", err);
+        // Failed fetching events
       } finally {
         if (mounted) setLoadingEvents(false);
       }

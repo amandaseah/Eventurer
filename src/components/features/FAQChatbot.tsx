@@ -89,7 +89,6 @@ export function FAQChatbot() {
     const s: any = { ...cornerStyle };
     if (typeof s.top === 'number') s.top = (s.top as number) + offset;
     if (typeof s.bottom === 'number') s.bottom = (s.bottom as number) + offset;
-    console.log(`[FAQChatbot] Applied offset: ${offset}px, corner: ${corner}`, s);
     return s;
   }, [cornerStyle, offset, corner]);
 
@@ -150,7 +149,6 @@ export function FAQChatbot() {
         )
       );
     } catch (error) {
-      console.error('Chatbot error:', error);
       setMessages(prev =>
         prev.map(msg =>
           msg.id === loadingMessage.id
@@ -167,7 +165,7 @@ export function FAQChatbot() {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -301,7 +299,7 @@ export function FAQChatbot() {
                   type="text"
                   value={input}
                   onChange={e => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyDown}
                   placeholder="Type your question..."
                   className="flex-1 px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 />

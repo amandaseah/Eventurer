@@ -120,7 +120,6 @@ export function CountdownWidget({
     const s: any = { ...cornerStyle };
     if (typeof s.top === 'number') s.top = (s.top as number) + offset;
     if (typeof s.bottom === 'number') s.bottom = (s.bottom as number) + offset;
-    console.log(`[CountdownWidget] Applied offset: ${offset}px, corner: ${corner}`, s);
     return s;
   }, [cornerStyle, offset, corner]);
 
@@ -236,8 +235,6 @@ export function CountdownWidget({
     }, 50);
     return () => clearTimeout(timer);
   }, [visibleEvents.length, corner]);
-
-  console.log(`[CountdownWidget] visibleEvents.length: ${visibleEvents.length}`, visibleEvents);
 
   const nextEvent = visibleEvents[0];
   const additionalEventCount = Math.max(0, visibleEvents.length - 1);
