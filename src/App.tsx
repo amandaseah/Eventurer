@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Event as AppEvent} from './types/event';
+import { reserveSlot, releaseSlot } from './lib/eventSlotService';
 import { LoginPage } from './components/pages/LoginPage';
 import { SignupPage } from './components/pages/SignupPage';
 import { LandingPage } from './components/pages/LandingPage';
@@ -113,7 +114,7 @@ function ShellApp() {
       // Failed to preload Google Maps
     });
   }, []);
-  
+
 
   // eventbrite events fetch!
   const [fetchedEvents, setFetchedEvents] = useState<AppEvent[]>([]);
@@ -245,10 +246,21 @@ function ShellApp() {
   };
 
   const handleRSVPChange = async (eventId: number, isRSVPed: boolean) => {
+    // Handle slot reservation/release
+    if (isRSVPed) {
+      const result = await reserveSlot(eventId);
+      if (!result.success) {
+        // Event is full or reservation failed
+        return;
+      }
+    } else {
+      await releaseSlot(eventId);
+    }
+
     const newRSVPs = isRSVPed
       ? [...rsvpedEventIds, eventId]
       : rsvpedEventIds.filter(id => id !== eventId);
-    
+
     setRsvpedEventIds(newRSVPs);
     await saveUserEventData(bookmarkedEventIds, newRSVPs);
   };

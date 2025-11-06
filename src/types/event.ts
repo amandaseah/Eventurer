@@ -21,4 +21,8 @@ export interface Event {
   startDate?: string;
   listed?: boolean;
   status?: string;
+  // Slot tracking
+  totalSlots?: number;
+  availableSlots?: number;
+  slotStatus?: 'available' | 'filling-fast' | 'almost-full' | 'full';
 }
