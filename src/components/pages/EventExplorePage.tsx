@@ -6,7 +6,7 @@ import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { EventCard } from '../features/event/EventCard';
 import { EventCalendarView } from '../features/event/EventCalendarView';
-import { Grid3x3, Calendar as CalendarIcon, Star } from 'lucide-react';
+import { Grid3x3, Calendar as CalendarIcon, Star, Search } from 'lucide-react';
 import { BackButton } from '../shared/BackButton';
 import { auth, db } from '../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -35,6 +35,7 @@ export function EventExplorePage({
   const [priceFilter, setPriceFilter] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
   const [localBookmarkedIds, setLocalBookmarkedIds] = useState<number[]>(bookmarkedEventIds);
   const [localRSVPedIds, setLocalRSVPedIds] = useState<number[]>(rsvpedEventIds);
@@ -85,6 +86,15 @@ export function EventExplorePage({
   const allEvents = useMemo(() => {
     let filtered = events.filter(e => !e.isPast);
 
+    // Search filter
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(e => 
+        e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        e.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        e.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(e => e.category === categoryFilter);
     }
@@ -126,7 +136,7 @@ export function EventExplorePage({
     }
 
     return filtered;
-  }, [events, categoryFilter, priceFilter, dateFilter, sortBy]);
+  }, [events, categoryFilter, priceFilter, dateFilter, sortBy, searchQuery]);
 
   const skeletonItems = Array.from({ length: 6 }, (_, i) => i);
 
@@ -182,23 +192,25 @@ export function EventExplorePage({
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4"
+              className="mb-6 space-y-4"
             >
-              <div className="flex flex-col items-center sm:items-start gap-2 text-center sm:text-left">
-                <div className="flex items-center gap-3">
-                  <Star className="w-6 h-6 text-yellow-500" />
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
-                    All Events
-                  </h2>
-                  <Star className="w-6 h-6 text-yellow-500" />
+              {/* Header with title and view switcher */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex flex-col items-center sm:items-start gap-2 text-center sm:text-left">
+                  <div className="flex items-center gap-3">
+                    <Star className="w-6 h-6 text-yellow-500" />
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                      All Events
+                    </h2>
+                    <Star className="w-6 h-6 text-yellow-500" />
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    Browse all available events
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm text-gray-500">
-                  Browse all available events
-                </p>
-              </div>
 
-              {/* View Switcher */}
-              <div className="flex gap-2 bg-white rounded-xl p-1 shadow-md border border-gray-200">
+                {/* View Switcher */}
+                <div className="flex gap-2 bg-white rounded-xl p-1 shadow-md border border-gray-200">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -225,6 +237,21 @@ export function EventExplorePage({
                   <CalendarIcon className="w-4 h-4" />
                   <span className="hidden sm:inline">Calendar</span>
                 </motion.button>
+              </div>
+              </div>
+
+              {/* Search Bar */}
+              <div className="w-full">
+                <div className="relative w-full">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5 z-10" />
+                  <input
+                    type="text"
+                    placeholder="Search events by name, description, or location..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 sm:py-4 text-sm sm:text-base border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-300 bg-white/80 backdrop-blur-sm placeholder-gray-400 text-gray-800 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out"
+                  />
+                </div>
               </div>
             </motion.div>
 
