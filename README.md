@@ -211,11 +211,48 @@ Eventurer
 - `/profile` - user profile and bookmarked, RSVP'd and past events
 - `/settings` - user settings
 
+## Deployment & Production Build 📦
+
+### **Live Application:**
+- **Deployed at**: https://eventurer-zeta.vercel.app/
+
+### **For Submission - Production Build:**
+```bash
+npm run build
+```
+
+**Output Structure:**
+```
+build/
+├── index.html                    # Main entry point
+├── assets/
+│   ├── index-[hash].js          # Bundled JavaScript
+│   └── index-[hash].css         # Bundled CSS
+├── favicon.png                  # App icon
+├── final-optimized.glb         # 3D model assets
+└── logos/                      # Static assets
+```
+
+**Deployment Options:**
+- **Single folder**: All files contained in `/build` directory
+- **Entry point**: `build/index.html` - open this file to run the application
+- **Static hosting**: Can be deployed to any web server or opened locally
+
+**Local Testing:**
+```bash
+# Method 1: Simple HTTP server
+cd build && python3 -m http.server 8080
+
+# Method 2: Using npm serve
+npx serve build
+```
+
 ## Notes 📔
 - `.env.local` must remain in `.gitignore` for security
 - Stripe test cards (eg `4242 4242 4242 4242 12/34 123`) can be used in deployment
 - Live keys must be used in production
 - Always redeploy to Vercel after updating environment variables
+- The application requires environment variables to be configured for full functionality (Firebase, Stripe, Google Maps, etc.)
 
 ## AI/LLM Dependencies 🤖
 
