@@ -121,14 +121,6 @@ export function ProfilePage({
     if (username) setLocalUsername(username);
   }, [username]);
 
-  const handleTabChange = (tab: 'bookmarked' | 'upcoming') => {
-    setActiveTab(tab);
-    // Scroll to tabs section smoothly
-    setTimeout(() => {
-      tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
-  };
-
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-white via-[#faf7ff] to-white">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
