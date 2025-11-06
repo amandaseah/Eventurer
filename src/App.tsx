@@ -511,8 +511,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Marketing landing as entry point */}
-        {/* <Route path="/" element={<MarketingScreen />} /> */}
-        <Route path="/" element={<Navigate to="/app/login" replace />} />
+        <Route path="/" element={<MarketingScreen />} />
         {/* Choice page for users to select experience */}
         <Route path="/choice" element={<ChoiceScreen />} />
         {/* 3D landing experience */}
