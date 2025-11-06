@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { motion } from "motion/react";
 import { Post, Reply } from "../../../lib/forumService";
 
+// Props interface for TopForumPreview component
 interface TopForumPreviewProps {
   posts: Post[];
   onViewAll: () => void;
@@ -19,6 +20,7 @@ const countAllReplies = (replies: Reply[]): number => {
   }, 0);
 };
 
+// TopForumPreview component to display a preview of top forum posts
 export default function TopForumPreview({
   posts,
   onViewAll,
@@ -42,6 +44,7 @@ export default function TopForumPreview({
     );
   }
 
+  // Render the list of top forum posts
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}

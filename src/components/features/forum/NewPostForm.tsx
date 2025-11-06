@@ -3,15 +3,18 @@ import { Button } from "../../ui/button";
 import { Textarea } from "../../ui/textarea";
 import { Image as ImageIcon, Send, X } from "lucide-react";
 
+// Props interface defining the callback function for submitting a new post
 interface NewPostFormProps {
   onAddPost: (comment: string, image?: string) => void;
 }
 
+// NewPostForm component to handle adding new forum posts
 export default function NewPostForm({ onAddPost }: NewPostFormProps) {
   const [text, setText] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Handle image file selection and convert for preview
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -20,10 +23,13 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
     reader.readAsDataURL(f);
   };
 
+  // Handle form submission
   const handleSubmit = () => {
     if (!text.trim() && !image) return;
     // Call the hook function with parameters
     onAddPost(text, image || undefined);
+
+    // Reset form state after successful submission
     setText("");
     setImage(null);
   };
@@ -32,6 +38,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
     <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-md mb-6 sm:mb-8">
       <h3 className="text-base sm:text-xl mb-3 sm:mb-4 font-semibold">Add Your Comment</h3>
 
+      {/* Text input area for post content */}
       <Textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -39,6 +46,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         className="rounded-xl sm:rounded-2xl min-h-[80px] sm:min-h-[100px] mb-3 sm:mb-4 text-sm sm:text-base"
       />
 
+      {/* Image preview section - only displayed when an image is selected */}
       {image && (
       <div className="relative mb-3 sm:mb-4 rounded-xl sm:rounded-2xl overflow-hidden">
           <img 
@@ -55,6 +63,7 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
         </div>
       )}
 
+      {/* Action buttons section */}
       <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-3 mt-3 w-full">
         <input
           ref={fileRef}
@@ -63,6 +72,8 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
           onChange={handleImageSelect}
           className="hidden"
         />
+
+        {/* Button to trigger file input click */}
         <Button
           onClick={() => fileRef.current?.click()}
           variant="outline"
@@ -71,6 +82,8 @@ export default function NewPostForm({ onAddPost }: NewPostFormProps) {
           <ImageIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
           Add Image
         </Button>
+
+        {/* Submit button - disabled when both text and image are empty */}
         <Button
           onClick={handleSubmit}
           disabled={!text.trim() && !image}

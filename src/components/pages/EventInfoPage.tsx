@@ -13,6 +13,7 @@ import { useEventForum } from "../../hooks/useEventForum";
 import Footer from "../shared/Footer";
 import { toast } from "sonner";
 
+// Props interface defining all required data and callbacks for the event info page
 interface EventInfoPageProps {
   eventId: string | number;
   events?: Event[];
@@ -36,25 +37,30 @@ export function EventInfoPage({
   onRSVPChange,
   username,
 }: EventInfoPageProps) {
+  // Resolve username with fallback chain: props → sessionStorage → localStorage → "Guest"
   const resolvedUsername =
     username ||
     (typeof sessionStorage !== "undefined" && sessionStorage.getItem("username")) ||
     (typeof localStorage !== "undefined" && localStorage.getItem("username")) ||
     "Guest";
 
+  // Local state for event data and loading/error states
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Local state for bookmark and RSVP status, initialized from parent's arrays
   const [isBookmarked, setIsBookmarked] = useState(bookmarkedEventIds.includes(Number(eventId)));
   const [isRSVPed, setIsRSVPed] = useState(rsvpedEventIds.includes(Number(eventId)));
   const [saves, setSaves] = useState(0);
 
-  // ✅ This controls the Confirm RSVP dialog inside EventActions
+  // This controls the Confirm RSVP dialog inside EventActions
   const [openDialog, setOpenDialog] = useState(false);
 
+  // Hook to fetch forum posts and provide upvote functionality
   const { posts, upvotePost } = useEventForum(Number(eventId));
 
+  // Fetch event details on mount or when eventId changes
   useEffect(() => {
     async function loadEvent() {
       try {
@@ -63,11 +69,13 @@ export function EventInfoPage({
 
         let eventData = events?.find((e) => String(e.id) === String(eventId));
 
+        // If not found in props, fetch from Eventbrite API
         if (!eventData) {
           const allEvents = await fetchEventbriteEventsForMe();
           eventData = allEvents.find((e: any) => String(e.id) === String(eventId));
         }
 
+        // Handle event not found scenario
         if (!eventData) {
           setError("Event not found");
         } else {
@@ -93,6 +101,7 @@ export function EventInfoPage({
     );
   }
 
+  // Error state: Display error message if event fetch failed or event not found
   if (error || !event) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-600">
@@ -101,6 +110,7 @@ export function EventInfoPage({
     );
   }
 
+  // Toggle bookmark status and update saves count accordingly
   const handleBookmark = () => {
     const newBookmarked = !isBookmarked;
     setIsBookmarked(newBookmarked);
@@ -108,7 +118,7 @@ export function EventInfoPage({
     onBookmarkChange(Number(eventId), newBookmarked);
   };
 
-  // ✅ This is now simple — payment logic is handled INSIDE EventActions
+  // This is now simple — payment logic is handled INSIDE EventActions
   const confirmRSVP = () => {
     if (isRSVPed) {
       setIsRSVPed(false);
@@ -121,6 +131,7 @@ export function EventInfoPage({
     }
   };
 
+  // Main event info page render
   return (
     <div className="min-h-screen">
       <Header onNavigate={onNavigate} />
@@ -128,6 +139,7 @@ export function EventInfoPage({
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl">
         <BackButton onClick={onGoBack} />
 
+        {/* Hero section with event image and title overlay */}
         <motion.div
           className="relative overflow-hidden rounded-3xl mb-8 h-64 sm:h-96"
           initial={{ opacity: 0, y: 20 }}
@@ -141,9 +153,12 @@ export function EventInfoPage({
           </div>
         </motion.div>
 
+        {/* Two-column layout: main content (left) and sidebar (right) */}
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <EventDetails event={event} saves={saves} />
+
+            {/* Preview of top 3 forum posts */}
             <TopForumPreview
               posts={posts.slice(0, 3)}
               onViewAll={() => onNavigate("event-forum", { eventId, username: resolvedUsername })}
@@ -151,10 +166,14 @@ export function EventInfoPage({
               upvotePost={(postId) => upvotePost(postId, resolvedUsername)}
               username={resolvedUsername}
             />
+
+            {/* Map and directions component */}
             <HowToGetThere event={event} />
           </div>
 
+          {/* Sidebar column with sticky positioning on larger screens */}
           <div className="space-y-4 lg:sticky lg:top-24">
+            {/* Primary action buttons (RSVP, bookmark) with payment handling */}
             <EventActions
               event={event}
               isRSVPed={isRSVPed}
@@ -166,6 +185,7 @@ export function EventInfoPage({
               setOpenDialog={setOpenDialog}
             />
 
+            {/* Secondary action button to navigate to full forum */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
