@@ -4,36 +4,42 @@ import { Bookmark, CheckCircle } from 'lucide-react';
 interface ProfileStatsProps {
   bookmarkedCount: number;
   upcomingCount: number;
-  onTabChange?: (tab: 'bookmarked' | 'upcoming') => void;
+  onBookmarkedClick?: () => void;
+  onUpcomingClick?: () => void;
+  activeSection?: 'bookmarked' | 'upcoming' | null;
 }
 
 export default function ProfileStats({
   bookmarkedCount,
   upcomingCount,
-  onTabChange,
+  onBookmarkedClick,
+  onUpcomingClick,
+  activeSection,
 }: ProfileStatsProps) {
   const stats = [
     {
       label: 'Bookmarked',
       value: bookmarkedCount,
       icon: Bookmark,
-      iconColor: 'text-rose-400',
-      textColor: 'text-gray-900',
-      bgColor: 'bg-gradient-to-br from-gray-50 via-white to-gray-100',
-      borderColor: 'border-gray-200',
-      shadowColor: 'shadow-[0_8px_20px_rgba(120,122,130,0.12)] hover:shadow-[0_16px_32px_rgba(120,122,130,0.18)]',
-      tab: 'bookmarked' as const,
+      color: 'pink',
+      bgColor: activeSection === 'bookmarked' ? 'bg-pink-100' : 'bg-pink-50',
+      borderColor: activeSection === 'bookmarked' ? 'border-pink-300' : 'border-pink-200',
+      iconColor: 'text-pink-500',
+      textColor: 'text-pink-600',
+      onClick: onBookmarkedClick,
+      isActive: activeSection === 'bookmarked',
     },
     {
       label: 'Upcoming',
       value: upcomingCount,
       icon: CheckCircle,
-      iconColor: 'text-gray-500',
-      textColor: 'text-gray-900',
-      bgColor: 'bg-gradient-to-br from-gray-50 via-white to-gray-100',
-      borderColor: 'border-gray-200',
-      shadowColor: 'shadow-[0_8px_20px_rgba(120,122,130,0.12)] hover:shadow-[0_16px_32px_rgba(120,122,130,0.18)]',
-      tab: 'upcoming' as const,
+      color: 'green',
+      bgColor: activeSection === 'upcoming' ? 'bg-green-100' : 'bg-green-50',
+      borderColor: activeSection === 'upcoming' ? 'border-green-300' : 'border-green-200',
+      iconColor: 'text-green-500',
+      textColor: 'text-green-600',
+      onClick: onUpcomingClick,
+      isActive: activeSection === 'upcoming',
     },
   ];
 
@@ -44,9 +50,15 @@ export default function ProfileStats({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
-          onClick={() => onTabChange?.(stat.tab)}
-          className={`${stat.bgColor} border ${stat.borderColor} rounded-2xl p-5 sm:p-6 text-center ${stat.shadowColor} transition-all cursor-pointer hover:border-gray-300 active:scale-[0.98]`}
-          whileHover={{ y: -2, scale: 1.02 }}
+          className={`${stat.bgColor} border ${stat.borderColor} rounded-2xl p-5 sm:p-6 text-center cursor-pointer hover:shadow-md transition-all duration-200 ${
+            stat.isActive ? 'ring-2 ring-offset-2' : ''
+          } ${
+            stat.isActive && stat.color === 'pink' ? 'ring-pink-400' : ''
+          } ${
+            stat.isActive && stat.color === 'green' ? 'ring-green-400' : ''
+          }`}
+          onClick={stat.onClick}
+          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           <div className="flex flex-col items-center gap-2">
