@@ -6,10 +6,10 @@ import { formatDateToDDMMYYYY } from '../../../lib/dateUtils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../ui/alert-dialog';
 import { toast } from 'sonner';
 import StripePaymentFormWrapper from "../payments/PaymentForm";
-import type { Event } from '../../../types/event';
+import type { Event as AppEvent } from '../../../types/event';
 
 interface EventCardProps {
-  event: Event;
+  event: AppEvent;
   onEventClick: (id: number) => void;
   isBookmarkedInitially?: boolean;
   isRSVPedInitially?: boolean;
@@ -220,10 +220,10 @@ const confirmRSVP = () => {
         </div>
 
         {/* Show user comment for past events or RSVP button for upcoming events */}
-        {event.isPast && event.userComment ? (
+        {event.isPast && (event as any).userComment ? (
           <div className="bg-pink-50 border border-pink-200 rounded-xl p-3">
             <p className="text-xs text-pink-600 mb-1">Your comment:</p>
-            <p className="text-sm text-gray-700 italic">&quot;{event.userComment}&quot;</p>
+            <p className="text-sm text-gray-700 italic">&quot;{(event as any).userComment}&quot;</p>
           </div>
         ) : !event.isPast ? (
           <AlertDialog open={showRSVPDialog} onOpenChange={setShowRSVPDialog}>

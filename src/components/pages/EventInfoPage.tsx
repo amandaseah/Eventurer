@@ -12,11 +12,12 @@ import { fetchEventbriteEventsForMe } from "../../lib/eventbriteService";
 import { useEventForum } from "../../hooks/useEventForum";
 import Footer from "../shared/Footer";
 import { toast } from "sonner";
+import type { Event as AppEvent } from "../../types/event";
 
 // Props interface defining all required data and callbacks for the event info page
 interface EventInfoPageProps {
   eventId: string | number;
-  events?: Event[];
+  events?: AppEvent[];
   onNavigate: (page: string, data?: any) => void;
   onGoBack: () => void;
   bookmarkedEventIds: number[];
@@ -45,7 +46,7 @@ export function EventInfoPage({
     "Guest";
 
   // Local state for event data and loading/error states
-  const [event, setEvent] = useState<Event | null>(null);
+  const [event, setEvent] = useState<AppEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
