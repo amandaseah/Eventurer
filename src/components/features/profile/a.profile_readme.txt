@@ -64,11 +64,12 @@ The Settings tab of ProfilePage.tsx.
 
 Purpose:
 Main container that ties all the above components together.
-Implements the tab navigation between different profile views.
+Implements clickable counter navigation between different profile views.
 
 Key details:
-	•	Uses Tabs from the Shadcn UI system.
-	•	Manages local states for user data, active tab, and editing mode.
+	•	Uses clickable ProfileStats counters for navigation instead of tabs.
+	•	Manages local states for user data, active section, and editing mode.
 	•	Imports all profile feature components for modular display.
-	•	Handles filtering and sorting of event data from mockData.
+	•	Handles filtering and sorting of event data from events prop.
 	•	Defines back navigation and transitions.
+	•	Shows bookmarked events by default when page loads.
