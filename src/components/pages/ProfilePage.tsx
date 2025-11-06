@@ -37,7 +37,7 @@ export function ProfilePage({
   username,
   onUsernameChange,
 }: ProfilePageProps & { events: any[] }) {
-  const [activeSection, setActiveSection] = useState<'bookmarked' | 'upcoming' | null>(null);
+  const [activeSection, setActiveSection] = useState<'bookmarked' | 'upcoming' | null>('bookmarked');
 
   // Local user display state (prefers ints from auth/db but editable locally)
   const [userName, setUserName] = useState<string>(currentUser?.displayName || `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() || 'Alex Chen');
