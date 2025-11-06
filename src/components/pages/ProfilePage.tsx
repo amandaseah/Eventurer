@@ -6,7 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import EventsGrid from "../features/profile/EventsGrid";
 import Footer from "../shared/Footer";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { Bookmark, CheckCircle } from 'lucide-react';
@@ -119,6 +119,14 @@ export function ProfilePage({
   useEffect(() => {
     if (username) setLocalUsername(username);
   }, [username]);
+
+  const handleTabChange = (tab: 'bookmarked' | 'upcoming') => {
+    setActiveTab(tab);
+    // Scroll to tabs section smoothly
+    setTimeout(() => {
+      tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-white via-[#faf7ff] to-white">

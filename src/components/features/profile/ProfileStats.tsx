@@ -45,7 +45,7 @@ export default function ProfileStats({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 sm:mb-8">{stats.map((stat, index) => (
-        <motion.div
+        <motion.button
           key={stat.label}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -62,7 +62,7 @@ export default function ProfileStats({
           whileTap={{ scale: 0.98 }}
         >
           <div className="flex flex-col items-center gap-2">
-            <stat.icon className={`w-8 h-8 ${stat.iconColor}`} />
+            <stat.icon className={`w-7 h-7 sm:w-8 sm:h-8 ${stat.iconColor} stroke-[1.5]`} />
             <div className={`text-3xl sm:text-4xl font-bold ${stat.textColor}`}>
               {stat.value}
             </div>
@@ -70,7 +70,7 @@ export default function ProfileStats({
               {stat.label}
             </div>
           </div>
-        </motion.div>
+        </motion.button>
       ))}
     </div>
   );
