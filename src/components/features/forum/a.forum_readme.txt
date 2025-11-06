@@ -11,18 +11,7 @@ Defines the `ForumPost` interface used throughout the forum components to keep d
 
 ⸻
 
-2️⃣ `Composer.tsx`
-• **Purpose:**  
-A lightweight, quick-post input bar for short text updates.  
-• **Key Features:**  
-Single-line input field with a “Post” button that triggers `onPost(text)`.  
-Ideal for short comments or quick notes.  
-• **Visual Role:**  
-Displayed above or below longer threads for fast interaction.
-
-⸻
-
-3️⃣ `NewPostForm.tsx`
+2️⃣ `NewPostForm.tsx`
 • **Purpose:**  
 Full-featured form allowing users to compose detailed posts with optional images.  
 • **Key Features:**  
@@ -33,7 +22,7 @@ Used as the main post composer on a forum or event discussion page.
 
 ⸻
 
-4️⃣ `PostItem.tsx`
+3️⃣ `PostItem.tsx`
 • **Purpose:**  
 Renders a single forum post or reply with its associated details and actions.  
 • **Key Features:**  
@@ -45,7 +34,7 @@ Core display component for forum threads.
 
 ⸻
 
-5️⃣ `PostList.tsx`
+4️⃣ `PostList.tsx`
 • **Purpose:**  
 Builds the threaded discussion structure from a flat array of posts.  
 • **Key Features:**  
@@ -55,7 +44,7 @@ Manages and displays the complete forum conversation hierarchy.
 
 ⸻
 
-6️⃣ `TopForumPreview.tsx`
+5️⃣ `TopForumPreview.tsx`
 • **Purpose:**  
 Shows a preview of the top or most-upvoted posts in a compact summary card.  
 • **Key Features:**  

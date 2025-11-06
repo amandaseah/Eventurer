@@ -6,7 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import EventsGrid from "../features/profile/EventsGrid";
 import Footer from "../shared/Footer";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Header } from '../Header';
 import { Bookmark, CheckCircle } from 'lucide-react';
