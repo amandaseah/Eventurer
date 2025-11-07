@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { Event } from './types/event';
+import type { Event as AppEvent} from './types/event';
+import { reserveSlot, releaseSlot } from './lib/eventSlotService';
 import { LoginPage } from './components/pages/LoginPage';
 import { SignupPage } from './components/pages/SignupPage';
 import { LandingPage } from './components/pages/LandingPage';
@@ -108,15 +109,10 @@ function ShellApp() {
   };
 
   useEffect(() => {
-    // Preload Google Maps so the first visit to event details feels instant.
-    loadGoogleMapsScript().catch(() => {
-      // Failed to preload Google Maps
-    });
+    loadGoogleMapsScript().catch(() => {});
   }, []);
-  
 
-  // eventbrite events fetch!
-  const [fetchedEvents, setFetchedEvents] = useState<Event[]>([]);
+  const [fetchedEvents, setFetchedEvents] = useState<AppEvent[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
 
 
@@ -137,13 +133,25 @@ function ShellApp() {
             // User events also failed, continue with empty array
           }
         }
-        const enriched = data.map((e: Event) => {
-          const { mood, category } = categorizeEvent(
-            e.title || e.name?.text || e.name || "",
-            e.description || e.description?.text || "",
-            e.category || e.category?.name || ""
-          );
-          return { ...e, mood, category };
+        const enriched = (data as any[]).map((e) => {
+          const title =
+            e?.title ??
+            e?.name?.text ??
+            e?.name ??
+            "";
+
+          const description =
+            typeof e?.description === "object"
+              ? (e?.description?.text ?? "")
+              : (e?.description ?? "");
+
+          const categoryName =
+            e?.category?.name ??
+            e?.category ??
+            "";
+
+          const { mood, category } = categorizeEvent(title, description, categoryName);
+          return { ...e, title, description, category: categoryName, mood };
         });
         if (mounted) setFetchedEvents(enriched);
       } catch (err) {
@@ -233,10 +241,21 @@ function ShellApp() {
   };
 
   const handleRSVPChange = async (eventId: number, isRSVPed: boolean) => {
+    // Handle slot reservation/release
+    if (isRSVPed) {
+      const result = await reserveSlot(eventId);
+      if (!result.success) {
+        // Event is full or reservation failed
+        return;
+      }
+    } else {
+      await releaseSlot(eventId);
+    }
+
     const newRSVPs = isRSVPed
       ? [...rsvpedEventIds, eventId]
       : rsvpedEventIds.filter(id => id !== eventId);
-    
+
     setRsvpedEventIds(newRSVPs);
     await saveUserEventData(bookmarkedEventIds, newRSVPs);
   };
@@ -495,11 +514,14 @@ function EventForumRoute({
 
 // ---- Router wrapper ----
 export default function App() {
+  // Check if we're in an iframe and should go directly to app
+  const isInIframe = window !== window.parent || new URLSearchParams(window.location.search).has('iframe');
+  
   return (
     <BrowserRouter>
       <Routes>
         {/* Marketing landing as entry point */}
-        <Route path="/" element={<MarketingScreen />} />
+        <Route path="/" element={isInIframe ? <Navigate to="/app" replace /> : <MarketingScreen />} />
         {/* Choice page for users to select experience */}
         <Route path="/choice" element={<ChoiceScreen />} />
         {/* 3D landing experience */}

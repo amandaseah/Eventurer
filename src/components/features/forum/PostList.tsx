@@ -1,5 +1,6 @@
 import PostItem from "./PostItem";
 
+// Props interface for PostList component
 interface PostListProps {
   eventId: number;
   posts: any[];

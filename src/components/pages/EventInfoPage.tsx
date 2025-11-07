@@ -12,10 +12,12 @@ import { fetchEventbriteEventsForMe } from "../../lib/eventbriteService";
 import { useEventForum } from "../../hooks/useEventForum";
 import Footer from "../shared/Footer";
 import { toast } from "sonner";
+import type { Event as AppEvent } from "../../types/event";
 
+// props interface defining all required data and callbacks for the event info page
 interface EventInfoPageProps {
   eventId: string | number;
-  events?: Event[];
+  events?: AppEvent[];
   onNavigate: (page: string, data?: any) => void;
   onGoBack: () => void;
   bookmarkedEventIds: number[];
@@ -42,17 +44,19 @@ export function EventInfoPage({
     (typeof localStorage !== "undefined" && localStorage.getItem("username")) ||
     "Guest";
 
-  const [event, setEvent] = useState<Event | null>(null);
+  const [event, setEvent] = useState<AppEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // local state for bookmark and RSVP status, initialized from parent's arrays
   const [isBookmarked, setIsBookmarked] = useState(bookmarkedEventIds.includes(Number(eventId)));
   const [isRSVPed, setIsRSVPed] = useState(rsvpedEventIds.includes(Number(eventId)));
   const [saves, setSaves] = useState(0);
 
-  // ✅ This controls the Confirm RSVP dialog inside EventActions
+  // this controls the Confirm RSVP dialog inside EventActions
   const [openDialog, setOpenDialog] = useState(false);
 
+  // hook to fetch forum posts and provide upvote functionality
   const { posts, upvotePost } = useEventForum(Number(eventId));
 
   useEffect(() => {
@@ -63,11 +67,13 @@ export function EventInfoPage({
 
         let eventData = events?.find((e) => String(e.id) === String(eventId));
 
+        // if not found in props, fetch from Eventbrite API
         if (!eventData) {
           const allEvents = await fetchEventbriteEventsForMe();
           eventData = allEvents.find((e: any) => String(e.id) === String(eventId));
         }
 
+        // handle event not found scenario
         if (!eventData) {
           setError("Event not found");
         } else {
@@ -101,6 +107,7 @@ export function EventInfoPage({
     );
   }
 
+  // toggle bookmark status and update saves count accordingly
   const handleBookmark = () => {
     const newBookmarked = !isBookmarked;
     setIsBookmarked(newBookmarked);
@@ -108,7 +115,7 @@ export function EventInfoPage({
     onBookmarkChange(Number(eventId), newBookmarked);
   };
 
-  // ✅ This is now simple — payment logic is handled INSIDE EventActions
+  // payment logic is handled INSIDE EventActions
   const confirmRSVP = () => {
     if (isRSVPed) {
       setIsRSVPed(false);
@@ -141,9 +148,12 @@ export function EventInfoPage({
           </div>
         </motion.div>
 
+        {/* Two-column layout: main content (left) and sidebar (right) */}
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <EventDetails event={event} saves={saves} />
+
+            {/* Preview of top 3 forum posts */}
             <TopForumPreview
               posts={posts.slice(0, 3)}
               onViewAll={() => onNavigate("event-forum", { eventId, username: resolvedUsername })}
@@ -151,10 +161,14 @@ export function EventInfoPage({
               upvotePost={(postId) => upvotePost(postId, resolvedUsername)}
               username={resolvedUsername}
             />
+
+            {/* Map and directions component */}
             <HowToGetThere event={event} />
           </div>
 
+          {/* Sidebar column with sticky positioning on larger screens */}
           <div className="space-y-4 lg:sticky lg:top-24">
+            {/* Primary action buttons (RSVP, bookmark) with payment handling */}
             <EventActions
               event={event}
               isRSVPed={isRSVPed}
@@ -166,6 +180,7 @@ export function EventInfoPage({
               setOpenDialog={setOpenDialog}
             />
 
+            {/* Secondary action button to navigate to full forum */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

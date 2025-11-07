@@ -110,8 +110,7 @@ export function FAQPage({ onNavigate, onGoBack }: FAQPageProps) {
         >
           <MessageCircle className="w-5 h-5 text-pink-500 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm text-gray-700">
-              <span className="font-semibold text-pink-600">Psst, quick tip!</span> See that pink chat button in the bottom right?
+            <p className="text-sm text-gray-600">
               That's your instant FAQ helper. Just type your question there for faster answers instead of scrolling through everything here.
             </p>
             <p className="mt-2 text-xs text-gray-500">

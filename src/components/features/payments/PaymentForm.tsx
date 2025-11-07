@@ -17,7 +17,7 @@ export default function StripePaymentFormWrapper({
         onSuccess?: () => void;
         eventTitle?: string;
      }) {
-  // amount in cents (e.g., 1000 = 10.00 SGD)
+  // amount in cents (e.g 1000 = 10.00 SGD)
   return (
     <Elements stripe={stripePromise}>
       <CheckoutForm amount={amount} onSuccess={onSuccess} eventTitle={eventTitle}/>
@@ -47,7 +47,7 @@ function CheckoutForm({
     const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
         setEmail(user.email || "");              // auto-fill email
-        setPayerName(user.displayName || "");    // auto-fill name if available
+        setPayerName(user.displayName || "");    // auto-fill name 
         }
     });
     return () => unsubscribe();
@@ -99,7 +99,7 @@ function CheckoutForm({
       });
 
       if (result.error) {
-        // payment failed — show error to user
+        // payment failed, show error to user
         setErrorMsg(result.error.message || "Payment failed");
       } else {
         // payment succeeded
@@ -117,12 +117,14 @@ function CheckoutForm({
   };
 
 return (
-  <form onSubmit={handleSubmit} className="p-4 sm:p-5 w-full max-w-md mx-auto space-y-4"> {/* UPDATED container */}
+  // pop up when making payment
+  <form onSubmit={handleSubmit} className="p-4 sm:p-5 w-full max-w-md mx-auto space-y-4"> 
     <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
       <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Review &amp; Pay</h3>
       <div className="text-sm sm:text-base text-gray-700">
         <div className="flex items-start justify-between gap-3">
           <span className="font-medium">Event</span>
+          {/* display the specific eventurer event title */}
           <span className="text-right break-words">{eventTitle ?? "Eventurer Event"}</span>
         </div>
         <div className="mt-2 flex items-center justify-between">

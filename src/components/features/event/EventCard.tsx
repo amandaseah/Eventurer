@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Bookmark, Clock } from 'lucide-react';
+import { Calendar, MapPin, Bookmark, Clock, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Image from '../../common/Image';
 import { useState, useEffect } from 'react';
@@ -6,10 +6,11 @@ import { formatDateToDDMMYYYY } from '../../../lib/dateUtils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../ui/alert-dialog';
 import { toast } from 'sonner';
 import StripePaymentFormWrapper from "../payments/PaymentForm";
-import type { Event } from '../../../types/event';
+import type { Event as AppEvent } from '../../../types/event';
+import { getEventSlots, getSlotStatus } from '../../../lib/eventSlotService';
 
 interface EventCardProps {
-  event: Event;
+  event: AppEvent;
   onEventClick: (id: number) => void;
   isBookmarkedInitially?: boolean;
   isRSVPedInitially?: boolean;
@@ -34,12 +35,26 @@ export function EventCard({
   const [saves, setSaves] = useState(event.saves || 0);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
+  const [availableSlots, setAvailableSlots] = useState<number | undefined>(undefined);
+  const [totalSlots, setTotalSlots] = useState<number | undefined>(undefined);
 
   // Update states when props change
   useEffect(() => {
     setIsBookmarked(isBookmarkedInitially);
     setIsRSVPed(isRSVPedInitially);
   }, [isBookmarkedInitially, isRSVPedInitially]);
+
+  // Load slot data
+  useEffect(() => {
+    const loadSlotData = async () => {
+      const slotData = await getEventSlots(event.id);
+      if (slotData) {
+        setAvailableSlots(slotData.availableSlots);
+        setTotalSlots(slotData.totalSlots);
+      }
+    };
+    loadSlotData();
+  }, [event.id]);
 
   const handleBookmark = () => {
     const newBookmarked = !isBookmarked;
@@ -67,18 +82,32 @@ const confirmRSVP = () => {
     // Cancelling RSVP
     setIsRSVPed(false);
     onRSVPChange?.(event.id, false);
+    // Update slot count locally
+    if (availableSlots !== undefined && totalSlots !== undefined) {
+      setAvailableSlots(Math.min(availableSlots + 1, totalSlots));
+    }
     toast.success(isFree ? 'RSVP cancelled successfully.' : 'RSVP cancelled. A cancellation email has been sent.');
     return;
   }
 
+  // Check if event is full before allowing RSVP
+  if (availableSlots !== undefined && availableSlots === 0) {
+    toast.error('Sorry, this event is full!');
+    return;
+  }
+
   if (isPaidEvent) {
-    // 🟢 Open Stripe payment modal
+    // Open stripe payment modal
     setPaymentAmount(Math.round(numericPrice * 100));
     setShowPaymentModal(true);
   } else {
-    // 🟢 Free event — directly confirm
+    // Free event so can directly confirm
     setIsRSVPed(true);
     onRSVPChange?.(event.id, true);
+    // Update slot count locally
+    if (availableSlots !== undefined) {
+      setAvailableSlots(Math.max(availableSlots - 1, 0));
+    }
     toast.success('RSVP confirmed! See you at the event!');
   }
 };
@@ -164,17 +193,41 @@ const confirmRSVP = () => {
 
         {/* Top badges row */}
         <div className="absolute top-2 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 flex items-center justify-between">
-          {/* Closing Soon badge - left side */}
-          {isClosingSoon() && !event.isPast && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-full bg-red-500/95 backdrop-blur-md shadow-lg"
-            >
-              <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
-              <span className="text-[10px] sm:text-xs font-bold text-white">Closing Soon</span>
-            </motion.div>
-          )}
+          {/* Left side badges */}
+          <div className="flex items-center gap-1.5">
+            {/* Closing Soon badge */}
+            {isClosingSoon() && !event.isPast && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-full bg-red-500/95 backdrop-blur-md shadow-lg"
+              >
+                <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
+                <span className="text-[10px] sm:text-xs font-bold text-white">Closing Soon</span>
+              </motion.div>
+            )}
+
+            {/* Slot warning badge */}
+            {availableSlots !== undefined && totalSlots !== undefined && !event.isPast && (() => {
+              const slotStatus = getSlotStatus(availableSlots, totalSlots);
+              if (slotStatus.status === 'available') return null;
+
+              return (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className={`flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-full backdrop-blur-md shadow-lg ${
+                    slotStatus.status === 'full' ? 'bg-red-600/95' :
+                    slotStatus.status === 'almost-full' ? 'bg-red-500/95' :
+                    'bg-orange-500/95'
+                  }`}
+                >
+                  <AlertCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
+                  <span className="text-[10px] sm:text-xs font-bold text-white">{slotStatus.message}</span>
+                </motion.div>
+              );
+            })()}
+          </div>
 
           {/* Spacer */}
           <div className="flex-1" />
@@ -220,31 +273,53 @@ const confirmRSVP = () => {
         </div>
 
         {/* Show user comment for past events or RSVP button for upcoming events */}
-        {event.isPast && event.userComment ? (
+        {event.isPast && (event as any).userComment ? (
           <div className="bg-pink-50 border border-pink-200 rounded-xl p-3">
             <p className="text-xs text-pink-600 mb-1">Your comment:</p>
-            <p className="text-sm text-gray-700 italic">&quot;{event.userComment}&quot;</p>
+            <p className="text-sm text-gray-700 italic">&quot;{(event as any).userComment}&quot;</p>
           </div>
         ) : !event.isPast ? (
-          <AlertDialog open={showRSVPDialog} onOpenChange={setShowRSVPDialog}>
-            <AlertDialogTrigger asChild>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                className={`w-full py-2 sm:py-3 rounded-xl transition-all flex items-center justify-center text-sm sm:text-base font-semibold ${
-                  isRSVPed
-                    ? 'bg-green-500 text-white hover:bg-green-600 shadow-md'
-                    : 'bg-pink-200 text-pink-600 border border-pink-300 hover:bg-pink-300 shadow-sm hover:shadow-md'
-                }`}
-              >
-                <span className="flex items-center justify-center gap-2">
-                  {isRSVPed ? '✓ RSVP\'d' : 'RSVP'}
-                </span>
-              </motion.button>
-            </AlertDialogTrigger>
+          (() => {
+            const isFull = availableSlots !== undefined && availableSlots === 0;
+
+            // If event is full and user hasn't RSVP'd, show disabled button
+            if (isFull && !isRSVPed) {
+              return (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={(e) => e.stopPropagation()}
+                  disabled
+                  className="w-full py-2 sm:py-3 rounded-xl transition-all flex items-center justify-center text-sm sm:text-base font-semibold bg-gray-200 text-gray-500 border border-gray-300 cursor-not-allowed"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    Event Full
+                  </span>
+                </motion.button>
+              );
+            }
+
+            return (
+              <AlertDialog open={showRSVPDialog} onOpenChange={setShowRSVPDialog}>
+                <AlertDialogTrigger asChild>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className={`w-full py-2 sm:py-3 rounded-xl transition-all flex items-center justify-center text-sm sm:text-base font-semibold ${
+                      isRSVPed
+                        ? 'bg-green-500 text-white hover:bg-green-600 shadow-md'
+                        : 'bg-pink-200 text-pink-600 border border-pink-300 hover:bg-pink-300 shadow-sm hover:shadow-md'
+                    }`}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      {isRSVPed ? '✓ RSVP\'d' : 'RSVP'}
+                    </span>
+                  </motion.button>
+                </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>
@@ -273,6 +348,8 @@ const confirmRSVP = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+            );
+          })()
         ) : null}
       </div>
       {/* Stripe Payment Modal */}
@@ -293,7 +370,11 @@ const confirmRSVP = () => {
           setShowPaymentModal(false);
           setIsRSVPed(true);
           onRSVPChange?.(event.id, true);
-          toast.success('Payment successful! You’re RSVP’d 🎉');
+          // Update slot count locally
+          if (availableSlots !== undefined) {
+            setAvailableSlots(Math.max(availableSlots - 1, 0));
+          }
+          toast.success('Payment successful! You\'re RSVP\'d 🎉');
         }}
       />
 

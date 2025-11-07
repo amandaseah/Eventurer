@@ -38,5 +38,4 @@ export default function Image({
   return <img {...rest} src={src} onError={handleError} />;
 }
 
-/** temporary alias so old imports keep working until u update them everywhere */
 export { default as ImageWithFallback } from "./Image";

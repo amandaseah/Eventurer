@@ -6,6 +6,7 @@ import { ThumbsUp, Reply } from "lucide-react";
 import { Post, Reply as ReplyType } from "../../../lib/forumService";
 import { Timestamp } from "firebase/firestore";
 
+// Props interface for the recursive PostItem component
 interface PostItemProps {
   post: Post;
   username: string;
@@ -15,10 +16,12 @@ interface PostItemProps {
   onSubmitReply: (postId: string, text: string, image?: string, parentReplyId?: string) => void;
 }
 
+// PostItem component to display a forum post or reply
 export default function PostItem({ post, username, depth = 0, rootPostId, onUpvote, onSubmitReply }: PostItemProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
 
+  // Handle reply submission
   const handleReply = () => {
     if (!replyText.trim()) return;
 
@@ -29,6 +32,7 @@ export default function PostItem({ post, username, depth = 0, rootPostId, onUpvo
     
     onSubmitReply(targetPostId, replyText, undefined, parentReplyId);
 
+    // Reset form state after submission
     setReplyText("");
     setIsReplying(false);
   };
@@ -51,6 +55,7 @@ export default function PostItem({ post, username, depth = 0, rootPostId, onUpvo
         animate={{ opacity: 1, x: 0 }}
         className={`bg-white rounded-3xl p-6 shadow-md ${depth > 0 ? "bg-pink-50" : ""}`}
       >
+        {/* Header: Username and timestamp */}
         <div className="flex items-center justify-between mb-2">
           <span className="font-semibold text-pink-500">{post.username}</span>
           <span className="text-gray-400 text-sm">{post.createdAt?.toDate?.()?.toLocaleString() || 'Just now'}</span>
@@ -71,7 +76,9 @@ export default function PostItem({ post, username, depth = 0, rootPostId, onUpvo
           </>
         )}
 
+        {/* Action buttons: Upvote and Reply */}
         <div className="flex items-center gap-4 mb-2">
+          {/* Upvote button with dynamic styling based on whether user has upvoted */}
           <button
             onClick={handleUpvote}
             className={`flex items-center gap-1 transition-colors ${
@@ -82,6 +89,7 @@ export default function PostItem({ post, username, depth = 0, rootPostId, onUpvo
             <span>{post.upvotes}</span>
           </button>
 
+           {/* Reply button to toggle reply form */}
           <button
             onClick={() => setIsReplying(prev => !prev)}
             className="flex items-center gap-1 text-gray-500 hover:text-pink-500 transition-colors"
@@ -91,6 +99,7 @@ export default function PostItem({ post, username, depth = 0, rootPostId, onUpvo
           </button>
         </div>
 
+        {/* Reply form - conditionally rendered when user clicks Reply button */}
         {isReplying && (
           <div className="mt-4 bg-pink-50 p-4 rounded-2xl">
             <Textarea
@@ -100,6 +109,7 @@ export default function PostItem({ post, username, depth = 0, rootPostId, onUpvo
               className="mb-3 rounded-2xl bg-white"
             />
 
+            {/* Action buttons for submitting or canceling the reply */}
             <div className="flex gap-2">
               <Button
                 onClick={handleReply}

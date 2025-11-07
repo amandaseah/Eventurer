@@ -9,6 +9,7 @@ import Footer from "../shared/Footer";
 import { useEffect, useState } from 'react';
 import { fetchEventbriteEventsForMe } from '../../lib/eventbriteService';
 
+// Props interface defining the data needed for the event forum page
 interface EventForumPageProps {
   eventId: number;
   events: any[];
@@ -23,7 +24,6 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
 
   const { posts, isConnected, isLoading, addPost, upvotePost, addReply } = useEventForum(eventId);
 
-  // Fetch event details if not in events array
   useEffect(() => {
     let isMounted = true;
 
@@ -38,17 +38,15 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
 
           // If not found in provided events, fetch from Eventbrite
           if (!eventData) {
-            console.log('[EventForumPage] Event not in props, fetching from Eventbrite...');
             const allEvents = await fetchEventbriteEventsForMe();
             eventData = allEvents.find((e: any) => String(e.id) === String(eventId));
           }
         } else {
-          // No events provided, fetch from Eventbrite directly
-          console.log('[EventForumPage] No events in props, fetching from Eventbrite...');
           const allEvents = await fetchEventbriteEventsForMe();
           eventData = allEvents.find((e: any) => String(e.id) === String(eventId));
         }
 
+        // Only update state if component is still mounted
         if (isMounted) {
           setEvent(eventData || null);
         }
@@ -66,6 +64,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
 
     loadEvent();
 
+    // Cleanup function to prevent memory leaks
     return () => {
       isMounted = false;
     };
@@ -82,6 +81,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
             animate={{ opacity: 1, scale: 1 }}
             className="text-center"
           >
+            {/* Custom animated spinner with dual-ring design */}
             <div className="relative w-16 h-16 mx-auto mb-4">
               <div className="absolute inset-0 border-4 border-pink-200 rounded-full"></div>
               <div className="absolute inset-0 border-4 border-pink-500 rounded-full border-t-transparent animate-spin"></div>
@@ -94,6 +94,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
     );
   }
 
+  // Error state: Display 404 page if event not found
   if (!event) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-pink-50/30 to-white flex flex-col">
@@ -136,13 +137,13 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
       </div>
     );
   }
-
+  
+  // Main forum page render
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onNavigate={onNavigate} />
 
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
-        {/* Back Button - Sticky */}
         <BackButton onClick={onGoBack} label="Back to Event" />
 
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8">
@@ -157,6 +158,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
               </div>
             </div>
 
+            {/* Connection status indicator */}
             <div className="flex items-center gap-2">
               {isConnected ? (
                 <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1.5 rounded-full text-sm">
@@ -188,6 +190,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
               <NewPostForm onAddPost={(text, image) => addPost(text, image, username)}/>
             </motion.div>
 
+            {/* List of all posts and their replies */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="space-y-4">
               <PostList
                 eventId={eventId}
@@ -199,6 +202,7 @@ export function EventForumPage({ eventId, events, onGoBack, onNavigate, username
 
             </motion.div>
 
+            {/* Empty state when there are no posts yet */}
             {posts.length === 0 && !isLoading && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="text-center py-16 bg-white rounded-3xl shadow-md">
                 <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />

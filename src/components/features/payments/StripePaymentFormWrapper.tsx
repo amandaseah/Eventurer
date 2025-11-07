@@ -1,9 +1,8 @@
-// src/features/payments/StripePaymentFormWrapper.tsx
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useState } from "react";
 
-// Load your publishable Stripe key
+// load publishable Stripe key
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 export default function StripePaymentFormWrapper({
@@ -43,7 +42,7 @@ function CheckoutForm({
 
     setLoading(true);
     try {
-      // ✅ Correct endpoint: matches your renamed backend file
+      // creating payment intent
       const resp = await fetch("/api/create-payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -61,6 +60,7 @@ function CheckoutForm({
         },
       });
 
+      // verifying payment
       if (result.error) {
         setErrorMsg(result.error.message || "Payment failed");
       } else if (result.paymentIntent?.status === "succeeded") {

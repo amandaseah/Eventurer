@@ -1,9 +1,10 @@
 import { motion, AnimatePresence, useMotionValue } from 'motion/react';
 import { bringToFront } from '../directives/draggable';
-import { X, Calendar } from 'lucide-react';
+import { X, Calendar, AlertCircle } from 'lucide-react';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { formatDateObjectToDDMMYYYY } from '../lib/dateUtils';
 import { registerFloating, unregisterFloating, updateFloatingCorner, subscribeOffset, unsubscribeOffset, getOffsetFor, triggerRelayout } from '../lib/floatingRegistry';
+import { getEventSlots, getSlotStatus } from '../lib/eventSlotService';
 
 interface EventData {
   id: number;
@@ -15,6 +16,8 @@ interface EventData {
     utc?: string;
   };
   startDate?: string;
+  availableSlots?: number;
+  totalSlots?: number;
 }
 
 interface CountdownWidgetProps {
@@ -31,6 +34,8 @@ interface CountdownEvent extends EventData {
   sources: EventSource[];
   countdownDays: number;
   eventDate: Date;
+  availableSlots?: number;
+  totalSlots?: number;
 }
 
 const MAX_DISPLAYED_EVENTS = 5;
@@ -194,6 +199,8 @@ export function CountdownWidget({
 
   // Show events from bookmarked or rsvped lists only
   // For events that are in both lists, we'll track both sources
+  const [eventsWithSlots, setEventsWithSlots] = useState<CountdownEvent[]>([]);
+
   const visibleEvents = useMemo(() => {
     const eventMap = new Map<number, CountdownEvent & { sources: EventSource[] }>();
 
@@ -226,6 +233,29 @@ export function CountdownWidget({
 
     return combined.slice(0, MAX_DISPLAYED_EVENTS);
   }, [bookmarkedEvents, rsvpedEvents]);
+
+  // Load slot data for visible events
+  useEffect(() => {
+    const loadSlotData = async () => {
+      const eventsWithSlotData = await Promise.all(
+        visibleEvents.map(async (event) => {
+          const slotData = await getEventSlots(event.id);
+          return {
+            ...event,
+            availableSlots: slotData?.availableSlots,
+            totalSlots: slotData?.totalSlots,
+          };
+        })
+      );
+      setEventsWithSlots(eventsWithSlotData);
+    };
+
+    if (visibleEvents.length > 0) {
+      loadSlotData();
+    } else {
+      setEventsWithSlots([]);
+    }
+  }, [visibleEvents]);
 
   // Trigger relayout when visibility changes (events appear/disappear)
   useEffect(() => {
@@ -293,7 +323,11 @@ export function CountdownWidget({
             
             <div className="overflow-y-auto px-5 py-4 pt-3">
               <div className="space-y-3">
-                {visibleEvents.map((event) => {
+                {eventsWithSlots.map((event) => {
+                  const slotStatus = event.availableSlots !== undefined && event.totalSlots !== undefined
+                    ? getSlotStatus(event.availableSlots, event.totalSlots)
+                    : null;
+
                   return (
                     <motion.div
                       key={event.id}
@@ -314,20 +348,35 @@ export function CountdownWidget({
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800 line-clamp-2 leading-tight">{event.title}</p>
-                          <div className="flex items-center gap-2 mt-1 flex-wrap">
-                            {event.sources.includes('bookmarked') && (
-                              <span
-                                className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${sourceChipClasses['bookmarked']}`}
-                              >
-                                {sourceLabels['bookmarked']}
-                              </span>
-                            )}
-                            {event.sources.includes('rsvped') && (
-                              <span
-                                className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${sourceChipClasses['rsvped']}`}
-                              >
-                                {sourceLabels['rsvped']}
-                              </span>
+                          <div className="flex flex-col gap-1 mt-1.5">
+                            {/* Source tags */}
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              {event.sources.includes('bookmarked') && (
+                                <span
+                                  className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${sourceChipClasses['bookmarked']}`}
+                                >
+                                  {sourceLabels['bookmarked']}
+                                </span>
+                              )}
+                              {event.sources.includes('rsvped') && (
+                                <span
+                                  className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${sourceChipClasses['rsvped']}`}
+                                >
+                                  {sourceLabels['rsvped']}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Slot warning - separate row for better visibility */}
+                            {slotStatus && event.sources.includes('bookmarked') && slotStatus.status !== 'available' && (
+                              <div className={`flex items-center gap-1.5 text-xs font-medium ${
+                                slotStatus.status === 'full' ? 'text-red-600' :
+                                slotStatus.status === 'almost-full' ? 'text-red-500' :
+                                'text-orange-500'
+                              }`}>
+                                <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                                <span>{slotStatus.message}</span>
+                              </div>
                             )}
                           </div>
                         </div>

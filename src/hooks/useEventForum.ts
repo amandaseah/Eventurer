@@ -10,6 +10,7 @@ import {
   Reply
 } from "../lib/forumService";
 
+// Custom hook to manage forum posts for a specific event
 export function useEventForum(eventId: number) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isConnected, setIsConnected] = useState(true);
